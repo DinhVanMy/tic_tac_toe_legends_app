@@ -1,0 +1,73 @@
+name: tictactoe_gameapp
+description: "A new Flutter project for playing tic tac toe game." # "A new Flutter project" lastest description
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.4 <4.0.0"
+
+dependencies:
+  awesome_notifications: null
+  bottom_sheet: ^4.0.4
+  cached_network_image: ^3.3.1
+  cloud_firestore: ^4.15.10
+  concentric_transition: ^1.0.3
+  confetti: ^0.7.0
+  cupertino_icons: ^1.0.6
+  dotted_border: ^2.1.0
+  firebase_auth: ^4.18.0
+  firebase_core: ^2.27.2
+  firebase_messaging: null
+  firebase_storage: ^11.6.11
+  flutter:
+    sdk: flutter
+  flutter_inappwebview: ^6.0.0
+  flutter_settings_ui: ^3.0.1
+  flutter_svg: ^2.0.9
+  form_field_validator: ^1.1.0
+  get: ^4.6.6
+  get_storage: ^2.1.1
+  google_generative_ai: ^0.4.5
+  google_nav_bar: ^5.0.6
+  google_sign_in: ^6.2.1
+  image_picker: ^1.0.7
+  internet_connection_checker: ^2.0.0
+  just_audio: ^0.9.39
+  lite_rolling_switch: ^1.0.1
+  share_plus: ^10.0.0
+  speech_to_text: null
+  twitter_login: ^4.4.0
+  uuid: ^4.4.0
+dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^3.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icons/appLogo.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/photos/
+    - assets/audios/
+    - assets/gifs/
+    - assets/champions/
+    - assets/effectings/
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600

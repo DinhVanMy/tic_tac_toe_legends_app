@@ -1,0 +1,27 @@
+// plugins {
+//     id 'java'
+// }
+
+// java {
+//     toolchain {
+//         languageVersion = JavaLanguageVersion.of(11)
+//     }
+// }
+// allprojects {
+//     repositories {
+//         google()
+//         mavenCentral()
+//     }
+// }
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
