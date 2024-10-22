@@ -2,31 +2,29 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Controller/Animations/Overlays/profile_tooltip.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
+import 'package:tictactoe_gameapp/Enums/popup_position.dart';
+import 'package:tictactoe_gameapp/Models/user_model.dart';
 
 import '../Configs/assets_path.dart';
 
 class UserCard extends StatelessWidget {
-  final String imageUrl;
-  final String? email;
-  final String name;
-  final String coins;
+  final UserModel user;
   final String status;
-  final String role;
+
   const UserCard({
     super.key,
-    required this.imageUrl,
-    required this.name,
-    required this.coins,
-    this.status = "",
-    required this.email,
-    required this.role,
+    required this.user,
+    required this.status,
   });
 
   @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
     final AuthController authController = Get.find();
+    final ProfileTooltip profileTooltip = Get.put(ProfileTooltip());
+    final GlobalKey itemKey = GlobalKey();
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -37,7 +35,7 @@ class UserCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: email == authController.getCurrentUserEmail()
+              color: user.email == authController.getCurrentUserEmail()
                   ? Colors.blueAccent
                   : Colors.redAccent,
               width: 2,
@@ -47,14 +45,16 @@ class UserCard extends StatelessWidget {
             children: [
               const SizedBox(height: 50),
               Text(
-                name,
+                user.name ?? '',
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: Colors.deepPurple,
+                      color: user.email == authController.getCurrentUserEmail()
+                          ? Colors.blueAccent
+                          : Colors.redAccent,
                       fontWeight: FontWeight.bold,
                     ),
               ),
               Text(
-                role,
+                user.role ?? '',
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium!
@@ -70,8 +70,13 @@ class UserCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    "$coins Coins",
-                    style: Theme.of(context).textTheme.bodyMedium,
+                    "${user.totalCoins ?? "00"} Coins",
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color:
+                              user.email == authController.getCurrentUserEmail()
+                                  ? Colors.blueAccent
+                                  : Colors.redAccent,
+                        ),
                   ),
                 ],
               ),
@@ -106,29 +111,52 @@ class UserCard extends StatelessWidget {
           ),
         ),
         Positioned(
+          bottom: 50,
+          left: w / 2.6 / 2 - 110,
+          child: Image.asset(
+            BorderRanking.challBorder,
+            width: 220,
+          ),
+        ),
+        Positioned(
           top: -50,
           left: w / 2.6 / 2 - 50,
-          child: Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondary,
-              borderRadius: BorderRadius.circular(100),
-              border: Border.all(
-                color: email == authController.getCurrentUserEmail()
-                    ? Colors.blue
-                    : Colors.red,
-                width: 5,
-              ),
+          child: GestureDetector(
+            key: itemKey,
+            onTap: () => profileTooltip.showProfileTooltip(
+              context,
+              itemKey,
+              user,
+              PopupPosition.above,
+              null,
+              null,
+              null,
+              // user.email == authController.getCurrentUserEmail()
+              //     ? Colors.lightBlueAccent
+              //     : Colors.redAccent,
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondary,
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(
+                  color: user.email == authController.getCurrentUserEmail()
+                      ? Colors.blue
+                      : Colors.red,
+                  width: 5,
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: CachedNetworkImage(
+                  imageUrl: user.image ?? "",
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
               ),
             ),
           ),

@@ -60,8 +60,14 @@ class UiPlayingMultiPlayerBoard {
                         int row = index ~/ gridSize;
                         int col = index % gridSize;
                         // Xác định xem người chơi là player1 hay player2
-                        bool isPlayer1 = roomData.player1!.email == user.email;
-                        bool isPlayer2 = roomData.player2!.email == user.email;
+                        bool isPlayer1 = (roomData.player1 != null
+                                ? roomData.player1!.email
+                                : "") ==
+                            user.email;
+                        bool isPlayer2 = (roomData.player2 != null
+                                ? roomData.player2!.email
+                                : "") ==
+                            user.email;
                         bool isPlayerTurn = (controller.isXtime.value &&
                                 roomData.isXturn! &&
                                 isPlayer1) ||
@@ -103,16 +109,16 @@ class UiPlayingMultiPlayerBoard {
                     ),
                   ),
                 ),
-                if (roomData.winnerVariable != '')
-                  CustomPaint(
-                    painter: LinePainter(
-                        controller.winningLineCoordinates,
-                        gridSize,
-                        roomData.winnerVariable == 'X'
-                            ? Colors.lightBlueAccent
-                            : Colors.yellowAccent),
-                    size: Size(gridSize * 50, gridSize * 50),
-                  ),
+                // if (roomData.winnerVariable != '')
+                //   CustomPaint(
+                //     painter: LinePainter(
+                //         controller.winningLineCoordinates,
+                //         gridSize,
+                //         roomData.winnerVariable == 'X'
+                //             ? Colors.lightBlueAccent
+                //             : Colors.yellowAccent),
+                //     size: Size(gridSize * 50, gridSize * 50),
+                //   ),
               ],
             ),
           ),
@@ -157,7 +163,7 @@ class UiPlayingMultiPlayerBoard {
       children: [
         AnimatedContainer(
           duration: const Duration(milliseconds: 500),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
           decoration: BoxDecoration(
             color: controller.isXtime.value
                 ? colorScheme.primary.withOpacity(0.5)
@@ -170,19 +176,29 @@ class UiPlayingMultiPlayerBoard {
           ),
           child: Row(
             children: [
-              Image.asset(
-                controller.isXtime.value ? roomData.champX! : roomData.champO!,
-                width: 50,
-                height: 50,
-              ),
+              controller.isXtime.value
+                  ? Image.asset(
+                      roomData.champX!,
+                      width: 40,
+                      height: 40,
+                    )
+                  : Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(color: Colors.blueGrey),
+                    ),
               const SizedBox(width: 10),
-              Text(
-                "Turn",
-                style: TextStyle(
-                  fontSize: 25,
-                  color: colorScheme.primaryContainer,
-                ),
-              ),
+              controller.isXtime.value
+                  ? Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(color: Colors.blueGrey),
+                    )
+                  : Image.asset(
+                      roomData.champO!,
+                      width: 40,
+                      height: 40,
+                    ),
             ],
           ),
         ),

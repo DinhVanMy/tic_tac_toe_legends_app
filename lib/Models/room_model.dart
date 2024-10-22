@@ -19,6 +19,7 @@ class RoomModel {
   int? initialMode;
   int? winLengthMode;
   String? imageMode;
+  String? mess;
   RoomModel({
     this.id,
     this.winningPrize,
@@ -37,6 +38,7 @@ class RoomModel {
     this.initialMode,
     this.winLengthMode,
     this.imageMode,
+    this.mess,
   });
 
   RoomModel.fromJson(Map<String, dynamic> json) {
@@ -93,6 +95,9 @@ class RoomModel {
     if (json["imageMode"] is String) {
       imageMode = json["imageMode"];
     }
+    if (json["mess"] is String) {
+      mess = json["mess"];
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -122,6 +127,7 @@ class RoomModel {
     data["initialMode"] = initialMode;
     data["winLengthMode"] = winLengthMode;
     data["imageMode"] = imageMode;
+    data["mess"] = mess;
     return data;
   }
 }

@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Pages/Auth/auth_page.dart';
-import 'package:tictactoe_gameapp/Pages/GuidePage/guide_page.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/friends_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/home_page.dart';
 import 'package:tictactoe_gameapp/Pages/MainHome/main_home.dart';
 import 'package:tictactoe_gameapp/Pages/RoomPage/room_page.dart';
@@ -49,6 +49,6 @@ var pages = [
   ),
   GetPage(
     name: "/guides",
-    page: () => const GuidePage(),
+    page: () => const FriendsPage(),
   ),
 ];

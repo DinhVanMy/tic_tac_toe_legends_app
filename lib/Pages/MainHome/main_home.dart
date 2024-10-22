@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
-import 'package:tictactoe_gameapp/Controller/main_home_controller.dart';
-import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/bottom_nav_bar.dart';
+import 'package:tictactoe_gameapp/Controller/MainHome/main_home_controller.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/bottom_nav_bar.dart';
 
 class MainHomePage extends StatelessWidget {
   const MainHomePage({super.key});

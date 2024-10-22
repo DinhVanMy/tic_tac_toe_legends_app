@@ -63,7 +63,11 @@ class UiPlayingBoard {
                               onTap: isDisabled
                                   ? null
                                   : () async {
-                                      controller.makeMove(row, col);
+                                      controller.makeMove(
+                                        controller.selectedDifficultyText.value,
+                                        row,
+                                        col,
+                                      );
                                     },
                               child: Container(
                                 margin: const EdgeInsets.all(0.5),

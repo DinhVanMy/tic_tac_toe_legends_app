@@ -1,16 +1,26 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tictactoe_gameapp/Components/primary_with_icon_button.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
-import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Console/play_with_bot_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/webview_controller.dart';
-import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/drawer_nav_bar.dart';
+import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Shop/shop_page.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/bottom_button_custom.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Drawer/drawer_nav_bar.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/expansion_side_left.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/expansion_side_right.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/middle_custom_widget.dart';
+import 'package:tictactoe_gameapp/Components/fortune_wheel/fortune_wheel_page.dart';
+import 'package:tictactoe_gameapp/Components/daily_gift/daily_gift_page.dart';
+import 'package:tictactoe_gameapp/Components/daily_mission/missions_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,198 +28,673 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WebViewControllers controller = Get.put(WebViewControllers());
-    final user = Get.find<ProfileController>().readProfileNewUser();
+    final NotifyInMainController notifyInMainController =
+        controller.notifyInMainController;
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final theme = Theme.of(context);
     final PlayWithBotController playWithBotController =
         Get.put(PlayWithBotController());
     final MusicController musicController = Get.find<MusicController>();
+    final FirestoreController firestoreController =
+        Get.put(FirestoreController());
+    final ProfileController profileController = Get.find<ProfileController>();
+    final user = profileController.readProfileNewUser();
 
     return Scaffold(
       key: scaffoldKey,
-      extendBodyBehindAppBar: true,
-      drawer: const DrawerNavBar(),
-      appBar: AppBar(
-        actions: [
-          GestureDetector(
-            onTap: () {
-              musicController.boosterSoundEffect();
-              scaffoldKey.currentState!.openDrawer();
-            },
-            child: CircleAvatar(
-              radius: 40,
-              child: user.image != null && user.image!.isNotEmpty
-                  ? CircleAvatar(
-                      backgroundImage: CachedNetworkImageProvider(user.image!),
-                      maxRadius: 55,
-                    )
-                  : const Icon(Icons.person_2_outlined),
+      extendBodyBehindAppBar: false,
+      drawer: DrawerNavBar(
+        firestoreController: firestoreController,
+        profileController: profileController,
+        user: user,
+        notifyInMainController: notifyInMainController,
+      ),
+      body: Stack(
+        children: [
+          Positioned(
+            right: 0,
+            top: 30,
+            child: Container(
+              height: 45,
+              width: 200,
+              decoration: BoxDecoration(
+                color: Colors.purpleAccent.shade400,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  bottomLeft: Radius.circular(10),
+                ),
+              ),
             ),
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(
-          bottom: 0,
-          right: 20,
-          left: 20,
-          top: 20,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Column(
+          Padding(
+            padding: const EdgeInsets.only(
+              right: 20,
+              left: 20,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("TIC TAC TOE",
-                        style: theme.textTheme.headlineLarge!
-                            .copyWith(color: theme.colorScheme.primary)),
+                    Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              border: Border.all(color: Colors.blue, width: 3),
+                              boxShadow: const [
+                                BoxShadow(
+                                  spreadRadius: 2.0,
+                                  color: Colors.lightBlueAccent,
+                                  blurRadius: 15.0,
+                                  offset: Offset(3, 3),
+                                ),
+                                BoxShadow(
+                                  spreadRadius: 2.0,
+                                  color: Colors.lightBlueAccent,
+                                  blurRadius: 15.0,
+                                  offset: Offset(-3, -3),
+                                ),
+                              ]),
+                          child: CircleAvatar(
+                            radius: 30,
+                            child: user.image != null && user.image!.isNotEmpty
+                                ? CircleAvatar(
+                                    backgroundImage:
+                                        CachedNetworkImageProvider(user.image!),
+                                    maxRadius: 55,
+                                  )
+                                : const Icon(Icons.person_2_outlined),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.lightBlueAccent[400],
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(50),
+                                  bottomRight: Radius.circular(10),
+                                  topLeft: Radius.circular(30),
+                                  bottomLeft: Radius.circular(30),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "1000",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  SvgPicture.asset(
+                                    IconsPath.coinIcon,
+                                    width: 20,
+                                    colorFilter:
+                                        const ColorFilter.linearToSrgbGamma(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.lightBlueAccent[400],
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(50),
+                                  topLeft: Radius.circular(30),
+                                  bottomLeft: Radius.circular(30),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "1000",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  SvgPicture.asset(
+                                    IconsPath.coinIcon,
+                                    width: 20,
+                                    colorFilter:
+                                        const ColorFilter.linearToSrgbGamma(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              IconButton(
+                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.email,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 20,
+                                  width: 20,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(100)),
+                                  child: const Text(
+                                    "99",
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                          const SizedBox(width: 10),
+                          IconButton(
+                            onPressed: () {
+                              Get.toNamed("settings");
+                            },
+                            icon: const Icon(
+                              Icons.settings,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          IconButton(
+                            onPressed: () {
+                              // musicController.boosterSoundEffect();
+                              scaffoldKey.currentState!.openDrawer();
+                            },
+                            icon: const Icon(
+                              Icons.storage_rounded,
+                              color: Colors.lightBlueAccent,
+                              size: 30,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                const SizedBox(height: 250, child: MiddleCustomWidget()),
+                Column(
+                  children: [
+                    PrimaryIconWithButton(
+                      buttonText: "Single Player",
+                      color: theme.colorScheme.primary,
+                      onTap: () {
+                        playWithBotController.showMapPicker();
+                        // Get.toNamed("/singlePlayer");
+                      },
+                      iconPath: IconsPath.user,
+                    ),
+                    const SizedBox(height: 30),
+                    PrimaryIconWithButton(
+                      buttonText: "Multi Player",
+                      color: theme.colorScheme.primary,
+                      onTap: () {
+                        musicController.swordSoundEffect();
+                        Get.toNamed("/room");
+                      },
+                      iconPath: IconsPath.group,
+                    ),
                   ],
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(
-                      "With Multiplayer",
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: theme.colorScheme.secondary,
+                    BottomButtonCustom(
+                      onPressed: () {
+                        musicController.buttonSoundEffect();
+                        Get.toNamed("/updateProfile");
+                      },
+                      theme: theme,
+                      icon: IconsPath.info,
+                    ),
+                    BottomButtonCustom(
+                      onPressed: () {
+                        musicController.buttonSoundEffect();
+                        controller.openWebView(url: url2);
+                      },
+                      theme: theme,
+                      icon: IconsPath.game,
+                    ),
+                    BottomButtonCustom(
+                      onPressed: () {
+                        musicController.buttonSoundEffect();
+                        controller.openWebView(url: url1);
+                      },
+                      theme: theme,
+                      icon: IconsPath.github,
+                    ),
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        musicController.buttonSoundEffect();
+                        Get.to(const ShopPage());
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.secondary,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.white, width: 3),
+                          boxShadow: const [
+                            BoxShadow(
+                              spreadRadius: 2.0,
+                              color: Colors.white,
+                              blurRadius: 15.0,
+                              offset: Offset(5, 5),
+                            ),
+                            BoxShadow(
+                              spreadRadius: 2.0,
+                              color: Colors.white,
+                              blurRadius: 15.0,
+                              offset: Offset(-5, -5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.store,
+                          size: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          Positioned(
+            top: 100,
+            left: 30,
+            child: Row(
+              children: [
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Get.dialog(
+                          const Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: DailyRewardPage()),
+                          barrierDismissible: true,
+                        );
+                      },
+                      child: Image.asset(
+                        Jajas.banner,
+                        width: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const Text(
+                      "Daily",
+                      style: TextStyle(
+                        color: Colors.purple,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Get.dialog(
+                          Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: Center(
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child:
+                                            Image.asset(GifsPath.chatbotGif)),
+                                    Positioned(
+                                      top: -20,
+                                      left: 50,
+                                      right: 50,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.lightBlueAccent,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          border: Border.all(
+                                              color: Colors.purpleAccent,
+                                              width: 5),
+                                        ),
+                                        child: const Text(
+                                          "Coming Soon...",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        );
+                      },
+                      child: Image.asset(
+                        Jajas.event,
+                        width: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const Text(
+                      "Event",
+                      style: TextStyle(
+                        color: Colors.purple,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Get.dialog(
+                          const Dialog(
+                            backgroundColor: Colors.transparent,
+                            child: FortuneWheelMain(),
+                          ),
+                          barrierDismissible: false,
+                        );
+                      },
+                      child: Image.asset(
+                        Jajas.spinner,
+                        width: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const Text(
+                      "Spinner",
+                      style: TextStyle(
+                        color: Colors.purple,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Get.dialog(
+                          Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: Center(
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child:
+                                            Image.asset(GifsPath.chatbotGif)),
+                                    Positioned(
+                                      top: -20,
+                                      left: 50,
+                                      right: 50,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.lightBlueAccent,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          border: Border.all(
+                                              color: Colors.purpleAccent,
+                                              width: 5),
+                                        ),
+                                        child: const Text(
+                                          "Coming Soon...",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        );
+                      },
+                      child: Image.asset(
+                        Jajas.worldNews,
+                        width: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const Text(
+                      "Discovery",
+                      style: TextStyle(
+                        color: Colors.purple,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Get.dialog(
+                          Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: Center(
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child:
+                                            Image.asset(GifsPath.chatbotGif)),
+                                    Positioned(
+                                      top: -20,
+                                      left: 50,
+                                      right: 50,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.lightBlueAccent,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          border: Border.all(
+                                              color: Colors.purpleAccent,
+                                              width: 5),
+                                        ),
+                                        child: const Text(
+                                          "Coming Soon...",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        );
+                      },
+                      child: Image.asset(
+                        Jajas.clans,
+                        width: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const Text(
+                      "Clans",
+                      style: TextStyle(
+                        color: Colors.purple,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Column(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        Get.dialog(
+                          Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: Center(
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    ClipRRect(
+                                        borderRadius: BorderRadius.circular(20),
+                                        child:
+                                            Image.asset(GifsPath.chatbotGif)),
+                                    Positioned(
+                                      top: -20,
+                                      left: 50,
+                                      right: 50,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: Colors.lightBlueAccent,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          border: Border.all(
+                                              color: Colors.purpleAccent,
+                                              width: 5),
+                                        ),
+                                        child: const Text(
+                                          "Coming Soon...",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        );
+                      },
+                      child: Image.asset(
+                        Jajas.mission,
+                        width: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const Text(
+                      "Pass",
+                      style: TextStyle(
+                        color: Colors.purple,
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-            // SvgPicture.asset(
-            //   IconsPath.applogo,
-            //   width: 200,
-            // ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.asset(
-                GifsPath.tictactoeGif,
-                width: 200,
-              ),
-            ),
-            Column(
+          ),
+          Positioned(
+            top: 180,
+            left: 2,
+            child: Column(
               children: [
-                PrimaryIconWithButton(
-                  buttonText: "Single Player",
-                  color: theme.colorScheme.primary,
+                InkWell(
                   onTap: () {
-                    playWithBotController.showMapPicker();
-                    // Get.toNamed("/singlePlayer");
+                    Get.dialog(
+                      Dialog(
+                        backgroundColor: Colors.transparent,
+                        child: MissionsPage(
+                          userId: user.id!,
+                        ),
+                      ),
+                    );
                   },
-                  iconPath: IconsPath.user,
+                  child: Image.asset(
+                    Jajas.quest,
+                    width: 50,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                const SizedBox(height: 30),
-                PrimaryIconWithButton(
-                  buttonText: "Multi Player",
-                  color: theme.colorScheme.primary,
-                  onTap: () {
-                    musicController.swordSoundEffect();
-                    Get.toNamed("/room");
-                  },
-                  iconPath: IconsPath.group,
+                const Text(
+                  "Missions",
+                  style: TextStyle(
+                    color: Colors.purple,
+                  ),
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () {
-                    musicController.buttonSoundEffect();
-                    Get.toNamed("/updateProfile");
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.secondary,
-                      borderRadius: BorderRadius.circular(20),
-                      border:
-                          Border.all(color: Colors.deepOrangeAccent, width: 3),
-                    ),
-                    child: SvgPicture.asset(
-                      IconsPath.info,
-                      width: 40,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () {
-                    musicController.buttonSoundEffect();
-                    controller.openWebView(url: url2);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.secondary,
-                      borderRadius: BorderRadius.circular(20),
-                      border:
-                          Border.all(color: Colors.deepOrangeAccent, width: 3),
-                    ),
-                    child: SvgPicture.asset(
-                      IconsPath.game,
-                      width: 40,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () {
-                    musicController.buttonSoundEffect();
-                    controller.openWebView(url: url1);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.secondary,
-                      borderRadius: BorderRadius.circular(20),
-                      border:
-                          Border.all(color: Colors.deepOrangeAccent, width: 3),
-                    ),
-                    child: SvgPicture.asset(
-                      IconsPath.github,
-                      width: 40,
-                    ),
-                  ),
-                ),
-                InkWell(
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () {
-                    musicController.buttonSoundEffect();
-                    logoutMessage(context);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.secondary,
-                      borderRadius: BorderRadius.circular(20),
-                      border:
-                          Border.all(color: Colors.deepOrangeAccent, width: 3),
-                    ),
-                    child: Image.asset(
-                      "assets/icons/icon_signout.png",
-                      width: 40,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
+          ),
+          const ExpansionSideWidgetLeft(),
+          const ExpansionSideWidgetRight(),
+        ],
       ),
     );
   }
-
-  // Future<Uint8List> _loadImageData(String path) async {
-  //   File imageFile = File(path);
-  //   Uint8List imageBytes = await imageFile.readAsBytes();
-  //   return imageBytes;
-  // }
 }
+
+// ClipRRect(
+//                   borderRadius: BorderRadius.circular(20),
+//                   child: Image.asset(
+//                     GifsPath.tictactoeGif,
+//                     width: 50,
+//                   ),
+//                 ),

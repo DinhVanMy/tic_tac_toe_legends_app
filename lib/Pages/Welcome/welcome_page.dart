@@ -10,11 +10,17 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     var pages = [
       Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(ImagePath.background1),
+            fit: BoxFit.cover,
+          ),
+        ),
         padding: const EdgeInsets.all(30),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(ImagePath.welcome1),
             const Text(
               "Welcome",
               style: TextStyle(
@@ -30,15 +36,22 @@ class WelcomePage extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
+            Image.asset(ImagePath.welcome1, width: 100),
           ],
         ),
       ),
       Container(
         padding: const EdgeInsets.all(30),
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(ImagePath.background1),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(ImagePath.welcome2),
             const Text(
               "Compete",
               style: TextStyle(
@@ -54,16 +67,25 @@ class WelcomePage extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
+            Image.asset(ImagePath.welcome2, width: 100),
           ],
         ),
       ),
       Container(
         padding: const EdgeInsets.all(30),
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(ImagePath.background3),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               ImagePath.welcome3,
+              width: 100,
             ),
             const Text(
               "Earn points for each game and make your way to top the scoreboard!",
@@ -73,7 +95,10 @@ class WelcomePage extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            TextButton(
+            const SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
               onPressed: () {
                 Get.offAllNamed("/auth");
               },
@@ -89,12 +114,15 @@ class WelcomePage extends StatelessWidget {
 
     return Scaffold(
       body: ConcentricPageView(
-        colors: const [Colors.red, Colors.blue, Colors.green],
+        colors: const [
+          Colors.transparent,
+          Colors.transparent,
+          Colors.transparent,
+        ],
         itemCount: 3,
         physics: const BouncingScrollPhysics(),
         onFinish: () {
-          // print("Completetd");
-          // Get.offAll(AuthPage());
+          Get.offAllNamed("/auth");
         },
         itemBuilder: (index) {
           return pages[index];

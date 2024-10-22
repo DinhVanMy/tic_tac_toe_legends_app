@@ -13,8 +13,11 @@ import 'package:tictactoe_gameapp/Controller/notification_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Splace/splace_page.dart';
+import 'package:tictactoe_gameapp/Test/test.dart';
+
 import 'firebase_options.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -29,21 +32,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LanguageController languageController = Get.put(LanguageController());
+
     Get.put(NotificationController());
     return GetMaterialApp(
       initialBinding: BindingsBuilder(() {
         Get.put(ThemeController(), permanent: true);
-        Get.put(AuthController(),permanent: true);
-        Get.put(ProfileController(),permanent: true);
+        Get.put(AuthController(), permanent: true);
+        Get.put(ProfileController(), permanent: true);
         Get.put(MusicController(), permanent: true);
-        //  Get.put(ThemeController(), permanent: false);
-        // Get.put(AuthController(),permanent: false);
-        // Get.put(ProfileController(),permanent: false);
-        // Get.put(MusicController(), permanent: false);
         //! Get.put(CheckNetworkController());
       }),
       // initialRoute: '/splace',
-      getPages: pages,
+      getPages: pages, navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'XO Game App',
       theme: lightTheme,
@@ -52,6 +52,9 @@ class MyApp extends StatelessWidget {
       locale: languageController.locale,
       fallbackLocale: const Locale('en'),
       home: const SplacePage(),
+      //  const MultiPlayer(
+      //   roomId: "339C80AB",
+      // ),
     );
   }
 }

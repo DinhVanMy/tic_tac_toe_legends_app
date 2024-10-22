@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/countdown_animation_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_play_controller.dart';
+import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Models/room_model.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Widgets/core/countdown_waiting_widget.dart';
 
@@ -19,8 +21,10 @@ class PlayWithPlayerController extends GetxController {
   RxList<RxList<String>> board = RxList<RxList<String>>();
   RxList<Offset> winningLineCoordinates = <Offset>[].obs;
   RxBool isXtime = true.obs;
-  RxInt xScore = 0.obs;
-  RxInt oScore = 0.obs;
+  // RxInt xScore = 0.obs;
+  // RxInt oScore = 0.obs;
+  RxBool isProcessing1 = false.obs;
+  RxBool isProcessing2 = false.obs;
   RxString winner = ''.obs;
   var roomModel = Rx<RoomModel?>(null);
   RxInt initialSize = 3.obs;
@@ -30,8 +34,15 @@ class PlayWithPlayerController extends GetxController {
   int currentWin = 0;
   int currentCoin = 0;
   StreamSubscription<DocumentSnapshot>? roomSubscription;
+  late int? currentCoinPlayer1;
+  late int? winningPrize;
+  late int? currentCoinPlayer2;
+  late int? currentWinPlayer1;
+  late int? currentWinPlayer2;
 
   final db = FirebaseFirestore.instance;
+  final String currentUserEmail =
+      Get.find<AuthController>().getCurrentUserEmail();
   final MusicPlayController musicPlayController =
       Get.put(MusicPlayController());
   final MusicController musicController = Get.find();
@@ -46,6 +57,7 @@ class PlayWithPlayerController extends GetxController {
 
       initialSize.value = roomModel.value!.initialMode!;
       winLength.value = roomModel.value!.winLengthMode!;
+
       board.value = List.generate(initialSize.value, (_) {
         return List.generate(initialSize.value, (_) => '').obs;
       }).obs;
@@ -54,8 +66,18 @@ class PlayWithPlayerController extends GetxController {
         "gameValue": board.expand((row) => row).toList(),
       });
 
+      winningPrize = int.tryParse(roomModel.value!.winningPrize!);
+      currentCoinPlayer1 =
+          int.tryParse(roomModel.value!.player1!.totalCoins ?? "0");
+      currentWinPlayer1 =
+          int.tryParse(roomModel.value!.player1!.totalWins ?? "0");
+      currentCoinPlayer2 =
+          int.tryParse(roomModel.value!.player2!.totalCoins ?? "0");
+      currentWinPlayer2 =
+          int.tryParse(roomModel.value!.player2!.totalWins ?? "0");
+
       roomSubscription =
-          db.collection("rooms").doc(roomId).snapshots().listen((event) {
+          db.collection("rooms").doc(roomId).snapshots().listen((event) async {
         RoomModel updatedRoomModel = RoomModel.fromJson(event.data()!);
 
         // Kiểm tra nếu gameValue có sự thay đổi
@@ -88,7 +110,25 @@ class PlayWithPlayerController extends GetxController {
           //     );
           //   },
           // ).obs;
+          // board.refresh();
         }
+        // if (updatedRoomModel.isXturn!) {
+        //   await musicPlayController.playSoundPlayer1();
+        // } else {
+        //   await musicPlayController.playSoundPlayer2();
+        // }
+        // if (updatedRoomModel.player1 != null || updatedRoomModel.player2 != null) {
+        //   if (updatedRoomModel.player1!.quickMess != null ||
+        //       updatedRoomModel.player2!.quickMess != null) {
+        //     removeMessage(updatedRoomModel);
+        //   }
+        // }
+        // if (updatedRoomModel.player1 != null || updatedRoomModel.player2 != null) {
+        //   if (updatedRoomModel.player1!.quickEmote != null ||
+        //       updatedRoomModel.player2!.quickEmote != null) {
+        //     removeEmote(updatedRoomModel);
+        //   }
+        // }
       }, onError: (error) {
         errorMessage("Error fetching room details: $error");
       });
@@ -114,8 +154,6 @@ class PlayWithPlayerController extends GetxController {
         await db.collection("rooms").doc(roomData.id!).update({
           "winnerVariable": winner.value,
         });
-        await scoreCalculateWinner(winner: winner.value, roomData: roomData);
-        await scoreCalculateLoser(winner: winner.value, roomData: roomData);
       } else {
         if (isBoardFull()) {
           advancedExpand++;
@@ -214,10 +252,9 @@ class PlayWithPlayerController extends GetxController {
     return false;
   }
 
-  Future<void> winnerDialog(String winner, RoomModel roomData) async {
-    await scoreCalculateWinner(winner: winner, roomData: roomData);
-    await musicPlayController.playSoundWinner();
-    await Get.defaultDialog(
+  void winnerDialog(String winner, RoomModel roomData) {
+    musicPlayController.playSoundWinner();
+    Get.defaultDialog(
       barrierDismissible: false,
       title: "VICTORY",
       backgroundColor: Colors.white,
@@ -259,14 +296,24 @@ class PlayWithPlayerController extends GetxController {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        resetPlayValue(roomData.id!);
+                      onPressed: () async {
+                        isProcessing1.value = true;
+                        await scoreCalculateWinner(
+                            winner: winner, roomData: roomData);
+                        await resetPlayValue(roomData.id!);
+                        // Get.back();
+                        // Get.back();
+                        // Get.back();
+                        isProcessing1.value = false;
+                        Get.until((route) => route.isFirst);
                       },
                       child: const Text("Play Again"),
                     ),
                     ElevatedButton(
-                      onPressed: () {
-                        musicController.stopMusicOnScreen6();
+                      onPressed: () async {
+                        await scoreCalculateWinner(
+                            winner: winner, roomData: roomData);
+                        await deleteRoom(roomData.id!);
                         Get.offAllNamed("/mainHome");
                       },
                       child: const Text("Exit"),
@@ -276,17 +323,37 @@ class PlayWithPlayerController extends GetxController {
               ],
             ),
           ),
-          const Center(
-            child: ConfettiWidgetCustom(),
-          )
+          isProcessing1.value
+              ? Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    child: const SizedBox(),
+                  ),
+                )
+              : const SizedBox(),
+          isProcessing1.value
+              ? Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Image.asset(
+                      GifsPath.loadingGif,
+                      width: 200,
+                      height: 200,
+                    ),
+                  ),
+                )
+              : const SizedBox(),
+          // const Center(
+          //   child: ConfettiWidgetCustom(),
+          // )
         ],
       ),
     );
   }
 
-  Future<void> defeatDialog(String winner, RoomModel roomData) async {
-    await musicPlayController.playSoundLoser();
-    await Get.defaultDialog(
+  void defeatDialog(String winner, RoomModel roomData) {
+    musicPlayController.playSoundLoser();
+    Get.defaultDialog(
       barrierDismissible: false,
       title: "DEFEAT",
       backgroundColor: Colors.white,
@@ -328,15 +395,25 @@ class PlayWithPlayerController extends GetxController {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        resetPlayValue(roomData.id!);
+                      onPressed: () async {
+                        isProcessing2.value = true;
+                        await scoreCalculateLoser(
+                            winner: winner, roomData: roomData);
+                        await resetPlayValue(roomData.id!);
+                        // Get.back();
+                        // Get.back();
+                        // Get.back();
+                        isProcessing2.value = false;
+                        Get.until((route) => route.isFirst);
                       },
                       child: const Text("Play Again"),
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        musicController.stopMusicOnScreen6();
-                        await Get.offAllNamed("/mainHome");
+                        await scoreCalculateLoser(
+                            winner: winner, roomData: roomData);
+                        await deleteRoom(roomData.id!);
+                        Get.offAllNamed("/mainHome");
                       },
                       child: const Text("Exit"),
                     )
@@ -345,6 +422,26 @@ class PlayWithPlayerController extends GetxController {
               ],
             ),
           ),
+          isProcessing2.value
+              ? Positioned.fill(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    child: const SizedBox(),
+                  ),
+                )
+              : const SizedBox(),
+          isProcessing2.value
+              ? Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Image.asset(
+                      GifsPath.loadingGif,
+                      width: 200,
+                      height: 200,
+                    ),
+                  ),
+                )
+              : const SizedBox(),
         ],
       ),
     );
@@ -352,38 +449,44 @@ class PlayWithPlayerController extends GetxController {
 
   Future<void> initializeBoard(String roomId) async {
     initialSize.value = roomModel.value!.initialMode!;
-    board.value = List.generate(initialSize.value, (_) {
-      return List.generate(initialSize.value, (_) => '').obs;
-    }).obs;
+    final List<String> emptyBoard =
+        List.filled(initialSize.value * initialSize.value, '');
+
     await db.collection("rooms").doc(roomId).update({
-      "gameValue": board.expand((row) => row).toList(),
-      "winnerVariable": '',
+      "gameValue": emptyBoard, // Reset game values to empty
+      "winnerVariable": '', // Reset winner
     });
-    board.refresh();
+
+    // Update local board state
+    board.value = List.generate(initialSize.value, (rowIndex) {
+      return RxList<String>.from(emptyBoard.sublist(
+          rowIndex * initialSize.value, (rowIndex + 1) * initialSize.value));
+    }).obs;
   }
 
   Future<void> resetPlayValue(String roomId) async {
     await initializeBoard(roomId);
-    Get.back();
+    roomModel.update((room) {
+      room!.gameValue = List.filled(initialSize.value * initialSize.value, '');
+      room.winnerVariable = '';
+    });
+    board.refresh();
   }
 
   Future<void> scoreCalculateWinner({
     required String winner,
     required RoomModel roomData,
   }) async {
-    int? winningPrize = int.tryParse(roomData.winningPrize!);
-
-    int? currentCoinPlayer1 = int.tryParse(roomData.player1!.totalCoins ?? "0");
-    int? currentWinPlayer1 = int.tryParse(roomData.player1!.totalWins ?? "0");
-    int? currentCoinPlayer2 = int.tryParse(roomData.player2!.totalCoins ?? "0");
-    int? currentWinPlayer2 = int.tryParse(roomData.player2!.totalWins ?? "0");
-
     if (winner == "X") {
       int? newCoinsPlayer1 = currentCoinPlayer1! + winningPrize!;
       int? newWinsPlayer1 = currentWinPlayer1! + 1;
       await db.collection('users').doc(roomData.player1!.id!).update({
         'totalCoins': newCoinsPlayer1.toString(),
         'totalWins': newWinsPlayer1.toString(),
+      }).catchError((e) => errorMessage(e.toString()));
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player1.totalCoins": newCoinsPlayer1.toString(),
+        "player1.totalWins": newWinsPlayer1.toString(),
       }).catchError((e) => errorMessage(e.toString()));
     } else {
       int? newCoinsPlayer2 = currentCoinPlayer2! + winningPrize!;
@@ -392,6 +495,10 @@ class PlayWithPlayerController extends GetxController {
         'totalCoins': newCoinsPlayer2.toString(),
         'totalWins': newWinsPlayer2.toString(),
       }).catchError((e) => errorMessage(e.toString()));
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player2.totalCoins": newCoinsPlayer2.toString(),
+        "player2.totalWins": newWinsPlayer2.toString(),
+      }).catchError((e) => errorMessage(e.toString()));
     }
   }
 
@@ -399,13 +506,6 @@ class PlayWithPlayerController extends GetxController {
     required String winner,
     required RoomModel roomData,
   }) async {
-    int? winningPrize = int.tryParse(roomData.winningPrize!);
-
-    int? currentCoinPlayer1 = int.tryParse(roomData.player1!.totalCoins ?? "0");
-    int? currentWinPlayer1 = int.tryParse(roomData.player1!.totalWins ?? "0");
-    int? currentCoinPlayer2 = int.tryParse(roomData.player2!.totalCoins ?? "0");
-    int? currentWinPlayer2 = int.tryParse(roomData.player2!.totalWins ?? "0");
-
     if (winner == "X") {
       int? newCoinsPlayer2 = currentCoinPlayer2! - winningPrize!;
       int? newWinsPlayer2 = currentWinPlayer2! - 1;
@@ -413,12 +513,262 @@ class PlayWithPlayerController extends GetxController {
         'totalCoins': newCoinsPlayer2.toString(),
         'totalWins': newWinsPlayer2.toString(),
       }).catchError((e) => errorMessage(e.toString()));
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player2.totalCoins": newCoinsPlayer2.toString(),
+        "player2.totalWins": newWinsPlayer2.toString(),
+      }).catchError((e) => errorMessage(e.toString()));
     } else {
       int? newCoinsPlayer1 = currentCoinPlayer1! - winningPrize!;
       int? newWinsPlayer1 = currentWinPlayer1! - 1;
       await db.collection('users').doc(roomData.player1!.id!).update({
         'totalCoins': newCoinsPlayer1.toString(),
         'totalWins': newWinsPlayer1.toString(),
+      }).catchError((e) => errorMessage(e.toString()));
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player1.totalCoins": newCoinsPlayer1.toString(),
+        "player1.totalWins": newWinsPlayer1.toString(),
+      }).catchError((e) => errorMessage(e.toString()));
+    }
+  }
+
+  Future<String> updateRoomWhenPlayerLeaves(String roomId) async {
+    try {
+      // Lấy thông tin của room từ Firestore
+      var roomSnapshot = await db.collection('rooms').doc(roomId).get();
+      var roomData = roomSnapshot.data() as Map<String, dynamic>;
+      if (roomData['player1'] != null &&
+          roomData['player1']['email'] == currentUserEmail) {
+        return "Player 1 has left the room";
+      } else if (roomData['player2'] != null &&
+          roomData['player2']['email'] == currentUserEmail) {
+        await db.collection('rooms').doc(roomId).update({
+          'player2': null,
+          'player2Status': "",
+        }).catchError((e) => errorMessage(e.toString()));
+        return "Player 2 has left the room";
+      } else {
+        return "";
+      }
+    } catch (error) {
+      return error.toString();
+    }
+  }
+
+  //delete room
+  Future<void> deleteRoom(String roomId) async {
+    String checkedPlayerLeave = await updateRoomWhenPlayerLeaves(roomId);
+    if (checkedPlayerLeave == "Player 1 has left the room") {
+      await db
+          .collection("rooms")
+          .doc(roomId)
+          .delete()
+          .catchError((e) => errorMessage(e.toString()));
+    } else if (checkedPlayerLeave == "Player 2 has left the room") {
+      errorMessage("You has left the room");
+    }
+  }
+
+  void chatFeature(BuildContext context) {
+    final TextEditingController textController = TextEditingController();
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 100,
+          height: 300,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.lightBlueAccent.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: DefaultTabController(
+            length: 2,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: textController,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: const BorderSide(color: Colors.black),
+                            ),
+                            labelText: 'Type your message...',
+                            labelStyle: const TextStyle(
+                              fontSize: 13.0,
+                            )),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.send,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        sendMessage(textController.text, roomModel.value!);
+                        FocusScope.of(context).unfocus();
+                        textController.clear();
+                        Get.back();
+                      },
+                    ),
+                  ],
+                ),
+                const TabBar(
+                  labelColor: Colors.white,
+                  indicatorColor: Colors.blueAccent,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  unselectedLabelColor: Colors.grey,
+                  tabs: [
+                    Tab(icon: Icon(Icons.message)),
+                    Tab(icon: Icon(Icons.history)),
+                  ],
+                ),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      ListView.builder(
+                        itemCount: quickChatMessages.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              quickChatMessages[index],
+                              style: const TextStyle(
+                                  fontSize: 13.0, color: Colors.white),
+                            ),
+                          );
+                        },
+                      ),
+                      ListView.builder(
+                        itemCount: quickChatMessages.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              quickChatMessages[index],
+                              style: const TextStyle(
+                                  fontSize: 13.0, color: Colors.white),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                )
+                // Expanded(
+                //   child: ListView.builder(
+                //     itemCount: quickChatMessages.length,
+                //     itemBuilder: (context, index) {
+                //       return Padding(
+                //         padding: const EdgeInsets.symmetric(vertical: 8.0),
+                //         child: Text(
+                //           quickChatMessages[index],
+                //           style: const TextStyle(
+                //               fontSize: 13.0, color: Colors.white),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> sendMessage(String text, RoomModel roomData) async {
+    if (roomData.player1!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player1.quickMess": text,
+      }).catchError((e) => errorMessage(e.toString()));
+    } else if (roomData.player2!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player2.quickMess": text,
+      }).catchError((e) => errorMessage(e.toString()));
+    }
+  }
+
+  Future<void> removeMessage(RoomModel roomData) async {
+    await Future.delayed(const Duration(seconds: 5));
+    if (roomData.player1!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player1.quickMess": null,
+      }).catchError((e) => errorMessage(e.toString()));
+    } else if (roomData.player2!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player2.quickMess": null,
+      }).catchError((e) => errorMessage(e.toString()));
+    }
+  }
+
+  void emoteFeature(BuildContext context, RoomModel roomData) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 100,
+          height: 200,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.lightBlueAccent.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Expanded(
+            child: GridView.builder(
+              scrollDirection: Axis.vertical,
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+              ),
+              itemCount: emotes.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    sendEmote(emotes[index], roomData);
+                    Get.back();
+                  },
+                  child: Image.asset(
+                    emotes[index],
+                    fit: BoxFit.cover,
+                    width: 100,
+                    height: 100,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> sendEmote(String imagePath, RoomModel roomData) async {
+    if (roomData.player1!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player1.quickEmote": imagePath,
+      }).catchError((e) => errorMessage(e.toString()));
+    } else if (roomData.player2!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player2.quickEmote": imagePath,
+      }).catchError((e) => errorMessage(e.toString()));
+    }
+  }
+
+  Future<void> removeEmote(RoomModel roomData) async {
+    await Future.delayed(const Duration(seconds: 5));
+    if (roomData.player1!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player1.quickEmote": null,
+      }).catchError((e) => errorMessage(e.toString()));
+    } else if (roomData.player2!.email == currentUserEmail) {
+      await db.collection("rooms").doc(roomData.id!).update({
+        "player2.quickEmote": null,
       }).catchError((e) => errorMessage(e.toString()));
     }
   }
@@ -455,7 +805,7 @@ class PlayWithPlayerController extends GetxController {
   ];
   List<String> modeTexts = ['3 x 3', '6 x 6', '9 x 9', '11 x 11', '15 x 15'];
   List<int> initialMode = [3, 6, 9, 11, 15];
-  List<int> winLengthMode = [6, 4, 5, 6, 7];
+  List<int> winLengthMode = [3, 4, 5, 6, 7];
   List<String> winningPrizeTexts = [
     '1 Coins',
     '10 Coins',

@@ -1,12 +1,13 @@
 // chat_screen.dart
 import 'dart:io';
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
-import 'package:tictactoe_gameapp/Controller/gemini_api_controller.dart';
+import 'package:tictactoe_gameapp/Data/gemini_api_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/speech_to_text_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Chat/Widgets/chat_mess_item.dart';
@@ -28,8 +29,7 @@ class ChatBotPage extends StatelessWidget {
         GlobalKey<RefreshIndicatorState>();
     RxString imagePath = "".obs;
     XFile? image;
-    double appBarHeight =
-        AppBar().preferredSize.height; // Lấy chiều cao của AppBar
+    double appBarHeight = AppBar().preferredSize.height;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -43,21 +43,25 @@ class ChatBotPage extends StatelessWidget {
           ),
         ),
         backgroundColor: Colors.lightBlueAccent,
-        title: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const CircleAvatar(
-                backgroundImage: AssetImage(GifsPath.androidGif),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.volume_up,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  backgroundImage: AssetImage(GifsPath.androidGif),
                 ),
-              ),
-              Row(
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.volume_up,
+                  ),
+                ),
+              ],
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Obx(() {
                     return Text(
@@ -89,8 +93,7 @@ class ChatBotPage extends StatelessWidget {
                                         File(user.image!),
                                         errorBuilder:
                                             (context, error, stackTrace) {
-                                          return const Icon(Icons
-                                              .error); //TODO Hiển thị icon nếu lỗi
+                                          return const Icon(Icons.error);
                                         },
                                       ),
                                       Image.asset(
@@ -109,43 +112,47 @@ class ChatBotPage extends StatelessWidget {
                   ),
                 ],
               ),
-              Obx(
-                () {
-                  return speechController.isListening.value
-                      ? IconButton(
-                          onPressed: () async {
-                            await speechController.stopListening();
-                            if (speechController.lastWords.value.isNotEmpty) {
-                              await chatController
-                                  .sendPrompt(speechController.lastWords.value);
-                            } else {
-                              await chatController
-                                  .sendPrompt("Can you hear me?");
-                            }
-                          },
-                          icon: const Icon(
-                            Icons.done_outline_rounded,
-                          ),
+            ),
+            Row(
+              children: [
+                Obx(
+                  () {
+                    return speechController.isListening.value
+                        ? IconButton(
+                            onPressed: () async {
+                              await speechController.stopListening();
+                              if (speechController.lastWords.value.isNotEmpty) {
+                                await chatController.sendPrompt(
+                                    speechController.lastWords.value);
+                              } else {
+                                await chatController
+                                    .sendPrompt("Can you hear me?");
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.done_outline_rounded,
+                            ),
+                          )
+                        : IconButton(
+                            onPressed: () async {
+                              await speechController.startListening();
+                            },
+                            icon: const Icon(Icons.mic),
+                          );
+                  },
+                ),
+                CircleAvatar(
+                  child: user.image != null && user.image!.isNotEmpty
+                      ? CircleAvatar(
+                          backgroundImage:
+                              CachedNetworkImageProvider(user.image!),
+                          maxRadius: 55,
                         )
-                      : IconButton(
-                          onPressed: () async {
-                            await speechController.startListening();
-                          },
-                          icon: const Icon(Icons.mic),
-                        );
-                },
-              ),
-              CircleAvatar(
-                child: user.image != null && user.image!.isNotEmpty
-                    ? CircleAvatar(
-                        backgroundImage:
-                            CachedNetworkImageProvider(user.image!),
-                        maxRadius: 55,
-                      )
-                    : const Icon(Icons.person_2_outlined),
-              ),
-            ],
-          ),
+                      : const Icon(Icons.person_2_outlined),
+                ),
+              ],
+            )
+          ],
         ),
       ),
       body: Padding(
@@ -263,13 +270,25 @@ class ChatBotPage extends StatelessWidget {
                             ),
                             Center(
                               child: Obx(() => chatController.isLoading.value
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: Image.asset(
-                                        GifsPath.loadingGif,
-                                        height: 200,
-                                        width: 200,
-                                      ),
+                                  ? Stack(
+                                      children: [
+                                        Positioned.fill(
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                                sigmaX: 5.0, sigmaY: 5.0),
+                                            child: const SizedBox(),
+                                          ),
+                                        ),
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          child: Image.asset(
+                                            GifsPath.loadingGif,
+                                            height: 200,
+                                            width: 200,
+                                          ),
+                                        ),
+                                      ],
                                     )
                                   : const SizedBox()),
                             )
@@ -331,8 +350,6 @@ class ChatBotPage extends StatelessWidget {
                       ),
                       suffixIcon: IconButton(
                         onPressed: () async {
-                          // imagePath.value = await profileController
-                          //     .pickImage(ImageSource.camera);
                           image = await profileController
                               .pickFileX(ImageSource.camera);
                           if (image != null) {

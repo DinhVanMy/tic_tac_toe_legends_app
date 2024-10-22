@@ -41,15 +41,17 @@ class PrimaryIconWithButton extends StatelessWidget {
           children: [
             SvgPicture.asset(
               iconPath,
-              width: 30,
+              width: 40,
             ),
             const SizedBox(
               width: 10,
             ),
             Text(
               buttonText,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.primaryContainer),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ],
         ),

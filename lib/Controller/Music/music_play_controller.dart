@@ -61,6 +61,15 @@ class MusicPlayController extends GetxController {
     );
   }
 
+  // Future<void> playSoundPlayer3() async {
+  //   await _player.setAsset(AudioSPath.coins); // Load file nhạc
+  //     _player.play(); // Phát nhạc
+  // } 
+  // Future<void> playSoundPlayer4() async {
+  //   await _player.setAsset(AudioSPath.coins); // Load file nhạc
+  //     _player.play(); // Phát nhạc
+  // } 
+
   // @override
   // void onClose() {
   //   _player.dispose();

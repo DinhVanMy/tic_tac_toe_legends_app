@@ -29,15 +29,29 @@ class BodyMultiPlayer extends StatelessWidget {
     return Obx(() {
       final RoomModel? roomData = playWithPlayerController.roomModel.value;
       if (roomData == null) {
-        return const Column(
+        return Column(
           children: [
-            CircularProgressIndicator(),
-            Text("No data"),
+            const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 5.0,
+                color: Colors.blueAccent,
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Text(
+              "No data",
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
           ],
         );
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (roomData.winnerVariable != "") {
+        // await Future.delayed(const Duration(seconds: 2));
+        if (roomData.winnerVariable != "" &&
+            roomData.player1 != null &&
+            roomData.player2 != null) {
           if (roomData.winnerVariable == "X" &&
               roomData.player1!.email == userModel.email) {
             playWithPlayerController.winnerDialog(
@@ -51,6 +65,18 @@ class BodyMultiPlayer extends StatelessWidget {
                 roomData.winnerVariable!, roomData);
           }
         }
+        if (roomData.player1 != null && roomData.player2 != null) {
+          if (roomData.player1!.quickMess != null ||
+              roomData.player2!.quickMess != null) {
+            playWithPlayerController.removeMessage(roomData);
+          }
+        }
+        if (roomData.player1 != null && roomData.player2 != null) {
+          if (roomData.player1!.quickEmote != null ||
+              roomData.player2!.quickEmote != null) {
+            playWithPlayerController.removeEmote(roomData);
+          }
+        }
       });
 
       return Column(
@@ -59,65 +85,278 @@ class BodyMultiPlayer extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                children: [
-                  InGameUserCard(
-                    icon: IconsPath.xIcon,
-                    name: roomData.player1!.name!,
-                    imageUrl: roomData.player1!.image!,
-                    color: roomData.isXturn! ? Colors.red : Colors.white,
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 25),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
+              roomData.player1 != null
+                  ? Column(
                       children: [
-                        SvgPicture.asset(
-                          IconsPath.wonIcon,
+                        Stack(
+                          children: [
+                            InGameUserCard(
+                              icon: IconsPath.xIcon,
+                              name: roomData.player1!.name!,
+                              imageUrl: roomData.player1!.image!,
+                              color:
+                                  roomData.isXturn! ? Colors.red : Colors.white,
+                              coins: roomData.player1!.totalCoins!,
+                            ),
+                            roomData.player1!.quickMess != null
+                                ? Positioned(
+                                    right: 0,
+                                    child: Container(
+                                      height: 100,
+                                      width: 100,
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.all(12.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withOpacity(0.9),
+                                        borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(30),
+                                          bottomLeft: Radius.circular(30),
+                                          bottomRight: Radius.circular(30),
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Text(
+                                          roomData.player1!.quickMess ?? "",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            roomData.player1!.quickEmote != null
+                                ? Positioned(
+                                    right: 0,
+                                    child: Container(
+                                      height: 100,
+                                      width: 100,
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.all(12.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withOpacity(0.9),
+                                        borderRadius: const BorderRadius.only(
+                                          topRight: Radius.circular(50),
+                                          bottomLeft: Radius.circular(50),
+                                          bottomRight: Radius.circular(50),
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: Image.asset(
+                                          roomData.player1!.quickEmote!,
+                                          width: 70,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Text("WON : ${roomData.player1!.totalWins}")
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 5),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    IconsPath.wonIcon,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text("WON : ${roomData.player1!.totalWins}")
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      playWithPlayerController
+                                          .chatFeature(context);
+                                    },
+                                    icon: const Icon(Icons.messenger_outline),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.mic_none),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      playWithPlayerController.emoteFeature(
+                                          context, roomData);
+                                    },
+                                    icon: const Icon(
+                                        Icons.emoji_emotions_outlined),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
                       ],
-                    ),
-                  )
-                ],
-              ),
-              Column(
-                children: [
-                  InGameUserCard(
-                    icon: IconsPath.oIcon,
-                    name: roomData.player2!.name!,
-                    imageUrl: roomData.player2!.image!,
-                    color: roomData.isXturn! ? Colors.white : Colors.blue,
-                  ),
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 25),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
+                    )
+                  : const CircularProgressIndicator(),
+              roomData.player2 != null
+                  ? Column(
                       children: [
-                        SvgPicture.asset(
-                          IconsPath.wonIcon,
+                        Stack(
+                          children: [
+                            InGameUserCard(
+                              icon: IconsPath.oIcon,
+                              name: roomData.player2!.name!,
+                              imageUrl: roomData.player2!.image!,
+                              color: roomData.isXturn!
+                                  ? Colors.white
+                                  : Colors.blue,
+                              coins: roomData.player2!.totalCoins!,
+                            ),
+                            roomData.player2!.quickMess != null
+                                ? Positioned(
+                                    left: 0,
+                                    child: Container(
+                                      height: 100,
+                                      width: 100,
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.all(12.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.9),
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(30),
+                                          bottomLeft: Radius.circular(30),
+                                          bottomRight: Radius.circular(30),
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: SingleChildScrollView(
+                                        child: Text(
+                                          roomData.player2!.quickMess ?? "",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            roomData.player2!.quickEmote != null
+                                ? Positioned(
+                                    left: 0,
+                                    child: Container(
+                                      height: 100,
+                                      width: 100,
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.all(12.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.9),
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(50),
+                                          bottomLeft: Radius.circular(50),
+                                          bottomRight: Radius.circular(50),
+                                        ),
+                                        boxShadow: const [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(2, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: Image.asset(
+                                          roomData.player2!.quickEmote!,
+                                          width: 70,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Text("WON : ${roomData.player2!.totalWins}")
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 5),
+                          decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    IconsPath.wonIcon,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text("WON : ${roomData.player2!.totalWins}")
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      playWithPlayerController
+                                          .chatFeature(context);
+                                    },
+                                    icon: const Icon(Icons.messenger_outline),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(Icons.mic_none),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      playWithPlayerController.emoteFeature(
+                                          context, roomData);
+                                    },
+                                    icon: const Icon(
+                                        Icons.emoji_emotions_outlined),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
                       ],
-                    ),
-                  )
-                ],
-              ),
+                    )
+                  : const CircularProgressIndicator(),
             ],
           ),
-          const SizedBox(height: 30),
+          const SizedBox(height: 10),
           uiPlayingMultiPlayerBoard.buildGameBoard(
               w,
               playWithPlayerController,

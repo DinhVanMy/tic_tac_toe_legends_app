@@ -6,7 +6,7 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
-import 'package:tictactoe_gameapp/Models/firebase_exception.dart';
+import 'package:tictactoe_gameapp/Enums/firebase_exception.dart';
 
 Future<void> registerBottomSheet(BuildContext context) async {
   await showFlexibleBottomSheet(

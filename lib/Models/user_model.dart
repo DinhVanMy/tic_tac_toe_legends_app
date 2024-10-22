@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class UserModel {
   String? id;
   String? name;
@@ -6,7 +8,11 @@ class UserModel {
   String? totalWins;
   String? role;
   String? totalCoins;
-  String? yourTurn;
+  String? quickMess;
+  String? quickEmote;
+  List<String>? friendsList;
+  String? status;
+  Timestamp? lastActive;
 
   UserModel({
     this.role,
@@ -16,7 +22,11 @@ class UserModel {
     this.image,
     this.totalWins,
     this.totalCoins,
-    this.yourTurn,
+    this.quickMess,
+    this.quickEmote,
+    this.friendsList,
+    this.status,
+    this.lastActive,
   });
 
   UserModel.fromJson(Map<String, dynamic> json) {
@@ -41,8 +51,20 @@ class UserModel {
     if (json["totalCoins"] is String) {
       totalCoins = json["totalCoins"];
     }
-    if (json["yourTurn"] is String) {
-      yourTurn = json["yourTurn"];
+    if (json["quickMess"] is String) {
+      quickMess = json["quickMess"];
+    }
+    if (json["quickEmote"] is String) {
+      quickEmote = json["quickEmote"];
+    }
+    if (json["friendsList"] is List<String>) {
+      friendsList = List<String>.from(json["friendsList"] ?? []);
+    }
+    if (json["status"] is String) {
+      status = json["status"];
+    }
+    if (json["lastActive"] is Timestamp) {
+      lastActive = json["lastActive"];
     }
   }
 
@@ -55,7 +77,11 @@ class UserModel {
     data["totalWins"] = totalWins;
     data["role"] = role;
     data["totalCoins"] = totalCoins;
-    data["yourTurn"] = yourTurn;
+    data["quickMess"] = quickMess;
+    data["quickEmote"] = quickEmote;
+    data["friendsList"] = friendsList;
+    data["status"] = status;
+    data["lastActive"] = lastActive;
     return data;
   }
 }

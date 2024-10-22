@@ -8,6 +8,7 @@ import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/PlayerGame/multi_player.dart';
+import 'package:tictactoe_gameapp/Pages/LobbyPage/Widget/end_drawer_lobby.dart';
 import 'package:tictactoe_gameapp/Pages/LobbyPage/Widget/game_info.dart';
 import 'package:tictactoe_gameapp/Pages/LobbyPage/Widget/room_info.dart';
 import 'package:tictactoe_gameapp/Controller/matching_controller.dart';
@@ -33,8 +34,8 @@ class LobbyPage extends StatelessWidget {
         Get.put(PlayWithPlayerController());
     final ProfileController profileController = Get.find<ProfileController>();
     final user = profileController.readProfileNewUser();
-
-    final musicController = Get.find<MusicController>();
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+    // final musicController = Get.find<MusicController>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // musicController.playMusicOnScreen7();
       // Get.find<NotificationController>().showNotification(
@@ -44,6 +45,11 @@ class LobbyPage extends StatelessWidget {
       // );
     });
     return Scaffold(
+      key: scaffoldKey,
+      endDrawer: EndDrawerLobby(
+        roomId: roomId,
+        user: user,
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -97,6 +103,7 @@ class LobbyPage extends StatelessWidget {
                       room.player2Status == "ready") {
                     WidgetsBinding.instance.addPostFrameCallback((_) async {
                       await Future.delayed(const Duration(seconds: 2));
+                      // musicController.stopMusicOnScreen7();
                       Get.to(MultiPlayer(
                         roomId: roomId,
                       ));
@@ -116,12 +123,8 @@ class LobbyPage extends StatelessWidget {
                             children: [
                               player1 != null
                                   ? UserCard(
-                                      imageUrl: player1.image ?? '',
-                                      name: player1.name ?? 'Player 1',
-                                      coins: player1.totalCoins ?? "00",
-                                      status: room.player1Status ?? 'waiting',
-                                      email: player1.email ?? "No Email",
-                                      role: player1.role ?? 'anonymous',
+                                      user: player1,
+                                      status: room.player1Status ?? "",
                                     )
                                   : SizedBox(
                                       width: w / 2.6,
@@ -132,12 +135,8 @@ class LobbyPage extends StatelessWidget {
                                     ),
                               player2 != null
                                   ? UserCard(
-                                      imageUrl: player2.image ?? '',
-                                      name: player2.name ?? 'Player 2',
-                                      coins: player2.totalCoins ?? "00",
-                                      status: room.player2Status ?? 'waiting',
-                                      email: player2.email ?? "No Email",
-                                      role: player2.role ?? 'guest',
+                                      user: player2,
+                                      status: room.player2Status ?? "",
                                     )
                                   : SizedBox(
                                       width: w / 2.6,
@@ -206,33 +205,74 @@ class LobbyPage extends StatelessWidget {
                                                       ),
                                                     ),
                                                   )
-                                                : ElevatedButton.icon(
-                                                    onPressed: () {
-                                                      matchController
-                                                          .findingPlayer2();
-                                                    },
-                                                    label:
-                                                        const Text("Finding"),
-                                                    icon: const Icon(
-                                                      Icons.search,
-                                                    ),
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      foregroundColor:
-                                                          Colors.blue,
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal: 20,
-                                                          vertical: 12),
-                                                      backgroundColor:
-                                                          Colors.white,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(50),
+                                                : Column(
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          scaffoldKey
+                                                              .currentState!
+                                                              .openEndDrawer();
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(15),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                            border: Border.all(
+                                                              color:
+                                                                  Colors.grey,
+                                                              width: 5,
+                                                            ),
+                                                          ),
+                                                          child: const Icon(
+                                                            Icons.add,
+                                                            color:
+                                                                Colors.black87,
+                                                            size: 40,
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
+                                                      const SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      ElevatedButton.icon(
+                                                        onPressed: () {
+                                                          matchController
+                                                              .findingPlayer2();
+                                                        },
+                                                        label: const Text(
+                                                            "Finding"),
+                                                        icon: const Icon(
+                                                          Icons.search,
+                                                        ),
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          foregroundColor:
+                                                              Colors.blue,
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      20,
+                                                                  vertical: 12),
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                           ],
                                         ),

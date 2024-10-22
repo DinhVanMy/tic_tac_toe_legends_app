@@ -2,7 +2,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/draws.dart';
-import 'package:tictactoe_gameapp/Controller/confetti_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Animations/confetti_controller.dart';
 
 class ConfettiWidgetCustom extends StatelessWidget {
   const ConfettiWidgetCustom({super.key});

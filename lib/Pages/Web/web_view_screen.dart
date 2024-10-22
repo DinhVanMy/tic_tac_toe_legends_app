@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 
-class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+class UltizeScreen extends StatelessWidget {
+  const UltizeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    const String url =
-        "https://ant.games/?utm_source=gg&utm_campaign=arb-161872";
     return Scaffold(
       body: SafeArea(
         child: InAppWebView(
-          initialUrlRequest: URLRequest(url: WebUri(url)),
+          initialUrlRequest: URLRequest(url: WebUri(url2)),
           keepAlive: InAppWebViewKeepAlive(),
           key: GlobalKey(),
         ),

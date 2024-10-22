@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Controller/online_status_controller.dart';
 
 class SplaceController extends GetxController {
   final auth = FirebaseAuth.instance;
@@ -15,6 +16,7 @@ class SplaceController extends GetxController {
     if (auth.currentUser == null) {
       Get.offAllNamed("/welcome");
     } else {
+      Get.put(OnlineStatusController());
       Get.offAllNamed("/mainHome");
     }
   }

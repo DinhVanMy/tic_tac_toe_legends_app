@@ -84,7 +84,9 @@ class ProfileController extends GetxController {
   }
 
   Future<String> pickImage(ImageSource source) async {
-    final XFile? image = await picker.pickImage(source: source);
+    final XFile? image = await picker.pickImage(
+      source: source,
+    );
     if (image != null) {
       return image.path;
     } else {
@@ -93,7 +95,11 @@ class ProfileController extends GetxController {
   }
 
   Future<XFile?> pickFileX(ImageSource source) async {
-    final XFile? image = await picker.pickImage(source: source);
+    final XFile? image = await picker.pickImage(
+      source: source,
+      maxHeight: 240,
+      maxWidth: 320,
+    );
     return image;
   }
 

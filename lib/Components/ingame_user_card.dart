@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 
 class InGameUserCard extends StatelessWidget {
   final String icon;
   final String name;
   final String imageUrl;
   final Color color;
-  const InGameUserCard(
-      {super.key,
-      required this.icon,
-      required this.name,
-      required this.imageUrl,
-      required this.color});
+  final String coins;
+  const InGameUserCard({
+    super.key,
+    required this.icon,
+    required this.name,
+    required this.imageUrl,
+    required this.color,
+    required this.coins,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,7 @@ class InGameUserCard extends StatelessWidget {
       children: [
         Container(
           width: w / 2.6,
-          height: 160,
+          height: 180,
           decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: BorderRadius.circular(20),
@@ -30,6 +34,7 @@ class InGameUserCard extends StatelessWidget {
                 width: 5,
               )),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
               Text(
@@ -39,7 +44,7 @@ class InGameUserCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
               Container(
                 padding:
                     const EdgeInsets.symmetric(vertical: 5, horizontal: 30),
@@ -58,7 +63,18 @@ class InGameUserCard extends StatelessWidget {
                     ),
                   ],
                 ),
-              )
+              ),
+              const SizedBox(height: 5),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(
+                    IconsPath.coinIcon,
+                  ),
+                  const SizedBox(width: 10),
+                  Text("Coins : $coins")
+                ],
+              ),
             ],
           ),
         ),

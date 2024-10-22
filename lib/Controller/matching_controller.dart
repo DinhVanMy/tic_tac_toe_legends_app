@@ -21,7 +21,6 @@ class MatchingController extends GetxController {
   RxBool isFindingPlayer2 = false.obs;
 
   final auth = FirebaseAuth.instance;
-  final db = FirebaseFirestore.instance;
   var uuid = const Uuid();
   RxBool isLoading = false.obs;
   Rx<UserModel> user = UserModel().obs;
@@ -52,7 +51,7 @@ class MatchingController extends GetxController {
           .update(newQueue.toJson())
           .catchError((e) => errorMessage(e.toString()));
 
-      await Future.delayed(const Duration(seconds: 2));
+      // await Future.delayed(const Duration(seconds: 2));
 
       // Lắng nghe thay đổi trong hàng đợi
       matchListener = _firestore.collection('matchings').snapshots().listen(
@@ -77,7 +76,7 @@ class MatchingController extends GetxController {
                 await createMatch();
               } else {
                 // Đợi người chơi khác tạo phòng
-                await Future.delayed(const Duration(seconds: 5));
+                await Future.delayed(const Duration(seconds: 3));
                 await waitForOpponentRoom(opponent['userId']);
               }
             }
@@ -108,7 +107,6 @@ class MatchingController extends GetxController {
       email: user.value.email,
       totalWins: user.value.totalWins,
       totalCoins: user.value.totalCoins,
-      yourTurn: "X",
       role: "Admin",
     );
 
@@ -117,12 +115,13 @@ class MatchingController extends GetxController {
       player1: player1,
       gameStatus: "lobby",
       player1Status: "waiting",
+      player2Status: "",
       isXturn: true,
       createdAt: DateTime.now(),
     );
 
     try {
-      await db
+      await _firestore
           .collection("rooms")
           .doc(id)
           .set(newRoom.toJson())
@@ -139,18 +138,17 @@ class MatchingController extends GetxController {
   Future<void> waitForOpponentRoom(String opponentId) async {
     var player2 = UserModel(
       id: opponentId,
-      name: user.value.name, // Load thông tin đối thủ
+      name: user.value.name,
       image: user.value.image,
       email: user.value.email,
       totalWins: user.value.totalWins,
       totalCoins: user.value.totalCoins,
-      yourTurn: "O",
       role: "player",
     );
     matchListener = _firestore
         .collection('rooms')
         .where('player1.id', isEqualTo: opponentId)
-        .where('player2Status', isEqualTo: null)
+        .where('player2Status', isEqualTo: "")
         .orderBy('createdAt', descending: true)
         .limit(1)
         .snapshots()
@@ -161,10 +159,10 @@ class MatchingController extends GetxController {
         _firestore.collection("rooms").doc(roomId).get().then((docSnapshot) {
           if (docSnapshot.exists) {
             // Tiến hành cập nhật
-            db.collection("rooms").doc(roomId).update({
+            _firestore.collection("rooms").doc(roomId).update({
               "player2": player2.toJson(),
               "player2Status": "waiting",
-            });
+            }).catchError((e) => errorMessage(e.toString()));
             cancelMatching();
             Get.to(LobbyPage(roomId: roomId));
           }
@@ -208,10 +206,8 @@ class MatchingController extends GetxController {
           roomData['player2']['email'] == currentUserEmail) {
         // Nếu player2 là người thoát phòng
         await _firestore.collection('rooms').doc(roomId).update({
-          // 'player2': FieldValue.delete(),
-          // 'player2Status': FieldValue.delete(),
-          'player2': null,
-          'player2Status': null,
+          'player2': "",
+          'player2Status': "",
         }).catchError((e) => errorMessage(e.toString()));
         return "Player 2 has left the room";
       } else {
@@ -226,7 +222,7 @@ class MatchingController extends GetxController {
   Future<void> deleteRoom(String roomId) async {
     String checkedPlayerLeave = await updateRoomWhenPlayerLeaves(roomId);
     if (checkedPlayerLeave == "Player 1 has left the room") {
-      await db
+      await _firestore
           .collection("rooms")
           .doc(roomId)
           .delete()
@@ -272,7 +268,7 @@ class MatchingController extends GetxController {
 
   // Lấy thông tin người chơi hiện tại
   Future<void> getUserDetails() async {
-    await db.collection("users").doc(auth.currentUser?.uid).get().then((value) {
+    await _firestore.collection("users").doc(auth.currentUser?.uid).get().then((value) {
       user.value = UserModel.fromJson(value.data()!);
     });
   }
@@ -289,23 +285,4 @@ class MatchingController extends GetxController {
     cancelMatching();
     super.onClose();
   }
-
-  //check delete
-  // Future<void> deleteRoomIfEmpty(String roomId) async {
-  //   try {
-  //     // Lấy thông tin của room từ Firestore
-  //     var roomSnapshot = await _firestore.collection('rooms').doc(roomId).get();
-  //     var roomData = roomSnapshot.data() as Map<String, dynamic>;
-
-  //     // Kiểm tra nếu cả player1 và player2 đều là null hoặc không tồn tại
-  //     if ((roomData['player1'] == null || roomData['player1']['id'] == null) &&
-  //         (roomData['player2'] == null || roomData['player2']['id'] == null)) {
-  //       await deleteRoom(roomId);
-  //     } else {
-  //       errorMessage("You are the only player");
-  //     }
-  //   } catch (error) {
-  //     errorMessage(error.toString());
-  //   }
-  // }
 }

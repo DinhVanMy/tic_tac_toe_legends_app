@@ -1,19 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Models/room_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/LobbyPage/lobby_page.dart';
 import 'package:uuid/uuid.dart';
 
 class RoomController extends GetxController {
-  final auth = FirebaseAuth.instance;
+  final AuthController auth = Get.find();
   final db = FirebaseFirestore.instance;
   var uuid = const Uuid();
   RxBool isLoading = false.obs;
   Rx<UserModel> user = UserModel().obs;
   Rx<RoomModel?> roomData = Rx<RoomModel?>(null);
+
   @override
   void onInit() {
     super.onInit();
@@ -30,7 +31,6 @@ class RoomController extends GetxController {
       email: user.value.email,
       totalWins: user.value.totalWins,
       totalCoins: user.value.totalCoins,
-      yourTurn: "X",
       role: "admin",
     );
     var newRoom = RoomModel(
@@ -38,6 +38,7 @@ class RoomController extends GetxController {
       player1: player1,
       gameStatus: "lobby",
       player1Status: "waiting",
+      player2Status: "",
       isXturn: true,
       createdAt: DateTime.now(),
     );
@@ -57,9 +58,14 @@ class RoomController extends GetxController {
   }
 
   Future<void> getUserDetails() async {
-    await db.collection("users").doc(auth.currentUser?.uid).get().then((value) {
+    await db
+        .collection("users")
+        .doc(auth.getCurrentUserId())
+        .get()
+        .then((value) {
       user.value = UserModel.fromJson(value.data()!);
     });
+    await deleteOldRoom();
   }
 
   void getRoomDetails(String roomId) {
@@ -93,8 +99,8 @@ class RoomController extends GetxController {
       name: user.value.name,
       image: user.value.image,
       email: user.value.email,
-      totalWins: "0",
-      yourTurn: "O",
+      totalWins: user.value.totalWins,
+      totalCoins: user.value.totalCoins,
       role: "player",
     );
     try {
@@ -117,5 +123,29 @@ class RoomController extends GetxController {
         "player2Status": status,
       },
     );
+  }
+
+  Future<void> deleteOldRoom() async {
+    final Timestamp sevenDaysAgo = Timestamp.fromDate(
+      DateTime.now().subtract(const Duration(days: 1)),
+    );
+
+    try {
+      QuerySnapshot snapshot = await db
+          .collection('rooms')
+          .where('createdAt', isLessThan: sevenDaysAgo)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        await db
+            .collection('rooms')
+            .doc(doc.id)
+            .delete()
+            .catchError((e) => errorMessage('Error deleting old messages: $e'));
+      }
+      print('Deleted rooms yesterday');
+    } catch (e) {
+      errorMessage('Error deleting old messages: $e');
+    }
   }
 }

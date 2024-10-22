@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/PlayerGame/body_multi_player.dart';
 import 'package:tictactoe_gameapp/Controller/Console/play_with_player_controller.dart';
@@ -12,7 +11,7 @@ class MultiPlayer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PlayWithPlayerController playWithPlayerController =
-        Get.find<PlayWithPlayerController>();
+        Get.put<PlayWithPlayerController>(PlayWithPlayerController());
     playWithPlayerController.getRoomDetails(roomId);
     final ProfileController profileController = Get.find<ProfileController>();
     final user = profileController.readProfileNewUser();

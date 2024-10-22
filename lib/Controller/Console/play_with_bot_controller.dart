@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:isolate';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,6 +12,7 @@ import 'package:tictactoe_gameapp/Controller/Animations/countdown_animation_cont
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_play_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Models/minimax_arg.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Widgets/core/countdown_waiting_widget.dart';
 
 class PlayWithBotController extends GetxController {
@@ -38,10 +41,10 @@ class PlayWithBotController extends GetxController {
     }).obs;
   }
 
-  void makeMove(int row, int col) async {
+  void makeMove(String difficulty, int row, int col) async {
     if (board[row][col] == '' && winner.value == '') {
       board[row][col] = isXtime.value ? 'X' : 'O';
-      await musicPlayController.playSoundPlayer1();
+      // await musicPlayController.playSoundPlayer1();
       board.refresh();
       if (checkWinner(row, col)) {
         winner.value = isXtime.value ? 'X' : 'O';
@@ -55,8 +58,9 @@ class PlayWithBotController extends GetxController {
           }
         }
         if (winner.value == '') {
-          await musicPlayController.playSoundPlayer2();
-          await playWithAI();
+          // await musicPlayController.playSoundPlayer2();
+          // await playWithAI();
+          await playWithAILevels(difficulty);
         }
       }
     }
@@ -264,7 +268,9 @@ class PlayWithBotController extends GetxController {
     }
   }
 
+  //Medium difficulty: Default Difficulty
   Future<void> playWithAI() async {
+    print("this is playWithAI()");
     // Tìm tất cả các ô trống
     var emptyCells = <List<int>>[];
     for (int row = 0; row < board.length; row++) {
@@ -317,11 +323,481 @@ class PlayWithBotController extends GetxController {
     }
   }
 
+  // Hard difficulty: Heuristic approach (can be further refined)
+  Map<String, int> memo = {};
+  Future<void> playWithAIHeuristic() async {
+    var emptyCells = <List<int>>[];
+
+    // Tìm tất cả các ô trống
+    for (int row = 0; row < board.length; row++) {
+      for (int col = 0; col < board[row].length; col++) {
+        if (board[row][col] == '') {
+          emptyCells.add([row, col]);
+        }
+      }
+    }
+
+    // Ưu tiên 1: Kiểm tra nếu AI có thể thắng
+    for (var cell in emptyCells) {
+      int row = cell[0];
+      int col = cell[1];
+      board[row][col] = isXtime.value ? 'X' : 'O'; // AI thử đi
+      if (checkWinner(row, col)) {
+        board.refresh();
+        winner.value = isXtime.value ? 'X' : 'O';
+        await winnerDialog(winner.value);
+        return;
+      } else {
+        board[row][col] = '';
+      }
+    }
+
+    // Ưu tiên 2: Ngăn chặn đối thủ nếu họ có 2 nước có thể thắng
+    for (var cell in emptyCells) {
+      int row = cell[0];
+      int col = cell[1];
+      board[row][col] = isXtime.value ? 'O' : 'X'; // Giả định đối thủ đi
+      if (checkTwoInARow(row, col)) {
+        board[row][col] = isXtime.value ? 'X' : 'O'; // AI đi để ngăn chặn
+        board.refresh();
+        togglePlayer();
+        return;
+      } else {
+        board[row][col] = '';
+      }
+    }
+
+    //! Ưu tiên 3: Ngăn chặn đối thủ nếu họ có thể thắng
+    // for (var cell in emptyCells) {
+    //   int row = cell[0];
+    //   int col = cell[1];
+    //   board[row][col] = isXtime.value ? 'O' : 'X'; // Giả định đối thủ đi
+    //   if (checkWinner(row, col)) {
+    //     board[row][col] = isXtime.value ? 'X' : 'O'; // AI đi để ngăn chặn
+    //     board.refresh();
+    //     togglePlayer(); // Đổi lượt lại cho người chơi
+    //     return;
+    //   } else {
+    //     board[row][col] = ''; // Hoàn tác nếu không phải nước đi ngăn chặn
+    //   }
+    // }
+
+    // Tối ưu hóa tìm nước đi bằng Minimax với giới hạn thời gian 1 giây
+    var bestMove = await computeBestMoveWithinTimeLimit(emptyCells);
+
+    // Thực hiện nước đi tốt nhất nếu có
+    if (bestMove[0] != -1 && bestMove[1] != -1) {
+      board[bestMove[0]][bestMove[1]] = isXtime.value ? 'X' : 'O';
+      board.refresh();
+      togglePlayer();
+    }
+  }
+
+// Hàm kiểm tra xem có 2 nước có thể thắng không
+  bool checkTwoInARow(int lastRow, int lastCol) {
+    // Kiểm tra hàng, cột và đường chéo
+    return (checkDirection(lastRow, lastCol, 1, 0) || // Kiểm tra hàng
+        checkDirection(lastRow, lastCol, 0, 1) || // Kiểm tra cột
+        checkDirection(lastRow, lastCol, 1, 1) || // Kiểm tra đường chéo /
+        checkDirection(lastRow, lastCol, 1, -1)); // Kiểm tra đường chéo \
+  }
+
+  bool checkDirection(int row, int col, int deltaRow, int deltaCol) {
+    int count = 0;
+
+    for (int i = -1; i <= 1; i += 2) {
+      int r = row;
+      int c = col;
+
+      while (true) {
+        r += deltaRow * i;
+        c += deltaCol * i;
+
+        if (r < 0 ||
+            r >= board.length ||
+            c < 0 ||
+            c >= board[r].length ||
+            board[r][c] != (isXtime.value ? 'O' : 'X')) {
+          break;
+        }
+        count++;
+      }
+    }
+
+    return count >= 2; // Trả về true nếu có 2 nước có thể thắng
+  }
+
+// Hàm này sử dụng Timer để đảm bảo tính toán trong vòng 1 giây
+  Future<List<int>> computeBestMoveWithinTimeLimit(
+      List<List<int>> emptyCells) async {
+    List<int> bestMove = [-1, -1];
+    int bestScore = -9999;
+
+    // memo.clear();
+
+    Completer<void> completer = Completer<void>();
+
+    Timer timer = Timer(const Duration(seconds: 5), () {
+      if (!completer.isCompleted) {
+        completer.complete(); // Kết thúc nếu vượt quá 1 giây
+      }
+    });
+
+    for (var cell in emptyCells) {
+      int row = cell[0];
+      int col = cell[1];
+      board[row][col] = isXtime.value ? 'X' : 'O'; // AI thử đi
+      int score = heuristic(
+        0,
+        true,
+        row,
+        col,
+        DateTime.now(),
+        -9999,
+        9999,
+      ); // Gọi minimax để tính điểm
+      print("isMaximizing --> memo : $memo , bestScore : $score");
+      board[row][col] = ''; // Hoàn tác nước đi
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMove = [row, col]; // Lưu lại nước đi tốt nhất
+      }
+
+      if (completer.isCompleted) break; // Kiểm tra nếu timer đã hết
+    }
+
+    timer.cancel(); // Hủy timer nếu chưa hết giờ
+    return bestMove;
+  }
+
+  int heuristic(int depth, bool isMaximizing, int lastRow, int lastCol,
+      DateTime startTime, int alpha, int beta) {
+    if (DateTime.now().difference(startTime).inMilliseconds > 1000) {
+      return 0; // Trả về điểm trung lập nếu vượt quá 1 giây
+    }
+
+    String boardState = boardToString();
+    if (memo.containsKey(boardState)) {
+      return memo[boardState]!;
+    }
+
+    if (checkWinner(lastRow, lastCol)) {
+      return isMaximizing ? 10 - depth : depth - 10;
+    }
+    if (isBoardFull()) {
+      return 0; // Trả về 0 nếu hòa
+    }
+
+    if (isMaximizing) {
+      int bestScore = -9999;
+      for (int row = 0; row < board.length; row++) {
+        for (int col = 0; col < board[row].length; col++) {
+          if (board[row][col] == '') {
+            board[row][col] = 'X'; // AI thử đi
+            int score = heuristic(depth + 1, false, row, col, startTime, alpha,
+                beta); // Đệ quy minimax
+            board[row][col] = ''; // Hoàn tác nước đi
+            bestScore = max(score, bestScore);
+            alpha = max(alpha, score); // Cập nhật giá trị alpha
+            if (beta <= alpha) {
+              break; // Cắt tỉa nhánh này
+            }
+          }
+        }
+      }
+      memo[boardState] = bestScore;
+      return bestScore;
+    } else {
+      int bestScore = 9999;
+      for (int row = 0; row < board.length; row++) {
+        for (int col = 0; col < board[row].length; col++) {
+          if (board[row][col] == '') {
+            board[row][col] = 'O'; // Người chơi thử đi
+            int score = heuristic(depth + 1, true, row, col, startTime, alpha,
+                beta); // Đệ quy minimax
+            board[row][col] = ''; // Hoàn tác nước đi
+            bestScore = min(score, bestScore);
+            beta = min(beta, score); // Cập nhật giá trị beta
+            if (beta <= alpha) {
+              break; // Cắt tỉa nhánh này
+            }
+          }
+        }
+      }
+      memo[boardState] = bestScore;
+      return bestScore;
+    }
+  }
+
+// Chuyển trạng thái bàn cờ thành chuỗi để làm khóa cho memoization
+  String boardToString() {
+    return board.map((row) => row.join()).join();
+  }
+
+  // Easy difficulty: Random moves
+  Future<void> playWithAIRandom() async {
+    print("this is playWithAIRandom");
+    var emptyCells = <List<int>>[];
+    for (int row = 0; row < board.length; row++) {
+      for (int col = 0; col < board[row].length; col++) {
+        if (board[row][col] == '') {
+          emptyCells.add([row, col]);
+        }
+      }
+    }
+    // Ưu tiên 1: Kiểm tra nếu AI có thể thắng
+    for (var cell in emptyCells) {
+      int row = cell[0];
+      int col = cell[1];
+      board[row][col] = isXtime.value ? 'X' : 'O'; // AI thử đi
+      if (checkWinner(row, col)) {
+        // Nếu AI có thể thắng, thực hiện nước đi này
+        board.refresh();
+        winner.value = isXtime.value ? 'X' : 'O';
+        await winnerDialog(winner.value);
+        return;
+      } else {
+        board[row][col] = ''; // Hoàn tác nếu không phải nước thắng
+      }
+    }
+    // Ưu tiên 2: Chọn ngẫu nhiên ô trống nếu không có nước nào đặc biệt
+    if (emptyCells.isNotEmpty) {
+      var randomCell = emptyCells[Random().nextInt(emptyCells.length)];
+      // await Future.delayed(const Duration(milliseconds: 500));
+      board[randomCell[0]][randomCell[1]] = isXtime.value ? 'X' : 'O';
+      board.refresh();
+      togglePlayer();
+    }
+  }
+
+  // Very hard difficulty: Minimax algorithm
+  Rx<Offset> bestMove = const Offset(-1, -1).obs;
+
+  // Hàm Minimax chạy trong Isolate
+  Future<void> playWithAIMinimaximus() async {
+    ReceivePort receivePort = ReceivePort();
+    await Isolate.spawn(_minimaxIsolate, receivePort.sendPort);
+
+    SendPort isolateSendPort = await receivePort.first;
+    ReceivePort responsePort = ReceivePort();
+
+    MinimaxArguments args = MinimaxArguments(
+      board: board,
+      currentPlayer: isXtime.value ? 'X' : 'O',
+      depth: 0,
+      alpha: -1000,
+      beta: 1000,
+      winLength: winLength.value,
+    );
+
+    isolateSendPort.send([args, responsePort.sendPort]);
+
+    // Đặt giới hạn thời gian 1 giây
+    Future.delayed(const Duration(seconds: 1), () {
+      responsePort.close();
+      receivePort.close();
+    });
+    try {
+      // Nhận kết quả từ isolate và cập nhật bestMove
+      var result = await responsePort.first;
+      Offset bestMove = result; // Kết quả từ Minimax
+
+      // Thực hiện nước đi tốt nhất
+      if (bestMove.dx != -1 && bestMove.dy != -1) {
+        int row = bestMove.dx.toInt();
+        int col = bestMove.dy.toInt();
+        board[row][col] =
+            isXtime.value ? 'X' : 'O'; // Cập nhật trạng thái bàn cờ
+        board.refresh();
+        // togglePlayer();
+        int winnerScore = checkWinnerState(board, winLength.value);
+        if (winnerScore != 0) {
+          winner.value = isXtime.value ? 'X' : 'O';
+          winnerDialog(winner.value);
+        } else {
+          togglePlayer();
+          if (isBoardFull()) {
+            expandBoard();
+          }
+        }
+      }
+
+      // Đóng các cổng sau khi hoàn tất
+      responsePort.close();
+      receivePort.close();
+    } catch (e) {
+      errorMessage("$e");
+    }
+  }
+
+  // Hàm xử lý Minimax trong Isolate
+  static void _minimaxIsolate(SendPort sendPort) async {
+    ReceivePort isolateReceivePort = ReceivePort();
+    sendPort.send(isolateReceivePort.sendPort);
+
+    await for (var message in isolateReceivePort) {
+      List<dynamic> arguments = message as List<dynamic>;
+      MinimaxArguments args = arguments[0];
+      SendPort replyPort = arguments[1];
+
+      // Gọi hàm minimax xử lý
+      Offset bestMove = minimax(
+        args.board,
+        args.currentPlayer,
+        args.depth,
+        args.alpha,
+        args.beta,
+        args.winLength,
+      );
+
+      replyPort.send(bestMove);
+    }
+  }
+
+  // Hàm Minimax với Alpha-Beta Pruning
+  static Offset minimax(
+    List<List<String>> board,
+    String currentPlayer,
+    int depth,
+    int alpha,
+    int beta,
+    int winLength,
+  ) {
+    // Hàm kiểm tra xem trò chơi đã kết thúc hay chưa
+    bool isGameOver(List<List<String>> board, int winLength) {
+      return checkWinnerState(board, winLength) != 0;
+    }
+
+// Trong hàm Minimax
+    if (isGameOver(board, winLength) || depth >= 4) {
+      return const Offset(
+          -1, -1); // Trả về move không hợp lệ nếu tìm thấy kết quả
+    }
+
+    int bestScore = (currentPlayer == 'X') ? -1000 : 1000;
+    Offset bestMove = const Offset(-1, -1);
+
+    // Duyệt qua tất cả các ô trống
+    for (int row = 0; row < board.length; row++) {
+      for (int col = 0; col < board[row].length; col++) {
+        if (board[row][col] == '') {
+          board[row][col] = currentPlayer; // Giả lập nước đi
+
+          // Đệ quy gọi minimax
+          int score = minimax(
+            board,
+            currentPlayer == 'X' ? 'O' : 'X',
+            depth + 1,
+            alpha,
+            beta,
+            winLength,
+          ).dx.toInt();
+
+          board[row][col] = ''; // Undo move
+
+          // Cập nhật alpha-beta pruning
+          if (currentPlayer == 'X') {
+            if (score > bestScore) {
+              bestScore = score;
+              bestMove = Offset(row.toDouble(), col.toDouble());
+              alpha = bestScore;
+            }
+          } else {
+            if (score < bestScore) {
+              bestScore = score;
+              bestMove = Offset(row.toDouble(), col.toDouble());
+              beta = bestScore;
+            }
+          }
+
+          // Nếu alpha >= beta, cắt tỉa
+          if (alpha >= beta) {
+            return bestMove;
+          }
+        }
+      }
+    }
+
+    return bestMove;
+  }
+
+  static int checkWinnerState(List<List<String>> board, int winLength) {
+    int n = board.length;
+
+    // Kiểm tra từng ô trên bảng
+    for (int row = 0; row < n; row++) {
+      for (int col = 0; col < n; col++) {
+        String currentPlayer = board[row][col];
+
+        // Bỏ qua ô trống
+        if (currentPlayer == '') continue;
+
+        // Kiểm tra hàng ngang
+        if (col + winLength <= n) {
+          if (List.generate(winLength, (index) => board[row][col + index])
+              .every((element) => element == currentPlayer)) {
+            return currentPlayer == 'X'
+                ? 10
+                : -10; // X thắng trả về +10, O thắng trả về -10
+          }
+        }
+
+        // Kiểm tra hàng dọc
+        if (row + winLength <= n) {
+          if (List.generate(winLength, (index) => board[row + index][col])
+              .every((element) => element == currentPlayer)) {
+            return currentPlayer == 'X' ? 10 : -10;
+          }
+        }
+
+        // Kiểm tra đường chéo chính (top-left đến bottom-right)
+        if (row + winLength <= n && col + winLength <= n) {
+          if (List.generate(
+                  winLength, (index) => board[row + index][col + index])
+              .every((element) => element == currentPlayer)) {
+            return currentPlayer == 'X' ? 10 : -10;
+          }
+        }
+
+        // Kiểm tra đường chéo phụ (top-right đến bottom-left)
+        if (row + winLength <= n && col - winLength >= -1) {
+          if (List.generate(
+                  winLength, (index) => board[row + index][col - index])
+              .every((element) => element == currentPlayer)) {
+            return currentPlayer == 'X' ? 10 : -10;
+          }
+        }
+      }
+    }
+    return 0;
+  }
+
+  Future<void> playWithAILevels(String difficulty) async {
+    switch (difficulty) {
+      case 'Easy':
+        await playWithAIRandom();
+        break;
+      case 'Medium':
+        await playWithAI();
+        break;
+      case 'Hard':
+        await playWithAIHeuristic();
+        break;
+      case 'Extreme':
+        await playWithAIMinimaximus();
+        break;
+      default:
+        await playWithAI();
+    }
+  }
+
   var isImagePicked = false.obs;
   var selectedImagePath = "".obs;
   var selectedImageX = "".obs;
   var selectedImageXHeroIndex = (-1).obs;
   var selectedImageO = "".obs;
+  var selectedDifficultyText = "".obs;
   var selectedImageOHeroIndex = (-1).obs;
   var selectedImageIndex = (-1).obs;
   var selectedModeIndex = (-1).obs;
@@ -347,8 +823,8 @@ class PlayWithBotController extends GetxController {
   ];
   List<String> modeTexts = ['3 x 3', '6 x 6', '9 x 9', '11 x 11', '15 x 15'];
   List<int> initialMode = [3, 6, 9, 11, 15];
-  List<int> winLengthMode = [3, 4, 5, 6, 7];
-  List<String> difficultyTexts = ['Easy', 'Medium', 'Hard', 'Death'];
+  List<int> winLengthMode = [3, 5, 7, 9, 10];
+  List<String> difficultyTexts = ['Easy', 'Medium', 'Hard', 'Extreme'];
 
   void selectImage(String path, int index) {
     selectedImagePath.value = path;
@@ -371,7 +847,8 @@ class PlayWithBotController extends GetxController {
     selectedImageOHeroIndex.value = index;
   }
 
-  void selectDifficulty(int index) {
+  void selectDifficulty(String difficulty, int index) {
+    selectedDifficultyText.value = difficulty;
     selectedDifficultyIndex.value = index;
   }
 
@@ -669,24 +1146,33 @@ class PlayWithBotController extends GetxController {
                               List.generate(difficultyTexts.length, (index) {
                             return GestureDetector(
                               onTap: () {
-                                selectDifficulty(index);
+                                selectDifficulty(difficultyTexts[index], index);
                               },
                               child: Obx(() {
                                 return Container(
                                   alignment: Alignment.center,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  padding: const EdgeInsets.all(8.0),
+                                  margin: const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(15),
                                   decoration: BoxDecoration(
                                     color:
                                         selectedDifficultyIndex.value == index
-                                            ? Colors.blue
+                                            ? index == 0
+                                                ? Colors.green
+                                                : index == 1
+                                                    ? Colors.yellow
+                                                    : index == 2
+                                                        ? Colors.orange
+                                                        : index == 3
+                                                            ? Colors.red
+                                                            : Colors.grey[300]
                                             : Colors.grey[300],
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
-                                    difficultyTexts[index],
-                                    style: const TextStyle(fontSize: 16),
+                                    difficultyTexts[index].toUpperCase(),
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 );
                               }),

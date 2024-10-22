@@ -23,12 +23,12 @@ class RoomInfo extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                const Row(
-                  children: [
-                    Text("Generated Room Code"),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                // const Row(
+                //   children: [
+                //     Text("Generated Room Code"),
+                //   ],
+                // ),
+                // const SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(
@@ -45,7 +45,8 @@ class RoomInfo extends StatelessWidget {
                           Text(
                             roomCode,
                             style: TextStyle(
-                              fontSize: w / 11,
+                              color: Colors.deepPurpleAccent,
+                              fontSize: w / 14,
                               letterSpacing: 2.4,
                               fontFamily: "Poppins",
                               fontWeight: FontWeight.w600,
@@ -65,7 +66,7 @@ class RoomInfo extends StatelessWidget {
                           errorMessage("Your enemy has not recieved roomCode");
                         }
                       },
-                      child: Container(
+                      child: Ink(
                         padding: const EdgeInsets.all(13),
                         height: 70,
                         width: 70,

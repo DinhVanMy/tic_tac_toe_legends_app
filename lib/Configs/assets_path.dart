@@ -24,6 +24,10 @@ class IconsPath {
 
 class ImagePath {
   static const basePath = "assets/photos/";
+  static const background1 = "${basePath}background1.png";
+  static const background2 = "${basePath}background2.png";
+  static const background3 = "${basePath}background3.jpg";
+  static const background4 = "${basePath}background4.jpg";
   static const boy = "${basePath}boy.png";
   static const girl = "${basePath}girl.png";
   static const welcome1 = "${basePath}welcome1.png";
@@ -138,6 +142,70 @@ class ChampionsPathB {
   static const yone = "${basePath}Yone.jpg";
   static const zed = "${basePath}Zed.jpg";
   static const zoe = "${basePath}Zoe.webp";
+}
+
+class BorderRanking {
+  static const basePath = "assets/borders/";
+  static const bronzeBorder = "${basePath}bronze_border.webp";
+  static const challBorder = "${basePath}chall_border.webp";
+  static const diamondBorder = "${basePath}diamond_border.webp";
+  static const goldBorder = "${basePath}gold_border.webp";
+  static const ironBorder = "${basePath}iron_border.webp";
+  static const masterBorder = "${basePath}master_border.webp";
+  static const platinumBorder = "${basePath}platinum_border.webp";
+  static const silverBorder = "${basePath}silver_border.webp";
+}
+
+class TrimRanking {
+  static const basePath = "assets/borders/";
+  static const bronzeTrim = "${basePath}bronze_trim.webp";
+  static const challTrim = "${basePath}chall_trim.webp";
+  static const diamondTrim = "${basePath}diamond_trim.webp";
+  static const goldTrim = "${basePath}gold_trim.webp";
+  static const ironTrim = "${basePath}iron_trim.webp";
+  static const masterTrim = "${basePath}master_trim.webp";
+  static const platinumTrim = "${basePath}platinum_trim.webp";
+  static const silverTrim = "${basePath}silver_trim.webp";
+}
+
+class Emotes {
+  static const angryKittenEmote = "assets/emotes/Angry_Kitten_Emote.webp";
+  static const beeHappyEmote = "assets/emotes/Bee_Happy_Emote.webp";
+  static const beeMadEmote = "assets/emotes/Bee_Mad_Emote.webp";
+  static const beeSadEmote = "assets/emotes/Bee_Sad_Emote.webp";
+  static const cupEmote = "assets/emotes/Cup-Yay%21_Emote.webp";
+  static const despairEmote = "assets/emotes/Despair_Emote.webp";
+  static const dressedToKillEmote = "assets/emotes/Dressed_to_Kill_Emote.webp";
+  static const goodAsGoldEmote = "assets/emotes/Good_as_Gold_Emote.webp";
+  static const happyToSeeUEmote = "assets/emotes/Happy_To_See_You_Emote.webp";
+  static const howDareEmote = "assets/emotes/How_Dare_You%3F_Emote.webp";
+  static const lookingForEmote = "assets/emotes/Looking_for_This%3F_Emote.webp";
+  static const penguEmote = "assets/emotes/M%27Pengu_Emote.webp";
+  static const peacePoroEmote = "assets/emotes/Peace_Poro_Emote.webp";
+  static const sadKittenEmote = "assets/emotes/Sad_Kitten_Emote.webp";
+  static const seeEmote = "assets/emotes/See_Ya%21_Emote.webp";
+  static const starRikuEmote = "assets/emotes/Star_Guardian_Riku_Emote.webp";
+  static const starSakiEmote = "assets/emotes/Star_Guardian_Saki_Emote.webp";
+  static const starTowaEmote = "assets/emotes/Star_Guardian_Towa_Emote.webp";
+  static const thumbsUpEmote = "assets/emotes/Thumbs_Up_Emote.webp";
+}
+
+class Jajas {
+  static const basePath = "assets/jajas/";
+  static const spinner = "${basePath}spinner.png";
+  static const framePlatinum = "${basePath}frame_platinum.png";
+  static const event = "${basePath}event.png";
+  static const banner = "${basePath}banner.png";
+  static const clans = "${basePath}clans.png";
+  static const mission = "${basePath}mission.png";
+  static const quest = "${basePath}quest.png";
+  static const worldNews = "${basePath}world_news.png";
+  static const card0 = "${basePath}card_0.png";
+  static const card1 = "${basePath}card_1.png";
+  static const card2 = "${basePath}card_2.png";
+  static const card3 = "${basePath}card_3.png";
+  static const card4 = "${basePath}card_4.png";
+  static const card5 = "${basePath}card_5.png";
 }
 
 const String defaltImage =

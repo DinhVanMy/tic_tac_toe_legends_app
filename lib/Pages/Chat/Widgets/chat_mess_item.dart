@@ -1,4 +1,3 @@
-// chat_message_item.dart
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -10,7 +9,6 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 class ChatMessageItem extends StatelessWidget {
   final Message message;
   final UserModel user;
-  // final String? imagePath;
 
   const ChatMessageItem({
     super.key,
