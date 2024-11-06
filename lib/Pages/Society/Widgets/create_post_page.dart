@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
+import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
@@ -65,7 +66,12 @@ class CreatePostPage extends StatelessWidget {
                             await postController.createPost(
                               content: postContent.value,
                               user: userModel,
-                              backgroundPost: backgroundPost.toList(),
+                              backgroundPost: backgroundPost
+                                  .toList()
+                                  .map((color) =>
+                                      ColorStringReverseFunction.colorToHex(
+                                          color))
+                                  .toList(),
                               privacy: audienceMode.value,
                               imageFiles: images,
                             );
@@ -80,7 +86,7 @@ class CreatePostPage extends StatelessWidget {
                               ),
                             ),
                           )).then((_) {
-                        Get.to(const SocietyGamingPage());
+                        Get.toNamed("mainHome");
                       });
                     },
                     child: Ink(

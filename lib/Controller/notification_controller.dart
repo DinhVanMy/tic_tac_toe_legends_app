@@ -122,11 +122,13 @@ class NotificationController extends GetxController {
         channelKey: 'basic_channel',
         title: title,
         body: body,
-        notificationLayout: NotificationLayout.BigPicture,
-        bigPicture: 'asset://assets/icons/appLogo.png',
+        notificationLayout: NotificationLayout.Default,
+        // bigPicture: 'asset://assets/icons/appLogo.png',
         payload: payload, // Truyền payload đã được chuyển đổi
         // customSound: notifySamSung,
         color: Colors.white,
+        largeIcon:
+            "https://static1.srcdn.com/wordpress/wp-content/uploads/2018/10/Ana-de-Armas-as-Joi-in-Blade-Runner-2049.jpg",
         backgroundColor: bgColor,
         // icon: 'resource://drawable/tic-tac-toe-x',
       ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/Functions/notification_add_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
 import 'package:uuid/uuid.dart';
@@ -16,7 +17,10 @@ class PostController extends GetxController {
   late final ScrollController scrollController;
   final ImagePicker picker = ImagePicker();
   DocumentSnapshot? lastDocument;
+  late final NotificationAddFunctions _notificationAddFunctions;
 
+  final List<String> options = ["Favoritest", "Newest", "Oldest"];
+  var selectedOption = 'Newest'.obs;
   var postsList = <PostModel>[].obs;
   RxBool isLiked = false.obs;
 
@@ -26,9 +30,11 @@ class PostController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _notificationAddFunctions = NotificationAddFunctions(firestore: _firestore);
     scrollController = ScrollController();
     fetchInitialPosts();
     listenToPostChanges();
+    ever(selectedOption, (_) => fetchFilteredPosts());
   }
 
   // Hàm tải dữ liệu trang đầu tiên
@@ -57,29 +63,72 @@ class PostController extends GetxController {
     }
   }
 
-  // Hàm tải thêm bài viết khi cuộn xuống dưới (pagination)
-  Future<void> fetchMorePosts() async {
-    if (isFetching || lastDocument == null) {
-      return;
-    }
+  Future<void> fetchFilteredPosts() async {
+    if (isFetching) return;
     isFetching = true;
 
     try {
-      QuerySnapshot snapshot = await _firestore
-          .collection('posts')
-          .orderBy('createdAt', descending: true)
-          .startAfterDocument(lastDocument!) // Tiếp tục sau tài liệu cuối cùng
-          .limit(pageSize)
-          .get();
+      Query query = _firestore.collection('posts').limit(pageSize);
 
+      switch (selectedOption.value) {
+        case 'Favoritest':
+          query = query.orderBy('likedList', descending: true);
+          break;
+        case 'Newest':
+          query = query.orderBy('createdAt', descending: true);
+          break;
+        case 'Oldest':
+          query = query.orderBy('createdAt', descending: false);
+          break;
+      }
+
+      QuerySnapshot snapshot = await query.get();
+      if (snapshot.docs.isNotEmpty) {
+        postsList.value = snapshot.docs.map((doc) {
+          return PostModel.fromJson(doc.data() as Map<String, dynamic>);
+        }).toList();
+        lastDocument = snapshot.docs.last;
+      }
+    } catch (e) {
+      errorMessage("Error fetching posts: $e");
+    } finally {
+      isFetching = false;
+    }
+  }
+
+  // Hàm tải thêm bình luận
+  Future<void> fetchMoreFilteredPosts() async {
+    if (isFetching || lastDocument == null) return;
+    isFetching = true;
+
+    try {
+      // Khởi tạo query và sắp xếp trước
+      Query query = _firestore.collection('posts');
+
+      switch (selectedOption.value) {
+        case 'Favoritest':
+          query = query.orderBy('likedList', descending: true);
+          break;
+        case 'Newest':
+          query = query.orderBy('createdAt', descending: true);
+          break;
+        case 'Oldest':
+          query = query.orderBy('createdAt', descending: false);
+          break;
+      }
+
+      // Thêm startAfterDocument sau khi orderBy
+      query = query.startAfterDocument(lastDocument!).limit(pageSize);
+
+      QuerySnapshot snapshot = await query.get();
       if (snapshot.docs.isNotEmpty) {
         var newPosts = snapshot.docs.map((doc) {
           return PostModel.fromJson(doc.data() as Map<String, dynamic>);
         }).toList();
-        postsList.addAll(newPosts); // Thêm bài viết mới vào danh sách
+        postsList.addAll(newPosts);
         lastDocument = snapshot.docs.last;
       } else {
-        lastDocument = null; // Không còn bài viết để tải thêm
+        lastDocument = null;
       }
     } catch (e) {
       errorMessage("Error fetching more posts: $e");
@@ -119,7 +168,7 @@ class PostController extends GetxController {
   Future<void> createPost({
     required String content,
     required UserModel user,
-    List<Color>? backgroundPost,
+    List<String>? backgroundPost,
     List<XFile>? imageFiles,
     List<String>? taggedUserIds,
     required String privacy,
@@ -140,9 +189,8 @@ class PostController extends GetxController {
       content: content,
       backgroundPost: backgroundPost,
       imageUrls: base64ImageList.isEmpty ? null : base64ImageList,
-      likeCount: 0,
-      commentCount: 0,
       shareCount: 0,
+      commentCount: 0,
       createdAt: DateTime.now(),
       taggedUserIds: taggedUserIds,
       privacy: privacy,
@@ -266,36 +314,51 @@ class PostController extends GetxController {
     }
   }
 
-  // Hàm tăng/giảm lượt like
-  Future<void> toggleLikePost(String postId) async {
-    DocumentReference postRef = _firestore.collection('posts').doc(postId);
+  Future<void> likePost(PostModel postModel, UserModel userModel) async {
+    DocumentReference postRef =
+        _firestore.collection('posts').doc(postModel.postId);
 
-    await _firestore.runTransaction((transaction) async {
-      DocumentSnapshot postSnapshot = await transaction.get(postRef);
-      if (postSnapshot.exists) {
-        int currentLikeCount = postSnapshot['likeCount'] ?? 0;
-        int updatedLikeCount =
-            !isLiked.value ? currentLikeCount - 1 : currentLikeCount + 1;
-        transaction.update(postRef, {'likeCount': updatedLikeCount});
-      }
-    });
+    await postRef.update({
+      'likedList':
+          FieldValue.arrayUnion([userModel.id]) // Thêm userId vào likedList
+    }).catchError((e) => errorMessage(e));
+
+    await _notificationAddFunctions.createLikeNotification(
+      senderId: userModel.id!,
+      senderModel: userModel,
+      receiverId: postModel.postUser!.id!,
+      postId: postModel.postId!,
+    );
   }
 
-  // Hàm tăng lượt bình luận
-  Future<void> incrementCommentCount(String postId) async {
+  // Hàm xóa userId khỏi likedList khi unlike
+  Future<void> unlikePost(String postId, String userId) async {
     DocumentReference postRef = _firestore.collection('posts').doc(postId);
 
-    await _firestore.runTransaction((transaction) async {
-      DocumentSnapshot postSnapshot = await transaction.get(postRef);
-      if (postSnapshot.exists) {
-        int currentCommentCount = postSnapshot['commentCount'] ?? 0;
-        transaction.update(postRef, {'commentCount': currentCommentCount + 1});
-      }
-    });
+    await postRef.update({
+      'likedList': FieldValue.arrayRemove([userId]) // Xóa userId khỏi likedList
+    }).catchError((e) => errorMessage(e));
   }
 
-  Future<void> incrementSharedCount(String postId) async {
-    DocumentReference postRef = _firestore.collection('posts').doc(postId);
+  RxBool isLikedPost(String userId, String postId) {
+    // Tìm bài viết theo postId
+    final post = postsList.firstWhereOrNull((post) => post.postId == postId);
+
+    // Nếu không tìm thấy post hoặc likedList là null, trả về false
+    if (post == null || post.likedList == null) {
+      return false.obs;
+    }
+
+    // Kiểm tra xem userId có nằm trong likedList của post không
+    final isLiked = post.likedList!.contains(userId);
+
+    return isLiked.obs; // Trả về RxBool phản ánh trạng thái "liked"
+  }
+
+  Future<void> incrementSharedCount(
+      PostModel postModel, UserModel userModel) async {
+    DocumentReference postRef =
+        _firestore.collection('posts').doc(postModel.postId);
 
     await _firestore.runTransaction((transaction) async {
       DocumentSnapshot postSnapshot = await transaction.get(postRef);
@@ -304,6 +367,40 @@ class PostController extends GetxController {
         transaction.update(postRef, {'shareCount': currentShareCount + 1});
       }
     });
+
+    await _notificationAddFunctions.createShareNotification(
+      senderId: userModel.id!,
+      senderModel: userModel,
+      receiverId: postModel.postUser!.id!,
+      postId: postModel.postId!,
+    );
+  }
+
+  Future<List<UserModel>> fetchPostLikeUsers(List<String> likeUserIds) async {
+    try {
+      // Tạo danh sách các futures để tải dữ liệu của từng user ID
+      List<Future<DocumentSnapshot>> userSnapshotsFutures = likeUserIds
+          .map(
+            (userId) => _firestore.collection('users').doc(userId).get(),
+          )
+          .toList();
+
+      // Chờ tất cả futures hoàn thành
+      List<DocumentSnapshot> userSnapshots =
+          await Future.wait(userSnapshotsFutures);
+
+      // Lọc ra các user đã tồn tại và chuyển thành UserModel
+      List<UserModel> likeUsers = userSnapshots
+          .where((snapshot) => snapshot.exists)
+          .map((snapshot) =>
+              UserModel.fromJson(snapshot.data() as Map<String, dynamic>))
+          .toList();
+
+      return likeUsers;
+    } catch (e) {
+      errorMessage("Error fetching post like users: $e");
+      return [];
+    }
   }
 
   Future<List<XFile>?> pickMultiImages() async {
@@ -330,35 +427,25 @@ class PostController extends GetxController {
       duration: const Duration(seconds: 1),
       curve: Curves.easeInOut,
     );
-    await fetchInitialPosts();
+    await fetchFilteredPosts();
   }
 
-  String timeAgo({required DateTime now, required DateTime createdAt}) {
-    Duration difference = now.difference(createdAt);
+  void updateSelectedOption(String value) {
+    selectedOption.value = value;
+  }
 
-    if (difference.inSeconds < 60) {
-      return 'a few seconds ago'; // Dưới 1 phút
-    }
-    if (difference.inMinutes < 60) {
-      return '${difference.inMinutes} minute${difference.inMinutes > 1 ? "s" : ""} ago'; // Dưới 1 giờ
-    }
-    if (difference.inHours < 24) {
-      return '${difference.inHours} hour${difference.inHours > 1 ? "s" : ""} ago'; // Dưới 1 ngày
-    }
-    if (difference.inDays < 7) {
-      return '${difference.inDays} day${difference.inDays > 1 ? "s" : ""} ago'; // Dưới 1 tuần
-    }
-    if (difference.inDays < 30) {
-      int weeks = (difference.inDays / 7).floor();
-      return '$weeks week${weeks > 1 ? "s" : ""} ago'; // Dưới 1 tháng
-    }
-    if (difference.inDays < 365) {
-      int months = (difference.inDays / 30).floor();
-      return '$months month${months > 1 ? "s" : ""} ago'; // Dưới 1 năm
-    }
-
-    int years = (difference.inDays / 365).floor();
-    return '$years year${years > 1 ? "s" : ""} ago'; // Lâu hơn 1 năm
+  var unreadCount = 0.obs;
+  // Hàm để lắng nghe số lượng thông báo chưa đọc
+  void listenToUnreadNotifications({required String userId}) {
+    FirebaseFirestore.instance
+        .collection("notifications")
+        .where("receiverId", isEqualTo: userId)
+        .where("isReaded", isEqualTo: false)
+        .snapshots()
+        .listen((snapshot) {
+      unreadCount.value =
+          snapshot.docs.length; // Cập nhật số lượng thông báo chưa đọc
+    });
   }
 
   @override

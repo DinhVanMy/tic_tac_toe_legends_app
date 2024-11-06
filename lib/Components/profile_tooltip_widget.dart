@@ -38,8 +38,8 @@ class ProfileTooltipCustom extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Total Wins: ${friend.totalWins!}"),
-                Text("Total Coins: ${friend.totalCoins!}"),
+                Text("Total Wins: ${friend.totalWins ?? "0"}"),
+                Text("Total Coins: ${friend.totalCoins ?? "0"}"),
               ],
             ),
             const SizedBox(height: 5),

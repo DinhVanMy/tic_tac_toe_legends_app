@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 
-class NotificationsModel {
+class GeneralNotificationsModel {
   String? id;
   String? senderId;
   UserModel? senderModel;
@@ -9,9 +9,13 @@ class NotificationsModel {
   String? message;
   String? type;
   Timestamp? timestamp;
+  bool? isReaded;
   String? roomId;
+  String? postId;
+  String? commentId;
+  int count = 1;
 
-  NotificationsModel({
+  GeneralNotificationsModel({
     this.id,
     this.senderId,
     this.senderModel,
@@ -19,10 +23,14 @@ class NotificationsModel {
     this.message,
     this.type,
     this.timestamp,
+    this.isReaded,
     this.roomId,
+    this.postId,
+    this.commentId,
+    this.count = 1,
   });
 
-  NotificationsModel.fromJson(Map<String, dynamic> json) {
+  GeneralNotificationsModel.fromJson(Map<String, dynamic> json) {
     if (json["id"] is String) {
       id = json["id"];
     }
@@ -46,9 +54,19 @@ class NotificationsModel {
     if (json["timestamp"] is Timestamp) {
       timestamp = json["timestamp"];
     }
+    if (json["isReaded"] is bool) {
+      isReaded = json["isReaded"];
+    }
     if (json["roomId"] is String) {
       roomId = json["roomId"];
     }
+    if (json["postId"] is String) {
+      postId = json["postId"];
+    }
+    if (json["commentId"] is String) {
+      commentId = json["commentId"];
+    }
+    count = json["count"]?? 1;
   }
 
   Map<String, dynamic> toJson() {
@@ -62,7 +80,11 @@ class NotificationsModel {
     data["message"] = message;
     data["type"] = type;
     data["timestamp"] = timestamp;
+    data["isReaded"] = isReaded;
     data["roomId"] = roomId;
+    data["postId"] = postId;
+    data["commentId"] = commentId;
+    data["count"] = count;
     return data;
   }
 }

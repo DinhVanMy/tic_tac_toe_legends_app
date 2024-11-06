@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/create_post_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/friend_blog_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_notification_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/world_blog_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
 
@@ -17,6 +18,9 @@ class SocietyGamingPage extends StatelessWidget {
     final ProfileController profileController = Get.find<ProfileController>();
     final PostController postController = Get.put(PostController());
     final user = profileController.readProfileNewUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      postController.listenToUnreadNotifications(userId: user.id!);
+    });
     return Scaffold(
       body: SafeArea(
         child: DefaultTabController(
@@ -56,6 +60,50 @@ class SocietyGamingPage extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Get.to(() => PostNotificationPage(
+                                        user: user,
+                                      ));
+                                },
+                                icon: const Icon(
+                                  Icons.notifications,
+                                  size: 35,
+                                  color: Colors.deepPurpleAccent,
+                                ),
+                              ),
+                              Obx(() => postController.unreadCount.value == 0
+                                  ? const SizedBox()
+                                  : Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: Container(
+                                        height: 25,
+                                        width: 25,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                            color: Colors.pinkAccent,
+                                            border: Border.all(
+                                                color: Colors.white, width: 2),
+                                            shape: BoxShape.circle),
+                                        child: Text(
+                                          postController.unreadCount.value > 99
+                                              ? "99+"
+                                              : postController.unreadCount.value
+                                                  .toString(),
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ))
+                            ],
+                          ),
                           IconButton(
                             onPressed: () => Get.to(CreatePostPage(
                               userModel: user,

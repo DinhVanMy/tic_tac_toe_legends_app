@@ -144,7 +144,7 @@ class RankingPlayerPage extends StatelessWidget {
                                         null,
                                         null,
                                         null,
-                                        
+                                    
                                       );
                                     },
                                     child: CircleAvatar(

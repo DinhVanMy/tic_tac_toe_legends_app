@@ -57,13 +57,15 @@ class ExpandableText extends StatelessWidget {
 class ExpandableContent extends StatelessWidget {
   final String content;
   final int maxLines;
-  final ThemeData theme;
+  final TextStyle style;
+  final bool isAligCenter;
 
   const ExpandableContent({
     super.key,
     required this.content,
-    this.maxLines = 3,
-    required this.theme,
+    this.maxLines = 5,
+    required this.style,
+    this.isAligCenter = false,
   });
 
   @override
@@ -74,7 +76,7 @@ class ExpandableContent extends StatelessWidget {
         // Tính toán để kiểm tra xem nội dung có vượt quá số dòng cho phép không
         final span = TextSpan(
           text: content,
-          style: theme.textTheme.titleLarge,
+          style: style,
         );
         final textPainter = TextPainter(
           text: span,
@@ -90,11 +92,12 @@ class ExpandableContent extends StatelessWidget {
               isExpanded.value = !isExpanded.value;
             },
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   content,
-                  style: theme.textTheme.titleLarge,
+                  style: style,
+                  textAlign: isAligCenter ? TextAlign.center : TextAlign.start,
                   maxLines: isExpanded.value ? 1000 : maxLines,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -102,7 +105,7 @@ class ExpandableContent extends StatelessWidget {
                   Text(
                     isExpanded.value ? "See Less" : "See More",
                     style: const TextStyle(
-                      color: Colors.lightBlue,
+                      color: Colors.blueGrey,
                       fontStyle: FontStyle.italic,
                     ),
                   ),

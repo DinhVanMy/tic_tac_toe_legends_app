@@ -122,17 +122,7 @@ class FriendsPage extends StatelessWidget {
                     Obx(
                       () {
                         if (firestoreController.friendsList.isEmpty) {
-                          return Center(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: const CircularProgressIndicator(
-                                color: Colors.blue,
-                              ),
-                            ),
-                          );
+                          return const SizedBox();
                         }
                         var friends = firestoreController.friendsList.toList();
                         return Expanded(

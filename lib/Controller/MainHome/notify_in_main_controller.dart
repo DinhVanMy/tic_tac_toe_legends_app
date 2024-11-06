@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:ui';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,17 +9,19 @@ import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Controller/matching_controller.dart';
 import 'package:tictactoe_gameapp/Controller/room_controller.dart';
-import 'package:tictactoe_gameapp/Models/notifications_model.dart';
+import 'package:tictactoe_gameapp/Models/general_notifications_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/main.dart';
 import 'package:uuid/uuid.dart';
 
 class NotifyInMainController extends GetxController {
-  var friendRequests = <NotificationsModel>[].obs; // Lời mời kết bạn lưu trữ
+  var friendRequests =
+      <GeneralNotificationsModel>[].obs; // Lời mời kết bạn lưu trữ
   var filteredFriendRequests =
-      <NotificationsModel>[].obs; // Lời mời kết bạn đã lọc
+      <GeneralNotificationsModel>[].obs; // Lời mời kết bạn đã lọc
   var searchText = ''.obs; // Text tìm kiếm từ người dùng
-  var gameInvites = <NotificationsModel>[].obs; // Lời mời chơi game tạm thời
+  var gameInvites =
+      <GeneralNotificationsModel>[].obs; // Lời mời chơi game tạm thời
   var isWaitingForOk = false.obs;
   final Rx<OverlayEntry?> _popupEntry = Rx<OverlayEntry?>(null);
   RxBool isPopupVisible = false.obs; // Để kiểm soát trạng thái của popup
@@ -51,7 +51,7 @@ class NotifyInMainController extends GetxController {
         .listen((QuerySnapshot snapshot) {
       // Xử lý từng thay đổi trong snapshot
       for (var change in snapshot.docChanges) {
-        var request = NotificationsModel.fromJson(
+        var request = GeneralNotificationsModel.fromJson(
             change.doc.data() as Map<String, dynamic>);
         request.id = change.doc.id; // Lưu ID từ Firestore vào model
 
@@ -95,7 +95,6 @@ class NotifyInMainController extends GetxController {
       filteredFriendRequests.assignAll(friendRequests.where((request) {
         final senderName = request.senderModel!.name!.toLowerCase();
         final email = request.senderModel!.email!.toLowerCase();
-        print("name : $senderName and email : $email");
         // Kiểm tra nếu senderName hoặc message chứa nội dung tìm kiếm
         return senderName.contains(searchLower) || email.contains(searchLower);
       }).toList());
@@ -117,7 +116,7 @@ class NotifyInMainController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       gameInvites.value = snapshot.docs.map((doc) {
-        var notification = NotificationsModel.fromJson(doc.data());
+        var notification = GeneralNotificationsModel.fromJson(doc.data());
         notification.id = doc.id;
         return notification;
       }).toList();
@@ -148,7 +147,7 @@ class NotifyInMainController extends GetxController {
       email: senderUser.email,
       image: senderUser.image,
     );
-    NotificationsModel request = NotificationsModel(
+    GeneralNotificationsModel request = GeneralNotificationsModel(
       id: id,
       senderId: currentUserId,
       senderModel: senderModel,
@@ -170,7 +169,7 @@ class NotifyInMainController extends GetxController {
         email: senderUser.email,
         image: senderUser.image,
       );
-      NotificationsModel invite = NotificationsModel(
+      GeneralNotificationsModel invite = GeneralNotificationsModel(
         senderId: currentUserId,
         senderModel: senderModel,
         receiverId: receiverId,
@@ -213,7 +212,7 @@ class NotifyInMainController extends GetxController {
   }
 
   void showInviteRequest(
-    NotificationsModel invite,
+    GeneralNotificationsModel invite,
   ) {
     if (_popupEntry.value != null) {
       // Xóa popup cũ nếu đã hiển thị
@@ -295,18 +294,3 @@ class NotifyInMainController extends GetxController {
     super.onClose();
   }
 }
-
-  // void listenForFriendRequests() {
-  //   listenForFriendRequestsSub = db
-  //       .collection('notifications')
-  //       .where('receiverId', isEqualTo: currentUserId)
-  //       .where('type', isEqualTo: 'friendRequest')
-  //       .snapshots()
-  //       .listen((snapshot) {
-  //     friendRequests.value = snapshot.docs.map((doc) {
-  //       var notification = NotificationsModel.fromJson(doc.data());
-  //       notification.id = doc.id; // Lưu ID của Firestore vào model
-  //       return notification;
-  //     }).toList();
-  //   });
-  // }

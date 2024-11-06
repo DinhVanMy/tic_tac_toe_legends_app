@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:tictactoe_gameapp/Test/rippleanimation/circle_painter.dart';
 
 class RipplesAnimationCustom extends StatefulWidget {
-
   const RipplesAnimationCustom({super.key});
 
   @override
@@ -23,6 +22,12 @@ class _RipplesAnimationCustomState extends State<RipplesAnimationCustom>
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return CustomPaint(
@@ -30,14 +35,14 @@ class _RipplesAnimationCustomState extends State<RipplesAnimationCustom>
       child: SizedBox(
         width: size.width / 1.3,
         height: size.height / 1.3,
-        child: const Center(
-            child: Text(
-          "Searching...",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        )),
+        // child: const Center(
+        //     child: Text(
+        //   "Searching...",
+        //   style: TextStyle(
+        //     color: Colors.white,
+        //     fontSize: 16,
+        //   ),
+        // )),
       ),
     );
   }

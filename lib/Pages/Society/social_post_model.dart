@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 
@@ -6,10 +5,10 @@ class PostModel {
   String? postId;
   UserModel? postUser;
   String? content; // Nội dung bài viết
-  List<Color>? backgroundPost;
+  List<String>? backgroundPost;
   List<String>? imageUrls; // Danh sách URL ảnh đính kèm
-  int? likeCount; // Số lượng lượt thích
-  int? commentCount; // Số lượng bình luận
+  List<String>? likedList;
+  int? commentCount;
   int? shareCount;
   DateTime? createdAt; // Thời gian đăng bài
   List<String>? taggedUserIds; // Danh sách ID người dùng được gắn thẻ
@@ -21,7 +20,7 @@ class PostModel {
     this.content,
     this.backgroundPost,
     this.imageUrls,
-    this.likeCount,
+    this.likedList,
     this.shareCount,
     this.commentCount,
     this.createdAt,
@@ -38,15 +37,19 @@ class PostModel {
           : UserModel.fromJson(json["postUser"]);
     }
     content = json['content'] as String?;
-    if (json["backgroundPost"] is List<Color>) {
-      backgroundPost = List<Color>.from(json["backgroundPost"] ?? []);
+    if (json["backgroundPost"] is List) {
+      backgroundPost = List<String>.from(json["backgroundPost"]);
     }
     if (json['imageUrls'] is List) {
       imageUrls = List<String>.from(json['imageUrls']);
     }
-    likeCount = json['likeCount'] as int? ?? 0;
-    commentCount = json['commentCount'] as int? ?? 0;
+    if (json['likedList'] is List) {
+      likedList = List<String>.from(json['likedList']);
+    }
     shareCount = json['shareCount'] as int? ?? 0;
+    if (json['commentCount'] is int) {
+      commentCount = json['commentCount'];
+    }
     if (json['createdAt'] is Timestamp) {
       createdAt = (json['createdAt'] as Timestamp).toDate();
     }
@@ -66,9 +69,9 @@ class PostModel {
     data['content'] = content;
     data['backgroundPost'] = backgroundPost;
     data['imageUrls'] = imageUrls;
-    data['likeCount'] = likeCount;
-    data['commentCount'] = commentCount;
+    data['likedList'] = likedList;
     data['shareCount'] = shareCount;
+    data['commentCount'] = commentCount;
     if (createdAt != null) {
       data['createdAt'] = createdAt?.toUtc();
     }

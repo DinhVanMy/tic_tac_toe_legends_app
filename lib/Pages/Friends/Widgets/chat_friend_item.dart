@@ -1,11 +1,10 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Data/chat_friend_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/message_friend_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 
@@ -171,7 +170,7 @@ class ChatFriendItem extends StatelessWidget {
                       : const SizedBox(),
                   const SizedBox(height: 5),
                   Text(
-                    firestoreController.displayTime(message.timestamp!),
+                    TimeFunctions.displayTime(message.timestamp!),
                     style:
                         const TextStyle(color: Colors.blueGrey, fontSize: 10),
                   ),

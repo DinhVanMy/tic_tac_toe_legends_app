@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Models/queue_model.dart';
 import '../Configs/messages.dart';
@@ -18,6 +19,8 @@ class ProfileController extends GetxController {
   final db = FirebaseFirestore.instance;
   RxBool isLoading = false.obs;
   Rx<UserModel> user = UserModel().obs;
+
+  late final LatLng userLocation;
 
   Future<void> updateProfile(String name, String imagePath) async {
     isLoading.value = true;
@@ -115,11 +118,14 @@ class ProfileController extends GetxController {
       if (userDoc.exists) {
         var userData = userDoc.data() as Map<String, dynamic>;
         user.value = UserModel.fromJson(userData);
+        GeoPoint geo =
+            user.value.location ?? const GeoPoint(21.0000992, 105.8399243);
+        userLocation = LatLng(geo.latitude, geo.longitude);
       } else {
         errorMessage("Not found 404");
       }
     } catch (e) {
-      errorMessage("Failed to fetch user profile: $e");
+      print("Failed to fetch user profile: $e");
     }
   }
 

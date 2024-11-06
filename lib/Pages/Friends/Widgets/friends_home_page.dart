@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/chat_with_friend_page.dart';
 
@@ -90,7 +91,7 @@ class FriendsHomePage extends StatelessWidget {
                             ),
                           )
                         : Text(
-                            firestoreController.displayTime(friend.lastActive!),
+                            TimeFunctions.displayTime(friend.lastActive!),
                             style: const TextStyle(
                               color: Colors.blueGrey,
                               fontSize: 15,

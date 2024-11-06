@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
@@ -64,32 +65,6 @@ class FirestoreController extends GetxController {
       // await loadFriends();
     } catch (e) {
       errorMessage('Failed to remove friend: $e');
-    }
-  }
-
-  // Lấy danh sách bạn bè từ Firestore khi khởi tạo
-  Future<void> loadFriends() async {
-    try {
-      friendsList.clear();
-      DocumentSnapshot userSnapshot =
-          await _firestore.collection('users').doc(userId).get();
-
-      if (userSnapshot.exists) {
-        List<dynamic> friendsIds = userSnapshot['friendsList'] ?? [];
-
-        for (String friendId in friendsIds) {
-          DocumentSnapshot friendSnapshot =
-              await _firestore.collection('users').doc(friendId).get();
-
-          if (friendSnapshot.exists) {
-            UserModel friend = UserModel.fromJson(
-                friendSnapshot.data() as Map<String, dynamic>);
-            friendsList.add(friend);
-          }
-        }
-      }
-    } catch (e) {
-      errorMessage(e.toString());
     }
   }
 
@@ -191,32 +166,12 @@ class FirestoreController extends GetxController {
     }
   }
 
-  String displayTimeDefault(Timestamp timestamp) {
-    DateTime dateTime = timestamp.toDate();
-    String hours = dateTime.hour.toString().padLeft(2, '0');
-    String minutes = dateTime.minute.toString().padLeft(2, '0');
-    return "$hours:$minutes";
-  }
-
-  String displayTime(Timestamp timestamp) {
-    DateTime dateTime = timestamp.toDate();
-
-    // Lấy giờ theo định dạng 12 giờ
-    int hour = dateTime.hour % 12 == 0 ? 12 : dateTime.hour % 12;
-    String minutes = dateTime.minute.toString().padLeft(2, '0');
-
-    // Xác định AM hay PM
-    String period = dateTime.hour >= 12 ? 'PM' : 'AM';
-
-    return "$hour:$minutes $period";
-  }
-
-  String displayDate(Timestamp timestamp) {
-    DateTime dateTime = timestamp.toDate();
-    String day = dateTime.day.toString().padLeft(2, '0');
-    String month = dateTime.month.toString().padLeft(2, '0');
-    String year = dateTime.year.toString();
-    return "$day/$month/$year";
+  late LatLng latlng;
+  Future<void> fetchUserLocation() async {
+    await _firestore.collection('users').doc(userId).get().then((value) {
+      UserModel user = UserModel.fromJson(value.data()!);
+      latlng = LatLng(user.location!.latitude, user.location!.longitude);
+    });
   }
 
   @override
@@ -226,49 +181,3 @@ class FirestoreController extends GetxController {
     super.onClose();
   }
 }
-
-// Lắng nghe danh sách bạn bè theo thời gian thực
-  // void _listenToFriends() {
-  //   try {
-  //     friendsSubscription = FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(userId)
-  //         .snapshots()
-  //         .listen((userSnapshot) async {
-  //       if (userSnapshot.exists) {
-  //         List<dynamic> friendsIds = userSnapshot['friendsList'] ?? [];
-  //         await _updateFriendsList(friendsIds);
-  //       }
-  //     }, onError: (e) {
-  //       errorMessage(e.toString());
-  //     });
-  //   } catch (e) {
-  //     errorMessage(e.toString());
-  //   }
-  // }
-
-  // // Cập nhật danh sách bạn bè
-  // Future<void> _updateFriendsList(List<dynamic> friendsIds) async {
-  //   try {
-  //     friendsList.clear();  // Xóa danh sách hiện tại
-  //     if (friendsIds.isEmpty) return;
-
-  //     // Sử dụng Future.wait để thực hiện song song các truy vấn
-  //     List<Future<UserModel?>> friendsFutures = friendsIds.map((friendId) async {
-  //       DocumentSnapshot friendSnapshot = await FirebaseFirestore.instance
-  //           .collection('users')
-  //           .doc(friendId)
-  //           .get();
-  //       if (friendSnapshot.exists) {
-  //         return UserModel.fromJson(friendSnapshot.data() as Map<String, dynamic>);
-  //       }
-  //       return null;
-  //     }).toList();
-
-  //     // Đợi tất cả các truy vấn hoàn thành và lọc ra kết quả hợp lệ
-  //     List<UserModel?> friends = await Future.wait(friendsFutures);
-  //     friendsList.value = friends.where((friend) => friend != null).cast<UserModel>().toList();
-  //   } catch (e) {
-  //     errorMessage(e.toString());
-  //   }
-  // }

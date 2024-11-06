@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tictactoe_gameapp/Enums/firebase_exception.dart';
-import 'package:twitter_login/twitter_login.dart';
 
 import '../Configs/messages.dart';
 
@@ -132,56 +131,4 @@ class AuthController extends GetxController {
       // print(e);
     }
   }
-
-  //log in with twitter (X)
-  Future<void> signInWithTwitter() async {
-    try {
-      final twitterLogin = TwitterLogin(
-        apiKey: 'uElLfWtFdDPyyOPyeCJwVmbDW',
-        apiSecretKey: 'X15aQdUpdljer6ZmuxLXt7Gte6O8LwlcMBvTP3X4ZsjZWZTJzW',
-        redirectURI: 'tictactoeapp://',
-      );
-
-      final authResult = await twitterLogin.loginV2();
-
-      final twitterAuthCredential = TwitterAuthProvider.credential(
-        accessToken: authResult.authToken!,
-        secret: authResult.authTokenSecret!,
-      );
-
-      // Once signed in, return the UserCredential
-      await auth.signInWithCredential(twitterAuthCredential);
-      successMessage("Login Success");
-      Get.offAllNamed("/updateProfile");
-    } catch (e) {
-      errorMessage("Login Failed : ${e.toString()}");
-    }
-  }
-
-  //TODO: sign in with github
-
-  // Future<void> signInWithGitHub(BuildContext context) async {
-  //   try {
-  //     // Create a GitHubSignIn instance
-  //     final GitHubSignIn gitHubSignIn = GitHubSignIn(
-  //         clientId: 'Ov23lii7MlU8pe2ZTPDz',
-  //         clientSecret: "04e91041eb445dac7790412b03e5c90b5e38880a",
-  //         redirectUrl:
-  //             'https://tictactoe-flutter-672ff.firebaseapp.com/__/auth/handler');
-
-  //     // Trigger the sign-in flow
-  //     final result = await gitHubSignIn.signIn(context);
-
-  //     // Create a credential from the access token
-  //     final githubAuthCredential = GithubAuthProvider.credential(result.token!);
-
-  //     // Once signed in, return the UserCredential
-  //     await auth.signInWithCredential(githubAuthCredential);
-  //     successMessage("Login Success");
-  //     Get.offAllNamed("/updateProfile");
-  //   } catch (e) {
-  //     errorMessage("Login Failed");
-  //     // print(e);
-  //   }
-  // }
 }

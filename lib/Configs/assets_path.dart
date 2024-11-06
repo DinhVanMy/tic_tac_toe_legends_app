@@ -56,6 +56,7 @@ class GifsPath {
   static const chatbotGif = "${basePath}chatbot_gif.gif";
   static const transformerGif = "${basePath}transformer_gif.gif";
   static const loadingGif = "${basePath}loading_gif.gif";
+   static const transitionGif = "${basePath}transition_gif.gif";
 }
 
 class AudioSPath {

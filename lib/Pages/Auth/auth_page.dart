@@ -125,7 +125,7 @@ class AuthPage extends StatelessWidget {
                     width: MediaQuery.of(context).size.width / 1.5,
                     color: Colors.lightBlueAccent,
                     onTap: () {
-                      authController.signInWithTwitter();
+                      authController.loginByGoogle();
                     },
                     iconPath: IconsPath.facebook,
                   ),
@@ -137,7 +137,7 @@ class AuthPage extends StatelessWidget {
                       width: MediaQuery.of(context).size.width / 1.5,
                       color: Colors.grey,
                       onTap: () {
-                        // authController.signInWithGitHub(context);
+                        authController.loginByGoogle();
                       },
                       iconPath: IconsPath.github),
                 ],

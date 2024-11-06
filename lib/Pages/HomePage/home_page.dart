@@ -2,10 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
 import 'package:tictactoe_gameapp/Components/primary_with_icon_button.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
+import 'package:tictactoe_gameapp/Controller/Animations/carousel_controller.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Console/play_with_bot_controller.dart';
@@ -21,6 +25,8 @@ import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/middle_custom_widget.da
 import 'package:tictactoe_gameapp/Components/fortune_wheel/fortune_wheel_page.dart';
 import 'package:tictactoe_gameapp/Components/daily_gift/daily_gift_page.dart';
 import 'package:tictactoe_gameapp/Components/daily_mission/missions_page.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/looping_carousel_widget.dart';
+import 'package:tictactoe_gameapp/Test/animated_carousel/test3.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -28,6 +34,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WebViewControllers controller = Get.put(WebViewControllers());
+    final CarouselController carouselController = Get.put(CarouselController());
     final NotifyInMainController notifyInMainController =
         controller.notifyInMainController;
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -51,6 +58,15 @@ class HomePage extends StatelessWidget {
       ),
       body: Stack(
         children: [
+          const Positioned(
+            bottom: 0,
+            child: LoopingCarousel(),
+          ),
+          const Positioned(
+            top: 0,
+            child: LoopingCarousel(),
+          ),
+          // const LoopingImageCarousel(),
           Positioned(
             right: 0,
             top: 30,
@@ -252,7 +268,11 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                const SizedBox(height: 250, child: MiddleCustomWidget()),
+                SizedBox(
+                    height: 250,
+                    child: MiddleCustomWidget(
+                      carouselController: carouselController,
+                    )),
                 Column(
                   children: [
                     PrimaryIconWithButton(
@@ -590,64 +610,34 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   width: 20,
                 ),
-                Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.dialog(
-                          Dialog(
-                              backgroundColor: Colors.transparent,
-                              child: Center(
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child:
-                                            Image.asset(GifsPath.chatbotGif)),
-                                    Positioned(
-                                      top: -20,
-                                      left: 50,
-                                      right: 50,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.lightBlueAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          border: Border.all(
-                                              color: Colors.purpleAccent,
-                                              width: 5),
-                                        ),
-                                        child: const Text(
-                                          "Coming Soon...",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        );
-                      },
-                      child: Image.asset(
-                        Jajas.mission,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const Text(
-                      "Pass",
-                      style: TextStyle(
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+          ),
+          Positioned(
+            top: 180,
+            right: 2,
+            child: Column(
+              children: [
+                InkWell(
+                  onTap: () async {
+                    await firestoreController.fetchUserLocation();
+                    Get.to(() => FriendZoneMapPage(
+                          user: user,
+                          firestoreController: firestoreController,
+                          latlng: firestoreController.latlng,
+                        ));
+                  },
+                  child: Image.asset(
+                    Jajas.mission,
+                    width: 50,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const Text(
+                  "Pass",
+                  style: TextStyle(
+                    color: Colors.purple,
+                  ),
                 ),
               ],
             ),
@@ -690,11 +680,3 @@ class HomePage extends StatelessWidget {
     );
   }
 }
-
-// ClipRRect(
-//                   borderRadius: BorderRadius.circular(20),
-//                   child: Image.asset(
-//                     GifsPath.tictactoeGif,
-//                     width: 50,
-//                   ),
-//                 ),

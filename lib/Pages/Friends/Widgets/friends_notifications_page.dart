@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 
 class FriendsNotificationsPage extends StatelessWidget {
   final ThemeData theme;
@@ -62,8 +63,7 @@ class FriendsNotificationsPage extends StatelessWidget {
                             ),
                           )
                         : Text(
-                            firestoreController
-                                .displayTime(friendRequest.timestamp!),
+                            TimeFunctions.displayTime(friendRequest.timestamp!),
                             style: const TextStyle(
                               color: Colors.blueGrey,
                               fontSize: 13,

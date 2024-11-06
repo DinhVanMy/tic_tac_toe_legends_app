@@ -13,8 +13,6 @@ import 'package:tictactoe_gameapp/Controller/notification_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Splace/splace_page.dart';
-import 'package:tictactoe_gameapp/Test/test.dart';
-
 import 'firebase_options.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

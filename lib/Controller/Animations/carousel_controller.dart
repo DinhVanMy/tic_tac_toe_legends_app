@@ -6,16 +6,16 @@ import 'package:tictactoe_gameapp/Configs/constants.dart';
 
 class CarouselController extends GetxController {
   final int realItemCount = images.length;
-  late final int virtualItemCount =
-      realItemCount * 1000; // Tăng số item để cuộn vô hạn
-  late final PageController pageController =
-      PageController(viewportFraction: 0.4, initialPage: realItemCount * 500);
+  late final int virtualItemCount;
+  late final PageController pageController;
   late var currentPage = (realItemCount * 500).toDouble().obs;
 
   @override
   void onInit() {
     super.onInit();
-
+    virtualItemCount = realItemCount * 1000;
+    pageController =
+        PageController(viewportFraction: 0.4, initialPage: realItemCount * 500);
     pageController.addListener(() {
       currentPage.value = pageController.page!;
     });

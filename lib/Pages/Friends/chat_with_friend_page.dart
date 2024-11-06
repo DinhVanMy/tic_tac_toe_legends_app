@@ -8,6 +8,7 @@ import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Data/chat_friend_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/chat_friend_item.dart';
 
@@ -65,7 +66,7 @@ class ChatWithFriendPage extends StatelessWidget {
                               .copyWith(color: Colors.grey),
                         )
                       : Text(
-                          "Online ${firestoreController.displayDate(userFriend.lastActive!)} - ${firestoreController.displayTimeDefault(userFriend.lastActive!)}",
+                          "Online ${TimeFunctions.displayDate(userFriend.lastActive!)} - ${TimeFunctions.displayTimeDefault(userFriend.lastActive!)}",
                           style: theme.textTheme.bodySmall!
                               .copyWith(color: Colors.grey),
                           maxLines: 2,

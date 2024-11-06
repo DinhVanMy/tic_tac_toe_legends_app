@@ -23,9 +23,11 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_inappwebview: ^6.0.0
+  flutter_map: ^7.0.2
   flutter_settings_ui: ^3.0.1
   flutter_svg: ^2.0.9
   form_field_validator: ^1.1.0
+  geolocator: ^7.7.1
   get: ^4.6.6
   get_storage: ^2.1.1
   google_generative_ai: ^0.4.5
@@ -34,10 +36,10 @@ dependencies:
   image_picker: ^1.0.7
   internet_connection_checker: ^2.0.0
   just_audio: ^0.9.39
+  latlong2: ^0.9.1
   lite_rolling_switch: ^1.0.1
   share_plus: ^10.0.0
   speech_to_text: null
-  twitter_login: ^4.4.0
   uuid: ^4.4.0
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
