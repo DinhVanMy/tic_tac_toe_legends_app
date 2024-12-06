@@ -416,7 +416,7 @@ class PostSectionWidget extends StatelessWidget {
                           return CommentListSheet(
                             scrollController: scrollController,
                             currentUser: currentUser,
-                            postId: post.postId!,
+                            post: post,
                           );
                         },
                         duration: const Duration(milliseconds: 500),

@@ -66,6 +66,7 @@ class ReplyCommentListSheet extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 10),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
                           backgroundImage:
@@ -225,6 +226,7 @@ class ReplyCommentListSheet extends StatelessWidget {
                         child: Column(
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 CircleAvatar(
                                   backgroundImage: CachedNetworkImageProvider(

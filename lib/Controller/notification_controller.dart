@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Configs/theme/colors.dart';
 
 class NotificationController extends GetxController {
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-
   @override
   void onInit() {
     super.onInit();
@@ -16,28 +14,42 @@ class NotificationController extends GetxController {
   Future<void> _initializeNotifications() async {
     await _initializeAwesomeNotifications();
     await _requestPermissions();
-    await _registerDeviceToken();
-    _listenToMessages();
     _listenToNotificationActions();
-    await showNotification(
-      'Welcome!',
-      'Win a game today!${Emojis.computer_desktop_computer} ${Emojis.building_sunset} ${Emojis.flag_Vietnam} ${Emojis.hand_victory_hand}',
-      {'screen': 'SplacePage'},
-    );
   }
 
   Future<void> _initializeAwesomeNotifications() async {
     await AwesomeNotifications().initialize(
-      null,
+      'resource://drawable/app_logo',
       [
         NotificationChannel(
           channelKey: 'basic_channel',
           channelName: 'Basic notifications',
-          channelDescription: 'Notification channel for basic tests',
+          channelDescription: 'Notification channel for basic notifications',
           defaultColor: const Color(0xFF9D50DD),
-          ledColor: Colors.white,
           importance: NotificationImportance.High,
-          // soundSource: notifySamSung,
+          ledColor: Colors.white,
+        ),
+        NotificationChannel(
+          channelKey: 'call_channel',
+          channelName: 'Call notifications',
+          channelDescription: 'Notification channel for call notifications',
+          defaultColor: Colors.green,
+          ledColor: Colors.lightGreenAccent,
+          importance: NotificationImportance.Max,
+          vibrationPattern: highVibrationPattern, //List<int> lowVibrationPattern = [0, 100, 200, 100];
+          channelShowBadge: true,
+          criticalAlerts: true,
+          playSound: true,
+          enableVibration: true,
+        ),
+        NotificationChannel(
+          channelKey: 'message_channel',
+          channelName: 'Message notifications',
+          channelDescription: 'Notification channel for message notifications',
+          defaultColor: Colors.blue,
+          importance: NotificationImportance.High,
+          vibrationPattern: lowVibrationPattern,
+          channelShowBadge: true,
         ),
       ],
     );
@@ -58,56 +70,25 @@ class NotificationController extends GetxController {
     }
   }
 
-  Future<void> _requestIOSPermissions() async {
-    NotificationSettings settings = await _messaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    if (settings.authorizationStatus != AuthorizationStatus.authorized) {}
-  }
-
-  Future<void> _registerDeviceToken() async {
-    String? token = await _messaging.getToken();
-    if (token != null) {
-      // Optionally, send the token to your server for further processing.
-    }
-  }
-
-  void _listenToMessages() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _handleMessage(message);
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      _handleMessageOpenedApp(message);
-    });
-  }
+  Future<void> _requestIOSPermissions() async {}
 
   void _listenToNotificationActions() {
     AwesomeNotifications().setListeners(
-      onActionReceivedMethod: _handleNotificationAction,
+      onActionReceivedMethod: (ReceivedAction action) async {
+        switch (action.buttonKeyPressed) {
+          case "accept_call":
+            Get.offAllNamed("/mainHome");
+            break;
+          case "decline_call":
+            errorMessage("Hmmm...");
+            break;
+          case "dismiss_mess":
+            errorMessage("Hmmm...");
+            break;
+          default:
+        }
+      },
     );
-  }
-
-  void _handleMessage(RemoteMessage message) {
-    String? title = message.notification?.title ?? 'No title';
-    String? body = message.notification?.body ?? 'No body';
-    Map<String, dynamic> data = message.data;
-
-    showNotification(title, body, data);
-  }
-
-  void _handleMessageOpenedApp(RemoteMessage message) {
-    // Chuyển đổi kiểu dữ liệu từ Map<String, dynamic> sang Map<String, String?>
-    Map<String, String?> convertedData =
-        message.data.map((key, value) => MapEntry(key, value.toString()));
-    _navigateToScreen(convertedData);
-  }
-
-  static Future<void> _handleNotificationAction(
-      ReceivedAction receivedAction) async {
-    _navigateToScreen(receivedAction.payload);
   }
 
   Future<void> showNotification(
@@ -127,23 +108,99 @@ class NotificationController extends GetxController {
         payload: payload, // Truyền payload đã được chuyển đổi
         // customSound: notifySamSung,
         color: Colors.white,
-        largeIcon:
-            "https://static1.srcdn.com/wordpress/wp-content/uploads/2018/10/Ana-de-Armas-as-Joi-in-Blade-Runner-2049.jpg",
         backgroundColor: bgColor,
         // icon: 'resource://drawable/tic-tac-toe-x',
       ),
-      // schedule: NotificationInterval(
-      //   interval: 5,
-      //   timeZone: await AwesomeNotifications().getLocalTimeZoneIdentifier(),
-      //   preciseAlarm: true,
-      // ),
     );
   }
 
-  static void _navigateToScreen(Map<String, String?>? data) {
-    if (data != null && data['screen'] == 'SplacePage') {
-      Get.offAllNamed("/splace");
-    } else {}
+  Future<void> showCallNotification(
+    String callerName,
+    String callerImage,
+  ) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: _createUniqueId(),
+        channelKey: 'call_channel',
+        title: callerName,
+        body: '📞 You have a call from your friend: $callerName',
+        notificationLayout: NotificationLayout.Default,
+        roundedLargeIcon: true,
+        largeIcon: callerImage,
+        timeoutAfter: const Duration(seconds: 30),
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'decline_call',
+          label: 'DECLINE',
+          color: Colors.redAccent,
+        ),
+        NotificationActionButton(
+          key: 'accept_call',
+          label: 'ACCEPT',
+          color: Colors.greenAccent,
+        )
+      ],
+    );
+  }
+
+  Future<void> showMessageNotification(
+      String senderName, String message) async {
+    await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: _createUniqueId(),
+          channelKey: 'message_channel',
+          title: senderName,
+          body: "📩 $message",
+          notificationLayout: NotificationLayout.Messaging,
+          payload: {
+            'type': 'message',
+            'sender': senderName,
+            'message': message
+          },
+        ),
+        actionButtons: [
+          NotificationActionButton(
+              key: 'dismiss_mess',
+              label: 'DISMISS',
+              actionType: ActionType.DismissAction),
+          NotificationActionButton(
+              key: 'reply_mess',
+              label: 'REPLY',
+              requireInputText: true,
+              actionType: ActionType.SilentAction,
+              isDangerousOption: true)
+        ]);
+  }
+
+  Future<void> showFriendRequestNotification(
+      String requesterName, String requesterImage) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: _createUniqueId(),
+        channelKey: 'message_channel', // Có thể dùng chung với kênh tin nhắn
+        title: "Friend Request",
+        body: "📨 $requesterName has sent you a friend request!",
+        notificationLayout: NotificationLayout.Default,
+        largeIcon: requesterImage, // Ảnh đại diện của người gửi yêu cầu
+        payload: {
+          'type': 'friend_request',
+          'requester': requesterName,
+        },
+      ),
+      actionButtons: [
+        NotificationActionButton(
+          key: 'decline_friend',
+          label: 'DECLINE',
+          color: Colors.redAccent,
+        ),
+        NotificationActionButton(
+          key: 'accept_friend',
+          label: 'ACCEPT',
+          color: Colors.greenAccent,
+        ),
+      ],
+    );
   }
 
   int _createUniqueId() {

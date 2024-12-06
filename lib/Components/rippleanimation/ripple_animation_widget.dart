@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tictactoe_gameapp/Test/rippleanimation/circle_painter.dart';
+import 'package:tictactoe_gameapp/Components/rippleanimation/circle_painter.dart';
 
 class RipplesAnimationCustom extends StatefulWidget {
   const RipplesAnimationCustom({super.key});

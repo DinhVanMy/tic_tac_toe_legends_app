@@ -8,6 +8,8 @@ environment:
   sdk: ">=3.3.4 <4.0.0"
 
 dependencies:
+  agora_rtc_engine: ^6.3.2
+  agora_token_service: ^0.1.2
   awesome_notifications: null
   bottom_sheet: ^4.0.4
   cached_network_image: ^3.3.1
@@ -18,7 +20,6 @@ dependencies:
   dotted_border: ^2.1.0
   firebase_auth: ^4.18.0
   firebase_core: ^2.27.2
-  firebase_messaging: null
   firebase_storage: ^11.6.11
   flutter:
     sdk: flutter
@@ -26,6 +27,7 @@ dependencies:
   flutter_map: ^7.0.2
   flutter_settings_ui: ^3.0.1
   flutter_svg: ^2.0.9
+  flutter_tts: ^3.8.5
   form_field_validator: ^1.1.0
   geolocator: ^7.7.1
   get: ^4.6.6
@@ -38,6 +40,7 @@ dependencies:
   just_audio: ^0.9.39
   latlong2: ^0.9.1
   lite_rolling_switch: ^1.0.1
+  permission_handler: ^11.3.1
   share_plus: ^10.0.0
   speech_to_text: null
   uuid: ^4.4.0

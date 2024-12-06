@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 
@@ -20,9 +21,14 @@ class ProfileTooltipCustom extends StatelessWidget {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            CircleAvatar(
-              backgroundImage: CachedNetworkImageProvider(friend.image!),
+            // CircleAvatar(
+            //   backgroundImage: CachedNetworkImageProvider(friend.image!),
+            //   radius: 30,
+            // ),
+            AvatarUserWidget(
               radius: 30,
+              imagePath: friend.image!,
+              gradientColors: const [Colors.lightBlueAccent, Colors.redAccent],
             ),
             const SizedBox(height: 5),
             Text(

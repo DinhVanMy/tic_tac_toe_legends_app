@@ -7,12 +7,14 @@ import 'package:tictactoe_gameapp/Configs/theme/theme_dark.dart';
 import 'package:tictactoe_gameapp/Configs/theme/theme_light.dart';
 import 'package:tictactoe_gameapp/Configs/translation/translation.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
+import 'package:tictactoe_gameapp/Controller/check_network_controller.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/notification_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Splace/splace_page.dart';
+import 'package:tictactoe_gameapp/Test/test_widget.dart';
 import 'firebase_options.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -30,15 +32,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LanguageController languageController = Get.put(LanguageController());
-
-    Get.put(NotificationController());
     return GetMaterialApp(
       initialBinding: BindingsBuilder(() {
         Get.put(ThemeController(), permanent: true);
         Get.put(AuthController(), permanent: true);
-        Get.put(ProfileController(), permanent: true);
         Get.put(MusicController(), permanent: true);
-        //! Get.put(CheckNetworkController());
+        // Get.put(CheckNetworkController(),permanent: true);
       }),
       // initialRoute: '/splace',
       getPages: pages, navigatorKey: navigatorKey,
@@ -51,6 +50,7 @@ class MyApp extends StatelessWidget {
       fallbackLocale: const Locale('en'),
       home: const SplacePage(),
       //  const MultiPlayer(
+
       //   roomId: "339C80AB",
       // ),
     );

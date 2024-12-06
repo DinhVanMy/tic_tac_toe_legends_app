@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/Functions/notification_add_functions.dart';
 import 'package:tictactoe_gameapp/Models/general_notifications_model.dart';
 
 class PostNotificationController extends GetxController
@@ -23,7 +25,7 @@ class PostNotificationController extends GetxController
   var sharedNotifications = <GeneralNotificationsModel>[].obs;
 
   // Trang hiện tại và số lượng thông báo mỗi trang
-  final int notificationsPerPage = 10;
+  final int notificationsPerPage = 12;
   DocumentSnapshot? lastDocument;
 
   @override
@@ -122,7 +124,7 @@ class PostNotificationController extends GetxController
     await _firestore
         .collection("notifications")
         .doc(notificationId)
-        .update({"isReaded": true});
+        .update({"isReaded": true}).catchError((e) => errorMessage(e));
 
     // Cập nhật trạng thái local
     var index = notifications.indexWhere((n) => n.id == notificationId);
@@ -167,7 +169,7 @@ class PostNotificationController extends GetxController
     final oldNotifications = await _firestore
         .collection("notifications")
         .where("timestamp", isLessThan: sevenDaysAgo)
-        .limit(50) // Giới hạn số lượng để giảm tải
+        .where("isReaded", isEqualTo: true)
         .get();
 
     // Xóa các thông báo đã lọc
@@ -178,5 +180,51 @@ class PostNotificationController extends GetxController
       }
       await batch.commit();
     }
+  }
+
+  Future<void> deleteNotification(String notificationId) async {
+    await _firestore
+        .collection("notifications")
+        .doc(notificationId)
+        .delete()
+        .catchError((e) => errorMessage(e));
+    Get.back();
+  }
+
+  var isNotifed = false.obs;
+
+  Future<void> checkIsNotifed(String postId) async {
+    final NotificationAddFunctions notificationAddFunctions =
+        NotificationAddFunctions(firestore: _firestore);
+    isNotifed.value = await notificationAddFunctions.getFieldDataFromCollection(
+          collectionPath: "posts",
+          docId: postId,
+          fieldName: "isNotified",
+        ) ??
+        true;
+  }
+
+  Future<void> turnOffNotify(String postId) async {
+    await checkIsNotifed(postId);
+    if (isNotifed.value) {
+      await _firestore
+          .collection("posts")
+          .doc(postId)
+          .update({"isNotified": false})
+          .catchError((e) => errorMessage(e))
+          .then(
+              (_) => successMessage("Now, you can not receive notifications"));
+      await checkIsNotifed(postId);
+    } else {
+      isNotifed.value == true;
+      await _firestore
+          .collection("posts")
+          .doc(postId)
+          .update({"isNotified": true})
+          .catchError((e) => errorMessage(e))
+          .then((_) => successMessage("Now, you can receive notifications"));
+      await checkIsNotifed(postId);
+    }
+    Get.back();
   }
 }

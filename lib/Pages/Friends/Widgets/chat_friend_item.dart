@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Data/chat_friend_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Models/Functions/hyperlink_text_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/message_friend_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
@@ -13,6 +14,7 @@ class ChatFriendItem extends StatelessWidget {
   final String currentUserId;
   final FirestoreController firestoreController;
   final ChatFriendController chatController;
+  final List<Color> color;
   final ThemeData theme;
 
   const ChatFriendItem({
@@ -22,6 +24,7 @@ class ChatFriendItem extends StatelessWidget {
     required this.chatController,
     required this.firestoreController,
     required this.theme,
+    required this.color,
   });
   @override
   Widget build(BuildContext context) {
@@ -145,21 +148,21 @@ class ChatFriendItem extends StatelessWidget {
                     : Colors.white,
                 borderRadius: BorderRadius.circular(15),
                 gradient: LinearGradient(
-                  colors: isMe
-                      ? [
-                          Colors.lightBlue,
-                          Colors.lightBlueAccent,
-                        ]
-                      : [Colors.greenAccent, Colors.lightGreenAccent],
+                  colors: _checkColors(isMe, color),
                 ),
               ),
               child: Column(
                 crossAxisAlignment:
                     isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    message.content!,
-                    style: const TextStyle(color: Colors.black),
+                  SelectableText.rich(
+                    HyperlinkTextFunction.buildMessageText(
+                      text: message.content!,
+                      color: _checkColor(isMe: isMe, colors: color),
+                    ),
+                    style: TextStyle(
+                      color: _checkColor(isMe: isMe, colors: color),
+                    ),
                   ),
                   message.imagePath != null && message.imagePath != ""
                       ? Image.memory(
@@ -171,8 +174,15 @@ class ChatFriendItem extends StatelessWidget {
                   const SizedBox(height: 5),
                   Text(
                     TimeFunctions.displayTime(message.timestamp!),
-                    style:
-                        const TextStyle(color: Colors.blueGrey, fontSize: 10),
+                    style: TextStyle(
+                        color: isMe
+                            ? color.length == 2 &&
+                                    color[0] == Colors.transparent &&
+                                    color[1] == Colors.transparent
+                                ? Colors.blueGrey.shade600
+                                : Colors.white54
+                            : Colors.blueGrey,
+                        fontSize: 10),
                   ),
                 ],
               ),
@@ -264,5 +274,36 @@ class ChatFriendItem extends StatelessWidget {
       ),
       elevation: 5.0,
     );
+  }
+
+  List<Color> _checkColors(bool isMe, List<Color> colors) {
+    if (isMe) {
+      if ((colors.length == 2 &&
+          colors[0] == Colors.transparent &&
+          colors[1] == Colors.transparent)) {
+        return [
+          Colors.lightBlue,
+          Colors.lightBlueAccent,
+        ];
+      } else {
+        return colors;
+      }
+    } else {
+      return [Colors.greenAccent, Colors.lightGreenAccent];
+    }
+  }
+
+  Color _checkColor({required bool isMe, required List<Color> colors}) {
+    if (isMe) {
+      if ((colors.length == 2 &&
+          colors[0] == Colors.transparent &&
+          colors[1] == Colors.transparent)) {
+        return Colors.black;
+      } else {
+        return Colors.white;
+      }
+    } else {
+      return Colors.black;
+    }
   }
 }

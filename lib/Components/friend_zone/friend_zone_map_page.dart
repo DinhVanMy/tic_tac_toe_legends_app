@@ -14,7 +14,7 @@ import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Enums/popup_position.dart';
 
 import 'package:tictactoe_gameapp/Models/user_model.dart';
-import 'package:tictactoe_gameapp/Test/rippleanimation/ripple_animation_widget.dart';
+import 'package:tictactoe_gameapp/Components/rippleanimation/ripple_animation_widget.dart';
 
 class FriendZoneMapPage extends StatelessWidget {
   final FirestoreController firestoreController;
@@ -30,7 +30,6 @@ class FriendZoneMapPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     LatLng defaultLatLng = const LatLng(21.0000992, 105.8399243);
-
     final ProfileTooltip profileTooltip = Get.put(ProfileTooltip());
     final LocationController locationController =
         Get.put(LocationController(userId: user.id!));

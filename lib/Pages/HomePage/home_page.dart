@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
+import 'package:tictactoe_gameapp/Components/invite_request_dialog.dart';
 import 'package:tictactoe_gameapp/Components/primary_with_icon_button.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:get/get.dart';
@@ -16,6 +16,7 @@ import 'package:tictactoe_gameapp/Controller/Console/play_with_bot_controller.da
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/webview_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/listen_latest_messages_controller.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Shop/shop_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/bottom_button_custom.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Drawer/drawer_nav_bar.dart';
@@ -26,7 +27,7 @@ import 'package:tictactoe_gameapp/Components/fortune_wheel/fortune_wheel_page.da
 import 'package:tictactoe_gameapp/Components/daily_gift/daily_gift_page.dart';
 import 'package:tictactoe_gameapp/Components/daily_mission/missions_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/looping_carousel_widget.dart';
-import 'package:tictactoe_gameapp/Test/animated_carousel/test3.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/agora_end_of_call_lay.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -34,18 +35,19 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WebViewControllers controller = Get.put(WebViewControllers());
-    final CarouselController carouselController = Get.put(CarouselController());
+    final ListenLatestMessagesController listenLatestMessagesController =
+        Get.put(ListenLatestMessagesController());
+
     final NotifyInMainController notifyInMainController =
         controller.notifyInMainController;
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final theme = Theme.of(context);
-    final PlayWithBotController playWithBotController =
-        Get.put(PlayWithBotController());
+
     final MusicController musicController = Get.find<MusicController>();
     final FirestoreController firestoreController =
         Get.put(FirestoreController());
     final ProfileController profileController = Get.find<ProfileController>();
-    final user = profileController.readProfileNewUser();
+    final user = profileController.user!;
 
     return Scaffold(
       key: scaffoldKey,
@@ -60,7 +62,10 @@ class HomePage extends StatelessWidget {
         children: [
           const Positioned(
             bottom: 0,
-            child: LoopingCarousel(),
+            child: RotatedBox(
+              quarterTurns: 2,
+              child: LoopingCarousel(),
+            ),
           ),
           const Positioned(
             top: 0,
@@ -225,11 +230,13 @@ class HomePage extends StatelessWidget {
                                   decoration: BoxDecoration(
                                       color: Colors.red,
                                       borderRadius: BorderRadius.circular(100)),
-                                  child: const Text(
-                                    "99",
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      color: Colors.black,
+                                  child: Text(
+                                    listenLatestMessagesController
+                                        .latestMessages.length
+                                        .toString(),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -268,19 +275,16 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                SizedBox(
-                    height: 250,
-                    child: MiddleCustomWidget(
-                      carouselController: carouselController,
-                    )),
+                const SizedBox(height: 250, child: MiddleCustomWidget()),
                 Column(
                   children: [
                     PrimaryIconWithButton(
                       buttonText: "Single Player",
                       color: theme.colorScheme.primary,
                       onTap: () {
+                        final PlayWithBotController playWithBotController =
+                            Get.put(PlayWithBotController());
                         playWithBotController.showMapPicker();
-                        // Get.toNamed("/singlePlayer");
                       },
                       iconPath: IconsPath.user,
                     ),
@@ -620,11 +624,17 @@ class HomePage extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () async {
-                    await firestoreController.fetchUserLocation();
+                    late LatLng latlng;
+                    if (user.location != null) {
+                      latlng = LatLng(
+                          user.location!.latitude, user.location!.longitude);
+                    } else {
+                      latlng = const LatLng(21.0000992, 105.8399243);
+                    }
                     Get.to(() => FriendZoneMapPage(
                           user: user,
                           firestoreController: firestoreController,
-                          latlng: firestoreController.latlng,
+                          latlng: latlng,
                         ));
                   },
                   child: Image.asset(

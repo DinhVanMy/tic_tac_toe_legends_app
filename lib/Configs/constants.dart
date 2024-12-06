@@ -6,6 +6,8 @@ import 'package:tictactoe_gameapp/Models/champion_model.dart';
 const String url1 = "https://github.com/DinhVanMy?tab=repositories";
 const String url2 = "https://poki.com/";
 const String apiGemini = "AIzaSyBhZLp795GpY6xGzOd1wnH_7zYVJahHSk4";
+const String apiAgoraAppId = "8e6122e4c440452ea9820c570212c24b";
+const String apiAgoraAppCertificate = "42729d5877ea49658fda7815e8e9abfa";
 
 //----------------------------------------------------------------
 final roomCodeValidator = MultiValidator([

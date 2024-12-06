@@ -89,6 +89,7 @@ class BodyMultiPlayer extends StatelessWidget {
                   ? Column(
                       children: [
                         Stack(
+                          clipBehavior: Clip.none,
                           children: [
                             InGameUserCard(
                               icon: IconsPath.xIcon,
@@ -96,11 +97,11 @@ class BodyMultiPlayer extends StatelessWidget {
                               imageUrl: roomData.player1!.image!,
                               color:
                                   roomData.isXturn! ? Colors.red : Colors.white,
-                              coins: roomData.player1!.totalCoins!,
+                              coins: roomData.player1!.totalCoins ?? "0",
                             ),
                             roomData.player1!.quickMess != null
                                 ? Positioned(
-                                    right: 0,
+                                    right: -20,
                                     child: Container(
                                       height: 100,
                                       width: 100,
@@ -135,7 +136,7 @@ class BodyMultiPlayer extends StatelessWidget {
                                 : const SizedBox(),
                             roomData.player1!.quickEmote != null
                                 ? Positioned(
-                                    right: 0,
+                                    right: -20,
                                     child: Container(
                                       height: 100,
                                       width: 100,
@@ -218,11 +219,25 @@ class BodyMultiPlayer extends StatelessWidget {
                         )
                       ],
                     )
-                  : const CircularProgressIndicator(),
+                  : Column(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Get.toNamed("mainHome");
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_rounded,
+                            size: 35,
+                          ),
+                        ),
+                        const Text("Leave the room")
+                      ],
+                    ),
               roomData.player2 != null
                   ? Column(
                       children: [
                         Stack(
+                          clipBehavior: Clip.none,
                           children: [
                             InGameUserCard(
                               icon: IconsPath.oIcon,
@@ -231,11 +246,11 @@ class BodyMultiPlayer extends StatelessWidget {
                               color: roomData.isXturn!
                                   ? Colors.white
                                   : Colors.blue,
-                              coins: roomData.player2!.totalCoins!,
+                              coins: roomData.player2!.totalCoins??"0",
                             ),
                             roomData.player2!.quickMess != null
                                 ? Positioned(
-                                    left: 0,
+                                    left: -20,
                                     child: Container(
                                       height: 100,
                                       width: 100,
@@ -270,7 +285,7 @@ class BodyMultiPlayer extends StatelessWidget {
                                 : const SizedBox(),
                             roomData.player2!.quickEmote != null
                                 ? Positioned(
-                                    left: 0,
+                                    left: -20,
                                     child: Container(
                                       height: 100,
                                       width: 100,
@@ -353,7 +368,20 @@ class BodyMultiPlayer extends StatelessWidget {
                         )
                       ],
                     )
-                  : const CircularProgressIndicator(),
+                  : Column(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Get.toNamed("mainHome");
+                          },
+                          icon: const Icon(
+                            Icons.arrow_back_rounded,
+                            size: 35,
+                          ),
+                        ),
+                        const Text("Leave the room")
+                      ],
+                    ),
             ],
           ),
           const SizedBox(height: 10),

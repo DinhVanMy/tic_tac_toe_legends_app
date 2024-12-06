@@ -2,6 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
+import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
+import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/chat_with_friend_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/About/Widgets/post_section_widget.dart';
@@ -11,19 +15,23 @@ import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
 class UserAboutPage extends StatelessWidget {
   final String intdexString;
   final UserModel unknownableUser;
-  final UserModel currentUser;
-  const UserAboutPage(
-      {super.key,
-      required this.unknownableUser,
-      required this.intdexString,
-      required this.currentUser});
+
+  const UserAboutPage({
+    super.key,
+    required this.unknownableUser,
+    required this.intdexString,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final ProfileController profileController = Get.find();
+    UserModel currentUser = profileController.user!;
     final ThemeData theme = Theme.of(context);
     final ScrollController scrollController = ScrollController();
     final UserAboutController userAboutController =
         Get.put(UserAboutController(userId: unknownableUser.id!));
+    final FirestoreController firestoreController =
+        Get.find<FirestoreController>();
 
     final List<String> options = ["Favoritest", "Newest", "Oldest"];
     var selectedOption = 'Newest'.obs;
@@ -153,23 +161,51 @@ class UserAboutPage extends StatelessWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  foregroundColor: Colors.white,
-                                  shadowColor: Colors.redAccent,
-                                  elevation: 5,
-                                ),
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.person_add),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text("Add Friend"),
-                                  ],
-                                )),
+                            child: Obx(() {
+                              bool isFriend = firestoreController
+                                  .isFriend(unknownableUser.id!)
+                                  .value;
+                              return isFriend
+                                  ? ElevatedButton(
+                                      onPressed: () {},
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        shadowColor: Colors.redAccent,
+                                        elevation: 5,
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Icon(Icons.person),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text("Friend"),
+                                        ],
+                                      ),
+                                    )
+                                  : ElevatedButton(
+                                      onPressed: () {
+                                        successMessage(
+                                            'You added ${unknownableUser.name!} to the list of friends');
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue,
+                                        foregroundColor: Colors.white,
+                                        shadowColor: Colors.redAccent,
+                                        elevation: 5,
+                                      ),
+                                      child: const Row(
+                                        children: [
+                                          Icon(Icons.person_add),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text("Add Friend"),
+                                        ],
+                                      ),
+                                    );
+                            }),
                           ),
                           const SizedBox(
                             width: 20,
@@ -177,8 +213,12 @@ class UserAboutPage extends StatelessWidget {
                           Expanded(
                             child: ElevatedButton(
                                 onPressed: () {
+                                  final NotifyInMainController
+                                      notifyInMainController =
+                                      Get.put(NotifyInMainController());
                                   Get.to(() => ChatWithFriendPage(
                                         userFriend: unknownableUser,
+                                        notifyInMainController: notifyInMainController,
                                       ));
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -226,7 +266,7 @@ class UserAboutPage extends StatelessWidget {
                         style: theme.textTheme.bodyLarge,
                       ),
                       SizedBox(
-                        height: 400,
+                        height: 200,
                         child: ListView.builder(
                             itemCount: PostEditModel.listPostEditModels.length,
                             itemBuilder: (context, index) {
@@ -242,37 +282,20 @@ class UserAboutPage extends StatelessWidget {
                                       children: [
                                         Icon(
                                           option.icon,
-                                          size: 35,
+                                          size: 25,
+                                          color: Colors.blueGrey,
                                         ),
                                         const SizedBox(
                                           width: 10,
                                         ),
                                         Expanded(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                option.title,
-                                                style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                              const SizedBox(
-                                                height: 10,
-                                              ),
-                                              Text(
-                                                option.description,
-                                                style: const TextStyle(
-                                                  fontSize: 15,
-                                                  color: Colors.blueGrey,
-                                                  fontStyle: FontStyle.italic,
-                                                ),
-                                              ),
-                                            ],
+                                          child: Text(
+                                            option.description,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black,
+                                              fontStyle: FontStyle.italic,
+                                            ),
                                           ),
                                         )
                                       ],

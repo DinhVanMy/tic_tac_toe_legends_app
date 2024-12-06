@@ -5,18 +5,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Data/chat_friend_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
+import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
+import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
+import 'package:tictactoe_gameapp/Models/Functions/permission_handle_functions.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/agora_call_page.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/background_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/chat_friend_item.dart';
+import 'package:uuid/uuid.dart';
 
 class ChatWithFriendPage extends StatelessWidget {
+  final NotifyInMainController notifyInMainController;
   final UserModel userFriend;
   const ChatWithFriendPage({
     super.key,
     required this.userFriend,
+    required this.notifyInMainController,
   });
 
   @override
@@ -32,256 +41,343 @@ class ChatWithFriendPage extends StatelessWidget {
       firestoreController.userId,
       userFriend.id!,
     ));
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-            onPressed: () => Get.back(),
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.deepPurpleAccent,
-              size: 35,
-            )),
-        title: Row(
-          children: [
-            Hero(
-              tag: 'friendAvatar-${userFriend.id}',
-              transitionOnUserGestures: true,
-              child: CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(userFriend.image!),
-                radius: 25,
+
+    return Obx(() {
+      var themColors = chatController.chatSettings.value.themeColors;
+      var backgroundColors = [Colors.transparent, Colors.transparent];
+      if (themColors != null) {
+        backgroundColors = themColors
+            .map((hex) => ColorStringReverseFunction.hexToColor(hex))
+            .toList();
+      } else {
+        backgroundColors = [Colors.transparent, Colors.transparent];
+      }
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+              onPressed: () => Get.back(),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.deepPurpleAccent,
+                size: 35,
+              )),
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: backgroundColors,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-            const SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(userFriend.name!, style: theme.textTheme.bodyLarge),
-                  userFriend.lastActive == null
-                      ? Text(
-                          "${userFriend.status ?? "Online"} 1 hour ago",
-                          style: theme.textTheme.bodySmall!
-                              .copyWith(color: Colors.grey),
-                        )
-                      : Text(
-                          "Online ${TimeFunctions.displayDate(userFriend.lastActive!)} - ${TimeFunctions.displayTimeDefault(userFriend.lastActive!)}",
-                          style: theme.textTheme.bodySmall!
-                              .copyWith(color: Colors.grey),
-                          maxLines: 2,
-                        ),
-                ],
+          ),
+          title: Row(
+            children: [
+              Hero(
+                tag: 'friendAvatar-${userFriend.id}',
+                transitionOnUserGestures: true,
+                child: CircleAvatar(
+                  backgroundImage:
+                      CachedNetworkImageProvider(userFriend.image!),
+                  radius: 25,
+                ),
               ),
-            )
+              const SizedBox(
+                width: 10,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(userFriend.name!, style: theme.textTheme.bodyLarge),
+                    userFriend.lastActive == null
+                        ? Text(
+                            "${userFriend.status ?? "Online"} 1 hour ago",
+                            style: theme.textTheme.bodySmall!
+                                .copyWith(color: Colors.grey),
+                          )
+                        : Text(
+                            "Online ${TimeFunctions.displayDate(userFriend.lastActive!)} - ${TimeFunctions.displayTimeDefault(userFriend.lastActive!)}",
+                            style: theme.textTheme.bodySmall!.copyWith(
+                              color: themColors != null
+                                  ? Colors.lightGreenAccent
+                                  : Colors.blueGrey,
+                            ),
+                            maxLines: 2,
+                          ),
+                  ],
+                ),
+              )
+            ],
+          ),
+          elevation: 3.0,
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.call,
+                color: Colors.deepPurpleAccent,
+                size: 30,
+              ),
+              onPressed: () async {
+                final permissionHandler = PermissionHandleFunctions();
+                bool micGranted =
+                    await permissionHandler.checkMicrophonePermission();
+                if (micGranted == true) {
+                  var userCurrent = profileController.user!;
+                  var uuid = const Uuid();
+                  final String channelId = uuid.v4().substring(0, 12);
+                  await notifyInMainController.sendCallInvite(
+                    receiverId: userFriend.id!,
+                    senderUser: userCurrent,
+                    channelId: channelId,
+                  );
+                  Get.to(() => AgoraCallPage(
+                        userFriend: userFriend,
+                        userCurrent: userCurrent,
+                        channelId: channelId,
+                        initialMicState: true,
+                        initialVideoState: false,
+                      ));
+                } else {
+                  errorMessage("Please microphone permission");
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.video_call,
+                color: Colors.deepPurpleAccent,
+                size: 30,
+              ),
+              onPressed: () async {
+                final permissionHandler = PermissionHandleFunctions();
+                bool camGranted =
+                    await permissionHandler.checkCameraPermission();
+                bool micGranted =
+                    await permissionHandler.checkMicrophonePermission();
+                if (camGranted == true && micGranted == true) {
+                  var userCurrent = profileController.user!;
+                  var uuid = const Uuid();
+                  final String channelId = uuid.v4().substring(0, 12);
+                  Get.to(() => AgoraCallPage(
+                        userFriend: userFriend,
+                        userCurrent: userCurrent,
+                        channelId: channelId,
+                        initialMicState: true,
+                        initialVideoState: true,
+                      ));
+                } else {
+                  errorMessage("Please camera permission");
+                }
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.info,
+                color: Colors.deepPurpleAccent,
+                size: 30,
+              ),
+              onPressed: () async {
+                await GeneralBottomsheetShowFunction
+                    .showScrollableGeneralBottomsheet(
+                  widgetBuilder: (context, controller) => BackgroundListSheet(
+                    scrollController: controller,
+                    chatFriendController: chatController,
+                  ),
+                  context: context,
+                  initHeight: 0.9,
+                );
+              },
+            ),
           ],
         ),
-        elevation: 3.0,
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.call,
-              color: Colors.deepPurpleAccent,
-              size: 30,
+        body: Container(
+          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: backgroundColors,
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(
-              Icons.video_call,
-              color: Colors.deepPurpleAccent,
-              size: 30,
-            ),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(
-              Icons.info,
-              color: Colors.deepPurpleAccent,
-              size: 30,
-            ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10, bottom: 5),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Obx(
-              () => chatController.isEmptyMessage.value
-                  ? _buildProfilePreview(theme)
-                  : Expanded(
-                      child: ChatFriendItem(
-                        userFriend: userFriend,
-                        currentUserId: firestoreController.userId,
-                        chatController: chatController,
-                        firestoreController: firestoreController,
-                        theme: theme,
-                      ),
-                    ),
-            ),
-            Obx(() {
-              if (imagePath.value.isNotEmpty) {
-                return Column(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        imagePath.value = "";
-                      },
-                      icon: const Icon(
-                        Icons.cancel,
-                        color: Colors.deepPurpleAccent,
-                        size: 30,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 200,
-                      height: 120,
-                      child: Image.file(
-                        File(
-                          imagePath.value,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Obx(
+                () => chatController.isEmptyMessage.value
+                    ? _buildProfilePreview(theme)
+                    : Expanded(
+                        child: ChatFriendItem(
+                          userFriend: userFriend,
+                          currentUserId: firestoreController.userId,
+                          chatController: chatController,
+                          firestoreController: firestoreController,
+                          color: backgroundColors,
+                          theme: theme,
                         ),
-                        fit: BoxFit.cover,
                       ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    )
-                  ],
-                );
-              } else {
-                return const SizedBox();
-              }
-            }),
-            Row(
-              children: [
-                Obx(() => chatController.isFocused.value
-                    ? IconButton(
+              ),
+              Obx(() {
+                if (imagePath.value.isNotEmpty) {
+                  return Column(
+                    children: [
+                      IconButton(
                         onPressed: () {
-                          chatController.focusNode.unfocus();
+                          imagePath.value = "";
                         },
                         icon: const Icon(
-                          Icons.keyboard_arrow_right,
+                          Icons.cancel,
+                          color: Colors.deepPurpleAccent,
+                          size: 30,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 200,
+                        height: 120,
+                        child: Image.file(
+                          File(
+                            imagePath.value,
+                          ),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      )
+                    ],
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              }),
+              Row(
+                children: [
+                  Obx(() => chatController.isFocused.value
+                      ? IconButton(
+                          onPressed: () {
+                            chatController.focusNode.unfocus();
+                          },
+                          icon: const Icon(
+                            Icons.keyboard_arrow_right,
+                            color: Colors.blueAccent,
+                            size: 30,
+                          ),
+                        )
+                      : Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.add_circle,
+                                color: Colors.blueAccent,
+                                size: 30,
+                              ),
+                              onPressed: () {},
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.camera_alt,
+                                color: Colors.blueAccent,
+                                size: 30,
+                              ),
+                              onPressed: () async {
+                                image = await profileController
+                                    .pickFileX(ImageSource.camera);
+                                if (image != null) {
+                                  imagePath.value = image!.path;
+                                } else {
+                                  imagePath.value = "";
+                                }
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.image_rounded,
+                                color: Colors.blueAccent,
+                                size: 30,
+                              ),
+                              onPressed: () async {
+                                image = await profileController
+                                    .pickFileX(ImageSource.gallery);
+                                if (image != null) {
+                                  imagePath.value = image!.path;
+                                } else {
+                                  imagePath.value = "";
+                                }
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(
+                                Icons.mic,
+                                color: Colors.blueAccent,
+                                size: 30,
+                              ),
+                              onPressed: () {},
+                            ),
+                          ],
+                        )),
+                  Expanded(
+                    child: TextField(
+                      focusNode: chatController.focusNode,
+                      controller: textController,
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 10.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          borderSide:
+                              const BorderSide(color: Colors.blueAccent),
+                        ),
+                        labelText: 'Message',
+                        labelStyle: theme.textTheme.bodyLarge!
+                            .copyWith(color: Colors.grey),
+                        suffixIcon: IconButton(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.emoji_emotions,
+                              color: Colors.blue,
+                              size: 30,
+                            )),
+                      ),
+                    ),
+                  ),
+                  Obx(() => IconButton(
+                        icon: Icon(
+                          imagePath.value.isEmpty
+                              ? Icons.send_sharp
+                              : Icons.image_search,
                           color: Colors.blueAccent,
                           size: 30,
                         ),
-                      )
-                    : Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(
-                              Icons.add_circle,
-                              color: Colors.blueAccent,
-                              size: 30,
-                            ),
-                            onPressed: () {},
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.camera_alt,
-                              color: Colors.blueAccent,
-                              size: 30,
-                            ),
-                            onPressed: () async {
-                              image = await profileController
-                                  .pickFileX(ImageSource.camera);
-                              if (image != null) {
-                                imagePath.value = image!.path;
-                              } else {
-                                imagePath.value = "";
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.image_rounded,
-                              color: Colors.blueAccent,
-                              size: 30,
-                            ),
-                            onPressed: () async {
-                              image = await profileController
-                                  .pickFileX(ImageSource.gallery);
-                              if (image != null) {
-                                imagePath.value = image!.path;
-                              } else {
-                                imagePath.value = "";
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.mic,
-                              color: Colors.blueAccent,
-                              size: 30,
-                            ),
-                            onPressed: () {},
-                          ),
-                        ],
-                      )),
-                Expanded(
-                  child: TextField(
-                    focusNode: chatController.focusNode,
-                    controller: textController,
-                    decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 10.0),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        borderSide: const BorderSide(color: Colors.blueAccent),
-                      ),
-                      labelText: 'Message',
-                      labelStyle: theme.textTheme.bodyLarge!
-                          .copyWith(color: Colors.grey),
-                      suffixIcon: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.emoji_emotions,
-                            color: Colors.blue,
-                            size: 30,
-                          )),
-                    ),
-                  ),
-                ),
-                Obx(() => IconButton(
-                      icon: Icon(
-                        imagePath.value.isEmpty
-                            ? Icons.send_sharp
-                            : Icons.image_search,
-                        color: Colors.blueAccent,
-                        size: 30,
-                      ),
-                      onPressed: () async {
-                        if (imagePath.value.isEmpty) {
-                          if (textController.text.isNotEmpty) {
-                            await chatController.sendMessage(
-                              textController.text,
-                            );
-                            textController.clear();
-                            chatController.focusNode.unfocus();
+                        onPressed: () async {
+                          if (imagePath.value.isEmpty) {
+                            if (textController.text.isNotEmpty) {
+                              await chatController.sendMessage(
+                                textController.text,
+                              );
+                              textController.clear();
+                              chatController.focusNode.unfocus();
+                            } else {
+                              errorMessage("Please enter a message");
+                            }
                           } else {
-                            errorMessage("Please enter a message");
+                            await chatController.sendImageMessage(
+                              textController.text,
+                              image!,
+                            );
+                            imagePath.value = "";
+                            if (textController.text.isNotEmpty) {
+                              textController.clear();
+                              chatController.focusNode.unfocus();
+                            }
                           }
-                        } else {
-                          await chatController.sendImageMessage(
-                            textController.text,
-                            image!,
-                          );
-                          imagePath.value = "";
-                          if (textController.text.isNotEmpty) {
-                            textController.clear();
-                            chatController.focusNode.unfocus();
-                          }
-                        }
-                      },
-                    )),
-              ],
-            )
-          ],
+                        },
+                      )),
+                ],
+              )
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _buildProfilePreview(ThemeData theme) {

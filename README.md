@@ -19,3 +19,5 @@ git status                   # Kiểm tra trạng thái của repository
 git add .                    # Thêm tất cả các thay đổi vào staging area
 git commit -m "Thông báo commit" # Commit các thay đổi với thông điệp
 git push origin <branch-name> # Đẩy các thay đổi lên repository
+
+firebase deploy --only functions

@@ -4,6 +4,7 @@ import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/Functions/permission_handle_functions.dart';
 
 class SpeechController extends GetxController {
   final stt.SpeechToText _speechToText = stt.SpeechToText();
@@ -11,16 +12,22 @@ class SpeechController extends GetxController {
   var isSpeechEnabled = false.obs;
   var lastWords = "".obs; //Hi, How is it going
   var isListening = false.obs;
-  
+
 // Inintial instance of speech
   Future<void> initializeSpeech() async {
     try {
-      isSpeechEnabled.value = await _speechToText.initialize(
-        onStatus: statusListener,
-        onError: errorListener,
-        debugLogging: true,
-        options: [stt.SpeechToText.androidIntentLookup],
-      );
+      final permissionHandler = PermissionHandleFunctions();
+      bool micGranted = await permissionHandler.checkMicrophonePermission();
+      if (micGranted) {
+        isSpeechEnabled.value = await _speechToText.initialize(
+          onStatus: statusListener,
+          onError: errorListener,
+          debugLogging: true,
+          options: [stt.SpeechToText.androidIntentLookup],
+        );
+      } else {
+        errorMessage('Microphone permission not granted');
+      }
     } catch (e) {
       if (e is PlatformException) {
         errorMessage('Speech initialization error: ${e.message}');
@@ -46,26 +53,28 @@ class SpeechController extends GetxController {
 // Listening--------------------------------
   Future<void> startListening() async {
     if (!isSpeechEnabled.value) {
-      await initializeSpeech();
+    await initializeSpeech();
     } else {
-      try {
-        await _speechToText.listen(
-          onResult: _onSpeechResult,
-          listenFor: const Duration(seconds: 30),
-          pauseFor: const Duration(seconds: 5),
-        );
-        isListening.value = _speechToText.isListening;
-      } catch (e) {
-        errorMessage('Error while starting listening: ${e.toString()}');
+    try {
+      await _speechToText.listen(
+        onResult: _onSpeechResult,
+        listenFor: const Duration(seconds: 30),
+        pauseFor: const Duration(seconds: 5),
+      );
+      isListening.value = _speechToText.isListening;
+    } catch (e) {
+      errorMessage('Error while starting listening: ${e.toString()}');
       }
     }
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
-    if (result.recognizedWords.isNotEmpty) {
-      lastWords.value = result.recognizedWords;
-    } else {
-      errorMessage("No recognized words.");
+    if (result.finalResult) {
+      if (result.recognizedWords.isNotEmpty) {
+        lastWords.value = result.recognizedWords;
+      } else {
+        errorMessage("No recognized words.");
+      }
     }
   }
 

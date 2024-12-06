@@ -26,8 +26,8 @@ class ExpansionSideWidgetLeft extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.blue[100],
                   borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      bottomLeft: Radius.circular(50)),
+                      topRight: Radius.circular(50),
+                      bottomRight: Radius.circular(50)),
                 ),
                 child: isExpanded.value
                     ? Column(

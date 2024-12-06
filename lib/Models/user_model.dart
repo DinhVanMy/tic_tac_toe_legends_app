@@ -59,8 +59,8 @@ class UserModel {
     if (json["quickEmote"] is String) {
       quickEmote = json["quickEmote"];
     }
-    if (json["friendsList"] is List<String>) {
-      friendsList = List<String>.from(json["friendsList"] ?? []);
+    if (json["friendsList"] is List) {
+      friendsList = List<String>.from(json["friendsList"]);
     }
     if (json["status"] is String) {
       status = json["status"];

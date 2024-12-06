@@ -2,9 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_notification_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_notification_tabs/edit_notify_bottomsheet.dart';
 
 class PostLikeTab extends StatelessWidget {
   final PostNotificationController postNotificationController;
@@ -56,8 +59,28 @@ class PostLikeTab extends StatelessWidget {
                     : Colors.lightBlueAccent.shade100,
                 child: InkWell(
                   splashColor: Colors.white,
-                  onTap: () {
-                    postNotificationController.markAsRead(likeNotification.id!);
+                  onTap: () async {
+                    await postNotificationController
+                        .markAsRead(likeNotification.id!);
+                    Get.to(UserAboutPage(
+                      unknownableUser: likeUser,
+                      intdexString: likeNotification.postId!,
+                    ));
+                  },
+                  onLongPress: () async {
+                    await postNotificationController
+                        .checkIsNotifed(likeNotification.postId!);
+                    await GeneralBottomsheetShowFunction
+                        .showScrollableGeneralBottomsheet(
+                      widgetBuilder: (context, controller) =>
+                          EditNotifyBottomsheet(
+                        likeNotification: likeNotification,
+                        scrollController: controller,
+                        postNotificationController: postNotificationController,
+                      ),
+                      context: context,
+                      initHeight: 0.5,
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(10),
@@ -103,7 +126,7 @@ class PostLikeTab extends StatelessWidget {
                                       likeNotification.timestamp!.toDate(),
                                 ),
                                 style: const TextStyle(
-                                  color: Colors.grey,
+                                  color: Colors.blueGrey,
                                   fontSize: 13,
                                 ),
                               ),

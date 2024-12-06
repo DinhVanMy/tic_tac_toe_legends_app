@@ -7,6 +7,7 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/online_status_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Login/change_password_dialog.dart';
 import 'package:tictactoe_gameapp/Pages/Setting/Widgets/locale_button.dart';
@@ -17,13 +18,14 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!GetStorage().hasData('isDarkMode')) {
-      GetStorage().write(
-          'isDarkMode', false); // Thiết lập mặc định nếu không có dữ liệu
+      GetStorage().write('isDarkMode', false);
     }
     final ThemeController themeController = Get.find<ThemeController>();
     final MusicController musicController = Get.find<MusicController>();
     final LanguageController languageController =
         Get.find<LanguageController>();
+    final OnlineStatusController onlineStatusController =
+        Get.find<OnlineStatusController>();
     final theme = Theme.of(context);
     final List<String> playlistLight = [AudioSPath.shinobuTheme];
     final List<String> playlistDark = [AudioSPath.akazaTheme];
@@ -156,7 +158,7 @@ class SettingScreen extends StatelessWidget {
                 title: Text("logout_sett".tr),
                 onPressed: (BuildContext context) {
                   musicController.digitalSoundEffect();
-                  logoutMessage(context);
+                  logoutMessage(context, onlineStatusController);
                 },
                 leading: const Icon(Icons.logout),
                 description: Text("logout_from_app_sett".tr),

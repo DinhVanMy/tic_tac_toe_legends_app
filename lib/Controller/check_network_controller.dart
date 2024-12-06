@@ -1,13 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:get/get.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:flutter/material.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 
 class CheckNetworkController extends GetxController {
   var isConnected = true.obs;
+  var ping = 0.obs; // Lưu thời gian ping (ms)
   late StreamSubscription<InternetConnectionStatus> _streamSubscription;
+  Timer? _pingTimer;
 
   @override
   void onInit() {
@@ -20,7 +22,12 @@ class CheckNetworkController extends GetxController {
     bool result = await InternetConnectionChecker().hasConnection;
     isConnected.value = result;
     if (!result) {
-      _showNoConnectionDialog();
+      showNoConnectionDialog(onPressed: () {
+        if (Get.isDialogOpen == true) {
+          Get.back();
+        }
+        _checkConnection().then((_) => errorMessage("Connection is failed..."));
+      });
     }
   }
 
@@ -29,7 +36,13 @@ class CheckNetworkController extends GetxController {
         InternetConnectionChecker().onStatusChange.listen((status) {
       isConnected.value = status == InternetConnectionStatus.connected;
       if (!isConnected.value) {
-        _showNoConnectionDialog();
+        showNoConnectionDialog(onPressed: () {
+          if (Get.isDialogOpen == true) {
+            Get.back();
+          }
+          _checkConnection()
+              .then((_) => errorMessage("Connection is failed..."));
+        });
       } else {
         if (Get.isDialogOpen == true) {
           Get.back();
@@ -39,35 +52,32 @@ class CheckNetworkController extends GetxController {
     });
   }
 
-  void _showNoConnectionDialog() {
-    if (Get.isDialogOpen == false) {
-      Get.dialog(
-        AlertDialog(
-          title: const Text('Oops...'),
-          content: const Text('No internet! Check your network connection'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                _checkConnection()
-                    .then((_) => errorMessage("Connection is failed..."));
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-          icon: const Icon(
-            Icons.warning,
-            size: 40,
-          ),
-          iconColor: Colors.red,
-        ),
-        barrierDismissible: false,
-      );
+  /// Bắt đầu theo dõi ping
+  void _startPingMonitoring() {
+    _pingTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
+      await _measurePing();
+    });
+  }
+
+  /// Đo thời gian ping
+  Future<void> _measurePing() async {
+    const String host = '8.8.8.8'; // Google DNS
+    try {
+      final stopwatch = Stopwatch()..start();
+      final socket =
+          await Socket.connect(host, 80, timeout: const Duration(seconds: 5));
+      stopwatch.stop();
+      ping.value = stopwatch.elapsedMilliseconds;
+      socket.destroy();
+    } catch (e) {
+      ping.value = -1; // -1 để biểu thị lỗi khi không đo được ping
     }
   }
 
   @override
   void dispose() {
     _streamSubscription.cancel();
+    _pingTimer?.cancel();
     super.dispose();
   }
 }

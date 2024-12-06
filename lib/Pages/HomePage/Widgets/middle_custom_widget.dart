@@ -5,18 +5,19 @@ import 'package:tictactoe_gameapp/Controller/Animations/carousel_controller.dart
 
 // UI
 class MiddleCustomWidget extends StatelessWidget {
-  final CarouselController carouselController;
-  const MiddleCustomWidget({super.key, required this.carouselController});
+  const MiddleCustomWidget({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final CarouselController carouselController = Get.put(CarouselController());
     return PageView.builder(
       controller: carouselController.pageController,
       itemCount: carouselController.virtualItemCount,
       physics: const BouncingScrollPhysics(),
       itemBuilder: (context, index) {
         int realIndex = carouselController.getRealIndex(index);
-
         return Obx(() {
           return Transform(
             alignment: Alignment.center,

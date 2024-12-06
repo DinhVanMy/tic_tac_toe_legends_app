@@ -51,6 +51,7 @@ class BottomNavBar extends StatelessWidget {
           GButton(
             icon: Icons.chat_outlined,
             text: 'Chatting',
+           
           ),
           GButton(
             icon: Icons.android_outlined,

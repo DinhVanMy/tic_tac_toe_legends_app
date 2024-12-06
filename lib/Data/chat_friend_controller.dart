@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/chat_friend_settings_model.dart';
 import 'package:tictactoe_gameapp/Models/message_friend_model.dart';
 import 'package:uuid/uuid.dart';
 
@@ -22,7 +23,7 @@ class ChatFriendController extends GetxController {
   var hasMoreMessages = true.obs;
   var isEmptyMessage = false.obs;
   var isSearching = false.obs;
-  final int pageSize = 10;
+  final int pageSize = 20;
   DocumentSnapshot? lastDocument;
 
   final String currentUserId;
@@ -38,9 +39,10 @@ class ChatFriendController extends GetxController {
     focusNode.addListener(() {
       isFocused.value = focusNode.hasFocus;
     });
-    scrollController.addListener(() {
-      _onScroll();
-    });
+    listenToChatSettings();
+    // scrollController.addListener(() {
+    //   _onScroll();
+    // });
   }
 
   // Hàm lắng nghe tin nhắn theo thời gian thực cho tin nhắn mới
@@ -49,7 +51,7 @@ class ChatFriendController extends GetxController {
         .collection('chats')
         .doc(_getChatRoomId())
         .collection('messages')
-        .orderBy('timestamp', descending: true)
+        .orderBy('timestamp', descending: false)
         .snapshots(includeMetadataChanges: true)
         .listen((QuerySnapshot snapshot) {
       // Xử lý từng thay đổi trong snapshot
@@ -194,7 +196,7 @@ class ChatFriendController extends GetxController {
       receiverId: friendId,
       content: content,
       timestamp: Timestamp.now(),
-      status: 'sent',
+      status: 'unseen',
     );
 
     await _firestore
@@ -229,7 +231,7 @@ class ChatFriendController extends GetxController {
       content: content,
       imagePath: base64String,
       timestamp: Timestamp.now(),
-      status: 'sent',
+      status: 'unseen',
     );
 
     await _firestore
@@ -260,7 +262,7 @@ class ChatFriendController extends GetxController {
       receiverId: targetUserId,
       content: content,
       timestamp: Timestamp.now(),
-      // status: 'sent',
+      status: 'unseen',
     );
 
     await FirebaseFirestore.instance
@@ -275,7 +277,7 @@ class ChatFriendController extends GetxController {
   //auto delete message after time out
   Future<void> deleteOldMessages() async {
     final Timestamp sevenDaysAgo = Timestamp.fromDate(
-      DateTime.now().subtract(const Duration(days: 7)),
+      DateTime.now().subtract(const Duration(days: 30)),
     );
 
     try {
@@ -294,11 +296,48 @@ class ChatFriendController extends GetxController {
             .doc(doc.id)
             .delete()
             .catchError((e) => errorMessage('Error deleting old messages: $e'));
-        print('Deleted messages 7 days ago');
+        successMessage('Deleted messages 7 days ago');
       }
     } catch (e) {
       errorMessage('Error deleting old messages: $e');
     }
+  }
+
+  Future<void> setThemeForChatRoom({required List<String>? colors}) async {
+    ChatFriendSettingsModel chatFriendSettingsModel = ChatFriendSettingsModel(
+      id: currentUserId,
+      themeColors: colors,
+      isNotified: true,
+    );
+    await _firestore
+        .collection('chats')
+        .doc(_getChatRoomId())
+        .set(chatFriendSettingsModel.toJson())
+        .catchError((e) => errorMessage(e));
+  }
+
+  Future<void> setDefaultThemeForChatRoom() async {
+    await _firestore
+        .collection('chats')
+        .doc(_getChatRoomId())
+        .update({'themeColors': FieldValue.delete()}).catchError(
+            (e) => errorMessage(e));
+  }
+
+  Rx<ChatFriendSettingsModel> chatSettings = ChatFriendSettingsModel().obs;
+  void listenToChatSettings() {
+    _firestore
+        .collection('chats')
+        .doc(_getChatRoomId())
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists) {
+        final data = snapshot.data();
+        if (data != null) {
+          chatSettings.value = ChatFriendSettingsModel.fromJson(data);
+        }
+      }
+    });
   }
 
   // Tạo ID phòng chat dựa trên userId và friendId

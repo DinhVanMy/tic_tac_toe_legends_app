@@ -6,7 +6,7 @@ class LoopingCarousel extends StatefulWidget {
   const LoopingCarousel({super.key});
 
   @override
-  _LoopingCarouselState createState() => _LoopingCarouselState();
+  State<LoopingCarousel> createState() => _LoopingCarouselState();
 }
 
 class _LoopingCarouselState extends State<LoopingCarousel> {
@@ -52,11 +52,12 @@ class _LoopingCarouselState extends State<LoopingCarousel> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.sizeOf(context).width,
+      height: MediaQuery.sizeOf(context).height * 0.5,
       width: MediaQuery.sizeOf(context).width,
       child: PageView.builder(
         controller: _pageController,
-        itemCount: imagePaths.length + 1, // Thêm một trang để tạo hiệu ứng vòng lặp
+        itemCount:
+            imagePaths.length + 1, // Thêm một trang để tạo hiệu ứng vòng lặp
         onPageChanged: (index) {
           // Kiểm tra nếu đến trang sao chép ở cuối
           if (index == imagePaths.length) {
@@ -70,7 +71,8 @@ class _LoopingCarouselState extends State<LoopingCarousel> {
           }
         },
         itemBuilder: (context, index) {
-          final imageIndex = index % imagePaths.length; // Lấy ảnh theo index thực
+          final imageIndex =
+              index % imagePaths.length; // Lấy ảnh theo index thực
           return Image.asset(imagePaths[imageIndex], fit: BoxFit.cover);
         },
       ),

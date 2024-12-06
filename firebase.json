@@ -1,1 +1,38 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"tictactoe-flutter-672ff","appId":"1:71459166896:android:5b59226030e77e2019b975","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"tictactoe-flutter-672ff","configurations":{"android":"1:71459166896:android:5b59226030e77e2019b975","ios":"1:71459166896:ios:f875779ae976dc2719b975"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "tictactoe-flutter-672ff",
+          "appId": "1:71459166896:android:5b59226030e77e2019b975",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "tictactoe-flutter-672ff",
+          "configurations": {
+            "android": "1:71459166896:android:5b59226030e77e2019b975",
+            "ios": "1:71459166896:ios:f875779ae976dc2719b975"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}

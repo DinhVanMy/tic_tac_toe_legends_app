@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/main_home_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/check_network_controller.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/bottom_nav_bar.dart';
 
 class MainHomePage extends StatelessWidget {
@@ -11,6 +12,10 @@ class MainHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final MainHomeController controller = Get.put(MainHomeController());
     final MusicController musicController = Get.find();
+//todo check network
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Get.put(CheckNetworkController(), permanent: true);
+    // });
     return Scaffold(
       body: Obx(() => controller.pages[controller.currentIndex.value]),
       bottomNavigationBar: BottomNavBar(

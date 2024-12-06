@@ -13,12 +13,12 @@ class OnlineStatusController extends GetxController
     super.onInit();
     WidgetsBinding.instance
         .addObserver(this); // Lắng nghe trạng thái app lifecycle.
-    _setOnline(); // Đặt trạng thái online khi khởi động app.
+    setOnline(); // Đặt trạng thái online khi khởi động app.
   }
 
   @override
   void onClose() {
-    _setOffline(); // Đặt trạng thái offline khi đóng app.
+    setOffline(); // Đặt trạng thái offline khi đóng app.
     WidgetsBinding.instance.removeObserver(this);
     super.onClose();
   }
@@ -27,14 +27,14 @@ class OnlineStatusController extends GetxController
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      _setOnline(); // App vào foreground (online).
+      setOnline(); // App vào foreground (online).
     } else if (state == AppLifecycleState.paused) {
-      _setOffline(); // App vào background (offline).
+      setOffline(); // App vào background (offline).
     }
   }
 
   // Đặt trạng thái online trong Firestore
-  Future<void> _setOnline() async {
+  Future<void> setOnline() async {
     await _firestore.collection('users').doc(userId).update({
       'status': 'online',
       'lastActive': FieldValue.serverTimestamp(),
@@ -42,7 +42,7 @@ class OnlineStatusController extends GetxController
   }
 
   // Đặt trạng thái offline trong Firestore
-  Future<void> _setOffline() async {
+  Future<void> setOffline() async {
     await _firestore.collection('users').doc(userId).update({
       'status': 'offline',
       'lastActive': FieldValue.serverTimestamp(),

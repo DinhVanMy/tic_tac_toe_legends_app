@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/theme/colors.dart';
-import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
-import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
-
-final AuthController authController = Get.find();
-final ProfileController profileController = Get.find();
+import 'package:tictactoe_gameapp/Controller/online_status_controller.dart';
 
 void successMessage(String message) {
   Get.showSnackbar(
@@ -65,7 +61,8 @@ void errorMessage(String message) {
   );
 }
 
-void logoutMessage(BuildContext context) {
+void logoutMessage(
+    BuildContext context, OnlineStatusController onlineStatusController) {
   Get.dialog(Dialog(
     child: Container(
       height: MediaQuery.of(context).size.height * 0.6,
@@ -126,10 +123,10 @@ void logoutMessage(BuildContext context) {
                     backgroundColor: Colors.green,
                     foregroundColor: Colors.white),
                 onPressed: () async {
-                  await authController.auth.signOut();
+                  // await authController.auth.signOut();
+                  await onlineStatusController.setOffline();
                   Get.offAllNamed("/auth");
                   successMessage("Logout successful!");
-                  await profileController.removeProfileNewUser();
                 },
                 child: const Text("LogOut"),
               ),
@@ -139,4 +136,45 @@ void logoutMessage(BuildContext context) {
       ),
     ),
   ));
+}
+
+void showNoConnectionDialog({required Function() onPressed}) {
+  if (Get.isDialogOpen == false) {
+    Get.dialog(
+      AlertDialog(
+        title: const Text(
+          'Oops... No internet connection',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        content: const Text(
+          'You need to be connected to your network connection or Wi-Fi to make online activity.',
+          style: TextStyle(
+            color: Colors.blueGrey,
+            fontSize: 16,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: onPressed,
+            child: const Text(
+              'Retry',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.blueAccent,
+              ),
+            ),
+          ),
+        ],
+        icon: const Icon(
+          Icons.warning,
+          size: 40,
+        ),
+        iconColor: Colors.red,
+      ),
+      barrierDismissible: false,
+    );
+  }
 }

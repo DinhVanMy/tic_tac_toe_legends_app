@@ -29,14 +29,14 @@ android {
     namespace "com.example.tictactoe_gameapp"
     compileSdk 34 //flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
-    /*  splits {
-    abi {
-        enable true
-        reset()
-        include 'x86', 'armeabi-v7a'
-        universalApk true
-    }
-  } */
+//      splits {
+//     abi {
+//         enable true
+//         reset()
+//         include 'x86', 'armeabi-v7a'
+//         universalApk true
+//     }
+//   } 
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -61,6 +61,9 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        // ndk {
+        //     abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64'
+        // }
     }
 
     buildTypes {

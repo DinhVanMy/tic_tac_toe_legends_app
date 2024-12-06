@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/Functions/notification_add_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_model.dart';
 import 'package:uuid/uuid.dart';
@@ -10,6 +11,7 @@ class CommentController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   late StreamSubscription subscriptionListenComment;
+  late final NotificationAddFunctions _notificationAddFunctions;
   DocumentSnapshot? lastDocument; // Tài liệu cuối cùng để phục vụ phân trang
 
   final List<String> options = ["Favoritest", "Newest", "Oldest"];
@@ -24,6 +26,7 @@ class CommentController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _notificationAddFunctions = NotificationAddFunctions(firestore: _firestore);
     fetchInitialComments();
     listenToCommentChanges();
     ever(selectedOption, (_) => fetchFilteredComments());
@@ -170,6 +173,7 @@ class CommentController extends GetxController {
   Future<void> addComment(
       {required String content,
       List<String>? taggedUserIds,
+      required String receiverId,
       required UserModel currentUser}) async {
     try {
       var uuid = const Uuid();
@@ -195,6 +199,15 @@ class CommentController extends GetxController {
       await _firestore.collection('posts').doc(postId).update({
         'commentCount': FieldValue.increment(1),
       }).catchError((e) => errorMessage(e));
+
+      await _notificationAddFunctions.createCommentNotification(
+        senderId: currentUser.id!,
+        senderModel: currentUser,
+        receiverId: receiverId,
+        postId: postId,
+        commentId: commentId,
+        comment: content,
+      );
     } catch (e) {
       errorMessage("Error adding comment: $e");
     }

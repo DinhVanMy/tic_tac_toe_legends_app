@@ -8,7 +8,6 @@ import 'package:tictactoe_gameapp/Pages/Web/web_view_screen.dart';
 
 class MainHomeController extends GetxController {
   RxInt currentIndex = 0.obs;
-
   var pages = <Widget>[
     const HomePage(),
     const FriendsPage(),

@@ -8,9 +8,13 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Controller/matching_controller.dart';
+import 'package:tictactoe_gameapp/Controller/notification_controller.dart';
+import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/room_controller.dart';
+import 'package:tictactoe_gameapp/Models/Functions/permission_handle_functions.dart';
 import 'package:tictactoe_gameapp/Models/general_notifications_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/agora_call_page.dart';
 import 'package:tictactoe_gameapp/main.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,8 +24,6 @@ class NotifyInMainController extends GetxController {
   var filteredFriendRequests =
       <GeneralNotificationsModel>[].obs; // Lời mời kết bạn đã lọc
   var searchText = ''.obs; // Text tìm kiếm từ người dùng
-  var gameInvites =
-      <GeneralNotificationsModel>[].obs; // Lời mời chơi game tạm thời
   var isWaitingForOk = false.obs;
   final Rx<OverlayEntry?> _popupEntry = Rx<OverlayEntry?>(null);
   RxBool isPopupVisible = false.obs; // Để kiểm soát trạng thái của popup
@@ -33,6 +35,7 @@ class NotifyInMainController extends GetxController {
 
   late StreamSubscription listenForFriendRequestsSub;
   late StreamSubscription listenForGameInvitesSub;
+  late StreamSubscription listenForCallSub;
 
   @override
   void onInit() {
@@ -115,7 +118,7 @@ class NotifyInMainController extends GetxController {
         .where('type', isEqualTo: 'gameInvite')
         .snapshots()
         .listen((snapshot) {
-      gameInvites.value = snapshot.docs.map((doc) {
+      var gameInvites = snapshot.docs.map((doc) {
         var notification = GeneralNotificationsModel.fromJson(doc.data());
         notification.id = doc.id;
         return notification;
@@ -123,12 +126,44 @@ class NotifyInMainController extends GetxController {
 
       // Hiển thị lời mời chơi game và xóa sau 30 giây
       for (var invite in gameInvites) {
-        showInviteRequest(invite);
+        showGameInviteRequest(invite);
 
         // Xóa lời mời chơi game từ Firestore sau 30 giây
         Future.delayed(const Duration(seconds: 10), () {
           if (invite.id != null) {
             db.collection('notifications').doc(invite.id).delete();
+          }
+          removePopup();
+        });
+      }
+    });
+  }
+
+  void listenForCall() {
+    listenForCallSub = db
+        .collection('notifications')
+        .where('receiverId', isEqualTo: currentUserId)
+        .where('type', isEqualTo: 'call')
+        .snapshots()
+        .listen((snapshot) {
+      var callInvites = snapshot.docs.map((doc) {
+        var notification = GeneralNotificationsModel.fromJson(doc.data());
+        notification.id = doc.id;
+        return notification;
+      }).toList();
+
+      // Hiển thị lời mời call và xóa sau 30 giây
+      for (var call in callInvites) {
+        showCallInviteRequest(call);
+        final NotificationController notificationController =
+            Get.put(NotificationController());
+        notificationController.showCallNotification(
+            call.senderModel!.name!, call.senderModel!.image!);
+
+        // Xóa lời mời call từ Firestore sau 30 giây
+        Future.delayed(const Duration(seconds: 10), () {
+          if (call.id != null) {
+            db.collection('notifications').doc(call.id).delete();
           }
           removePopup();
         });
@@ -143,6 +178,7 @@ class NotifyInMainController extends GetxController {
   ) async {
     String id = uuid.v4().substring(0, 12);
     var senderModel = UserModel(
+      id: senderUser.id,
       name: senderUser.name,
       email: senderUser.email,
       image: senderUser.image,
@@ -165,6 +201,7 @@ class NotifyInMainController extends GetxController {
     try {
       isWaitingForOk.value = true;
       var senderModel = UserModel(
+        id: senderUser.id,
         name: senderUser.name,
         email: senderUser.email,
         image: senderUser.image,
@@ -184,6 +221,32 @@ class NotifyInMainController extends GetxController {
       errorMessage(e.toString());
     } finally {
       isWaitingForOk.value = false;
+    }
+  }
+
+  Future<void> sendCallInvite({
+    required String receiverId,
+    required UserModel senderUser,
+    required String channelId,
+  }) async {
+    try {
+      var senderModel = UserModel(
+        id: senderUser.id,
+        name: senderUser.name,
+        email: senderUser.email,
+        image: senderUser.image,
+      );
+      GeneralNotificationsModel call = GeneralNotificationsModel(
+        senderId: currentUserId,
+        senderModel: senderModel,
+        receiverId: receiverId,
+        roomId: channelId,
+        type: 'call',
+        timestamp: Timestamp.now(),
+      );
+      await db.collection('notifications').add(call.toJson());
+    } catch (e) {
+      errorMessage(e.toString());
     }
   }
 
@@ -211,7 +274,7 @@ class NotifyInMainController extends GetxController {
     });
   }
 
-  void showInviteRequest(
+  void showGameInviteRequest(
     GeneralNotificationsModel invite,
   ) {
     if (_popupEntry.value != null) {
@@ -225,7 +288,7 @@ class NotifyInMainController extends GetxController {
           elevation: 5.0,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: InviteRequestDialog(
+          child: GameInviteRequestDialog(
             friend: invite.senderModel!,
             onPressedAccept: () {
               Get.showOverlay(
@@ -278,6 +341,50 @@ class NotifyInMainController extends GetxController {
     isPopupVisible.value = true;
   }
 
+  void showCallInviteRequest(GeneralNotificationsModel call) {
+    if (_popupEntry.value != null) {
+      // Xóa popup cũ nếu đã hiển thị
+      removePopup();
+    }
+    _popupEntry.value = OverlayEntry(
+      builder: (context) => Center(
+        child: Material(
+          elevation: 5.0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: CallInviteRequestDialog(
+            friend: call.senderModel!,
+            onPressedRefuse: () {
+              removePopup();
+            },
+            onPressedAccept: () async {
+              removePopup();
+              final permissionHandler = PermissionHandleFunctions();
+              bool micGranted =
+                  await permissionHandler.checkMicrophonePermission();
+              bool camGranted = await permissionHandler.checkCameraPermission();
+              if (micGranted == true && camGranted == true) {
+                final ProfileController profileController = Get.find();
+                Get.to(() => AgoraCallPage(
+                      userFriend: call.senderModel!,
+                      userCurrent: profileController.user!,
+                      channelId: call.roomId!,
+                      initialMicState: true,
+                      initialVideoState: true,
+                    ));
+              } else {}
+            },
+          ),
+        ),
+      ),
+    );
+
+    // Hiển thị popup
+    navigatorKey.currentState!.overlay!.insert(_popupEntry.value!);
+    // animationController.forward();
+    isPopupVisible.value = true;
+  }
+
   void removePopup() {
     if (_popupEntry.value != null) {
       _popupEntry.value?.remove();
@@ -290,6 +397,7 @@ class NotifyInMainController extends GetxController {
   void onClose() {
     listenForFriendRequestsSub.cancel();
     listenForGameInvitesSub.cancel();
+    listenForCallSub.cancel();
     removePopup();
     super.onClose();
   }

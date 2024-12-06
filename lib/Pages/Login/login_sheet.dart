@@ -226,7 +226,6 @@ Widget _buildLoginBottomSheet(
                       if (status == AuthStatus.successful) {
                         successMessage(
                             "Welcome ${auth.getCurrentUserEmail()} !");
-                        Get.offAllNamed("/updateProfile");
                       } else {
                         String error =
                             AuthExceptionHandler.generateErrorMessage(status);

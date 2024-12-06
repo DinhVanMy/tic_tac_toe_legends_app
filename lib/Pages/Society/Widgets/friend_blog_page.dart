@@ -96,16 +96,14 @@ class FriendBlogPage extends StatelessWidget {
                                                 width: 10,
                                               ),
                                               Expanded(
-                                                  child: InkWell(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
+                                                  child: GestureDetector(
                                                 onTap: () =>
                                                     Get.to(CreatePostPage(
                                                   userModel: user,
                                                   postController:
                                                       postController,
                                                 )),
-                                                child: Ink(
+                                                child: Container(
                                                   height: 45,
                                                   padding:
                                                       const EdgeInsets.only(

@@ -148,7 +148,11 @@ class PostNotificationPage extends StatelessWidget {
                     theme: theme,
                     user: user,
                   ),
-                  const PostCommentTab(),
+                  PostCommentTab(
+                    postNotificationController: postNotificationController,
+                    theme: theme,
+                    user: user,
+                  ),
                   PostOthersTab(
                     postNotificationController: postNotificationController,
                     theme: theme,

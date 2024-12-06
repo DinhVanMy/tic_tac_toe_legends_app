@@ -33,17 +33,17 @@ class LobbyPage extends StatelessWidget {
     final PlayWithPlayerController playWithPlayerController =
         Get.put(PlayWithPlayerController());
     final ProfileController profileController = Get.find<ProfileController>();
-    final user = profileController.readProfileNewUser();
+    final user = profileController.user!;
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     // final musicController = Get.find<MusicController>();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
       // musicController.playMusicOnScreen7();
       // Get.find<NotificationController>().showNotification(
       //   'Your Great!',
       //   'You have joined room: $roomId',
       //   {'screen': 'SplacePage'},
       // );
-    });
+    // });
     return Scaffold(
       key: scaffoldKey,
       endDrawer: EndDrawerLobby(

@@ -7,12 +7,14 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Controller/text_to_speech_controller.dart';
 import 'package:tictactoe_gameapp/Data/gemini_api_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/speech_to_text_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Chat/Widgets/chat_mess_item.dart';
 import 'package:tictactoe_gameapp/Pages/Chat/Widgets/option_card.dart';
 import 'package:tictactoe_gameapp/Pages/Chat/Widgets/section_widget.dart';
+import 'package:tictactoe_gameapp/Components/customized_widgets/tts_change_setting_widget.dart';
 
 class ChatBotPage extends StatelessWidget {
   const ChatBotPage({super.key});
@@ -22,11 +24,13 @@ class ChatBotPage extends StatelessWidget {
     final theme = Theme.of(context);
     final SpeechController speechController = Get.put(SpeechController());
     final ProfileController profileController = Get.find<ProfileController>();
-    final user = profileController.readProfileNewUser();
+    final user = profileController.user!;
     final ChatController chatController = Get.put(ChatController());
     final TextEditingController textController = TextEditingController();
     final GlobalKey<RefreshIndicatorState> refreshKey =
         GlobalKey<RefreshIndicatorState>();
+    final TextToSpeechController ttsController =
+        Get.put(TextToSpeechController());
     RxString imagePath = "".obs;
     XFile? image;
     double appBarHeight = AppBar().preferredSize.height;
@@ -46,18 +50,8 @@ class ChatBotPage extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                const CircleAvatar(
-                  backgroundImage: AssetImage(GifsPath.androidGif),
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.volume_up,
-                  ),
-                ),
-              ],
+            const CircleAvatar(
+              backgroundImage: AssetImage(GifsPath.androidGif),
             ),
             Expanded(
               child: Row(
@@ -81,26 +75,8 @@ class ChatBotPage extends StatelessWidget {
                               left: 0,
                               right: 0,
                               child: Material(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.file(
-                                        File(user.image!),
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Icon(Icons.error);
-                                        },
-                                      ),
-                                      Image.asset(
-                                        GifsPath.chatbotGif,
-                                      ),
-                                    ],
-                                  ),
+                                child: TtsChangeSettingWidget(
+                                  ttsController: ttsController,
                                 ),
                               ),
                             ),
@@ -265,6 +241,7 @@ class ChatBotPage extends StatelessWidget {
                                 return ChatMessageItem(
                                   message: message,
                                   user: user,
+                                  ttsController: ttsController,
                                 );
                               },
                             ),

@@ -14,11 +14,21 @@ class CarouselController extends GetxController {
   void onInit() {
     super.onInit();
     virtualItemCount = realItemCount * 1000;
+    _initializePageController();
+  }
+
+  // Khởi tạo hoặc tái khởi tạo PageController
+  void _initializePageController() {
     pageController =
         PageController(viewportFraction: 0.4, initialPage: realItemCount * 500);
-    pageController.addListener(() {
+    pageController.addListener(_pageListener);
+  }
+
+  // Lắng nghe sự thay đổi của PageController
+  void _pageListener() {
+    if (pageController.positions.isNotEmpty) {
       currentPage.value = pageController.page!;
-    });
+    }
   }
 
   // Điều chỉnh lại chỉ số thực tế
@@ -50,6 +60,7 @@ class CarouselController extends GetxController {
 
   @override
   void onClose() {
+    pageController.removeListener(_pageListener);
     pageController.dispose();
     super.onClose();
   }

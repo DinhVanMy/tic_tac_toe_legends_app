@@ -13,6 +13,7 @@ class PostModel {
   DateTime? createdAt; // Thời gian đăng bài
   List<String>? taggedUserIds; // Danh sách ID người dùng được gắn thẻ
   String? privacy; // Quyền riêng tư (public, friends, private)
+  bool? isNotified;
 
   PostModel({
     this.postId,
@@ -26,6 +27,7 @@ class PostModel {
     this.createdAt,
     this.taggedUserIds,
     this.privacy,
+    this.isNotified,
   });
 
   // Constructor để chuyển từ JSON sang PostModel
@@ -57,6 +59,9 @@ class PostModel {
       taggedUserIds = List<String>.from(json['taggedUserIds']);
     }
     privacy = json['privacy'] as String?;
+    if (json["isNotified"] is bool) {
+      isNotified = json["isNotified"];
+    }
   }
 
   // Phương thức để chuyển PostModel thành JSON
@@ -77,6 +82,7 @@ class PostModel {
     }
     data['taggedUserIds'] = taggedUserIds;
     data['privacy'] = privacy;
+    data["isNotified"] = isNotified;
     return data;
   }
 }

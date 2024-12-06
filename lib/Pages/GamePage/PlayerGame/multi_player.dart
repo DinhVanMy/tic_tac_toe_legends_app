@@ -14,7 +14,7 @@ class MultiPlayer extends StatelessWidget {
         Get.put<PlayWithPlayerController>(PlayWithPlayerController());
     playWithPlayerController.getRoomDetails(roomId);
     final ProfileController profileController = Get.find<ProfileController>();
-    final user = profileController.readProfileNewUser();
+    final user = profileController.user!;
     // final MusicController musicController = Get.find();
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   musicController.stopMusicOnScreen7();

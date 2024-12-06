@@ -1,31 +1,45 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
+import 'package:tictactoe_gameapp/Models/message_friend_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/chat_with_friend_page.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/listen_latest_messages_controller.dart';
 
 class FriendsHomePage extends StatelessWidget {
+  final ListenLatestMessagesController listenLatestMessagesController;
   final FirestoreController firestoreController;
+  final NotifyInMainController notifyInMainController;
   final ThemeData theme;
   const FriendsHomePage(
-      {super.key, required this.firestoreController, required this.theme});
+      {super.key,
+      required this.firestoreController,
+      required this.theme,
+      required this.listenLatestMessagesController,
+      required this.notifyInMainController});
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       if (firestoreController.filterfriendsList.isEmpty) {
-        return Center(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(100),
+        return const Column(
+          children: [
+             SizedBox(
+              height: 100,
             ),
-            child: const CircularProgressIndicator(
-              color: Colors.blue,
+            Text(
+              "No friends? Add more friends!",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
+          ],
         );
       }
       var friends = firestoreController.filterfriendsList.toList();
@@ -34,6 +48,11 @@ class FriendsHomePage extends StatelessWidget {
         itemCount: friends.length,
         itemBuilder: (context, index) {
           var friend = friends[index];
+          MessageFriendModel? latestMessage = listenLatestMessagesController
+              .latestMessages
+              .firstWhereOrNull((msg) =>
+                  msg.receiverId == friend.id || msg.senderId == friend.id);
+
           return Dismissible(
             key: Key(friend.id!),
             direction: DismissDirection.endToStart,
@@ -46,6 +65,7 @@ class FriendsHomePage extends StatelessWidget {
               onTap: () {
                 Get.to(ChatWithFriendPage(
                   userFriend: friend,
+                  notifyInMainController: notifyInMainController,
                 ));
               },
               borderRadius: BorderRadius.circular(20),
@@ -71,14 +91,16 @@ class FriendsHomePage extends StatelessWidget {
                         children: [
                           Text(friend.name!, style: theme.textTheme.bodyLarge),
                           const SizedBox(height: 10),
-                          const Text(
-                            "You: Hello friend ! How are you? overflow: TextOverflow.ellipsis,overflow: TextOverflow.ellipsis,",
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: Colors.grey,
-                            ),
-                          ),
+                          latestMessage != null
+                              ? Text(latestMessage.content!)
+                              : const Text(
+                                  "Hello friend ! How are you? ",
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    color: Colors.grey,
+                                  ),
+                                ),
                         ],
                       ),
                     ),

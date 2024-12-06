@@ -39,7 +39,7 @@ class GradientGeneratorFunctions {
 
   static List<Color> getDynamicRandomGradientColors({
     int colorCount = 5,
-    required bool isDarkMode,
+    bool isDarkMode = false,
   }) {
     final Random random = Random();
     final List<Color> colors = [];
@@ -79,6 +79,33 @@ class GradientGeneratorFunctions {
       ));
     }
     return colors;
+  }
+
+  static String _getColorName(Color color) {
+    if (color.red > color.green && color.red > color.blue) {
+      return "Red";
+    } else if (color.green > color.red && color.green > color.blue) {
+      return "Green";
+    } else if (color.blue > color.red && color.blue > color.green) {
+      return "Blue";
+    } else if (color.red == color.green && color.red > color.blue) {
+      return "Yellow";
+    } else if (color.red == color.blue && color.red > color.green) {
+      return "Purple";
+    } else {
+      return "Gray";
+    }
+  }
+
+  static String generateGradientName({required List<Color> colors}) {
+    final Random random = Random();
+    const adjectives = ["Vibrant", "Calm", "Energetic", "Peaceful", "Lively"];
+     String primaryColorName = _getColorName(colors.first);
+    const themes = ["Sunset", "Ocean", "Forest", "Rainbow", "Dusk"];
+
+    return "${adjectives[random.nextInt(adjectives.length)]} "
+        "$primaryColorName "
+        "${themes[random.nextInt(themes.length)]}";
   }
 
   static List<Widget> generateGradientContainers({

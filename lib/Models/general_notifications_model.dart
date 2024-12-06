@@ -10,6 +10,7 @@ class GeneralNotificationsModel {
   String? type;
   Timestamp? timestamp;
   bool? isReaded;
+
   String? roomId;
   String? postId;
   String? commentId;
@@ -57,6 +58,7 @@ class GeneralNotificationsModel {
     if (json["isReaded"] is bool) {
       isReaded = json["isReaded"];
     }
+
     if (json["roomId"] is String) {
       roomId = json["roomId"];
     }
@@ -66,7 +68,7 @@ class GeneralNotificationsModel {
     if (json["commentId"] is String) {
       commentId = json["commentId"];
     }
-    count = json["count"]?? 1;
+    count = json["count"] ?? 1;
   }
 
   Map<String, dynamic> toJson() {
@@ -81,6 +83,7 @@ class GeneralNotificationsModel {
     data["type"] = type;
     data["timestamp"] = timestamp;
     data["isReaded"] = isReaded;
+
     data["roomId"] = roomId;
     data["postId"] = postId;
     data["commentId"] = commentId;

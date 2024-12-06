@@ -13,6 +13,7 @@ class WebViewControllers extends GetxController {
     super.onInit();
     notifyInMainController.listenForFriendRequests();
     notifyInMainController.listenForGameInvites();
+    notifyInMainController.listenForCall();
     settings = InAppBrowserClassSettings(
       browserSettings: InAppBrowserSettings(
         hideUrlBar: false,

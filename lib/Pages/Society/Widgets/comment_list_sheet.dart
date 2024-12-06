@@ -8,21 +8,22 @@ import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_controller.
 import 'package:tictactoe_gameapp/Pages/Society/Comment/sub_comment_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/reply_comment_list_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
 
 class CommentListSheet extends StatelessWidget {
   final ScrollController scrollController;
   final UserModel currentUser;
-  final String postId;
+  final PostModel post;
   const CommentListSheet(
       {super.key,
       required this.scrollController,
       required this.currentUser,
-      required this.postId});
+      required this.post});
 
   @override
   Widget build(BuildContext context) {
     final CommentController commentController =
-        Get.put(CommentController(postId));
+        Get.put(CommentController(post.postId!));
     final TextEditingController textEditingController = TextEditingController();
     final FocusNode focusNode = FocusNode();
     RxString commentContent = "".obs;
@@ -131,6 +132,7 @@ class CommentListSheet extends StatelessWidget {
                         child: Column(
                           children: [
                             Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 CircleAvatar(
                                   backgroundImage: CachedNetworkImageProvider(
@@ -298,7 +300,7 @@ class CommentListSheet extends StatelessWidget {
                                                 scrollController:
                                                     scrollController,
                                                 currentUser: currentUser,
-                                                postId: postId,
+                                                postId: post.postId!,
                                                 commentModel: comment,
                                                 commentController:
                                                     commentController,
@@ -338,7 +340,7 @@ class CommentListSheet extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              Obx(() => commentContent.value.isNotEmpty
+              Obx(() => commentId.value.isNotEmpty
                   ? Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 10),
@@ -412,7 +414,7 @@ class CommentListSheet extends StatelessWidget {
                                     Get.delete<SubCommentController>();
                                     SubCommentController subCommentController =
                                         Get.put(SubCommentController(
-                                      postId,
+                                      post.postId!,
                                       commentId.value,
                                     ));
                                     await subCommentController.addSubComment(
@@ -420,6 +422,7 @@ class CommentListSheet extends StatelessWidget {
                                         currentUser: currentUser);
                                     textEditingController.clear();
                                     commentContent.value = "";
+                                    commentId.value = "";
                                   },
                                   icon: const Icon(
                                     Icons.reply_all_rounded,
@@ -431,8 +434,10 @@ class CommentListSheet extends StatelessWidget {
                                   onPressed: () async {
                                     focusNode.unfocus();
                                     await commentController.addComment(
-                                        content: commentContent.value,
-                                        currentUser: currentUser);
+                                      content: commentContent.value,
+                                      currentUser: currentUser,
+                                      receiverId: post.postUser!.id!,
+                                    );
                                     textEditingController.clear();
                                     commentContent.value = "";
                                   },

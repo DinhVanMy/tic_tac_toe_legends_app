@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
+import 'package:tictactoe_gameapp/Models/Functions/gradient_generator_functions.dart';
 
 class MapsPage extends StatelessWidget {
   const MapsPage({super.key});
@@ -13,10 +14,11 @@ class MapsPage extends StatelessWidget {
       child: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(ImagePath.background3),
-            fit: BoxFit.cover,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: GradientGeneratorFunctions.getDynamicRandomGradientColors(),
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
         child: GridView.builder(

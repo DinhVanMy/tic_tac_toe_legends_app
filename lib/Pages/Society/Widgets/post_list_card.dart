@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
+import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
@@ -33,6 +34,7 @@ class PostListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var currentIndex = 0.obs;
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -46,7 +48,6 @@ class PostListCard extends StatelessWidget {
               Get.to(UserAboutPage(
                 unknownableUser: postUser,
                 intdexString: post.postId!,
-                currentUser: currentUser,
               ));
             },
             child: Row(
@@ -186,8 +187,10 @@ class PostListCard extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: ExpandableContent(
                       content: post.content!,
-                      style:
-                          theme.textTheme.titleLarge!.copyWith(fontSize: 18)),
+                      style: theme.textTheme.titleLarge!.copyWith(
+                        fontSize: 18,
+                        overflow: TextOverflow.ellipsis,
+                      )),
                 ),
           const SizedBox(
             height: 10,
@@ -201,11 +204,74 @@ class PostListCard extends StatelessWidget {
                       itemBuilder: (context, index) {
                         return Row(
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.memory(
-                                base64Decode(
-                                  post.imageUrls![index],
+                            GestureDetector(
+                              onTap: () {
+                                currentIndex.value = index;
+                                Get.dialog(
+                                  Dialog(
+                                    backgroundColor: Colors.transparent,
+                                    insetPadding: const EdgeInsets.all(10),
+                                    child: GestureDetector(
+                                      onTap: () => Get.back(),
+                                      child: PageView.builder(
+                                        controller: PageController(
+                                            initialPage: currentIndex.value),
+                                        onPageChanged: (index) {
+                                          currentIndex.value = index;
+                                        },
+                                        itemCount: post.imageUrls!.length,
+                                        itemBuilder: (context, index) {
+                                          return Container(
+                                            width: double.infinity,
+                                            height: 200,
+                                            alignment: Alignment.topCenter,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: MemoryImage(
+                                                  base64Decode(
+                                                    post.imageUrls![index],
+                                                  ),
+                                                ),
+                                                fit: BoxFit.fitWidth,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              "${index + 1} / ${post.imageUrls!.length}",
+                                              style: const TextStyle(
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white),
+                                            ),
+                                          );
+                                          //  InteractiveViewer(
+                                          //   boundaryMargin:
+                                          //       const EdgeInsets.all(8),
+                                          //   minScale: 1,
+                                          //   maxScale: 3,
+                                          //   child:
+                                          //    ClipRRect(
+                                          //     borderRadius:
+                                          //         BorderRadius.circular(10),
+                                          //     child: Image.memory(
+                                          //       base64Decode(
+                                          //         post.imageUrls![index],
+                                          //       ),
+                                          //       width: double.infinity,
+                                          //     ),
+                                          //   ),
+                                          // );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.memory(
+                                  base64Decode(
+                                    post.imageUrls![index],
+                                  ),
                                 ),
                               ),
                             ),
@@ -443,7 +509,7 @@ class PostListCard extends StatelessWidget {
                           return CommentListSheet(
                             scrollController: scrollController,
                             currentUser: currentUser,
-                            postId: post.postId!,
+                            post: post,
                           );
                         },
                         duration: const Duration(milliseconds: 500),
@@ -486,26 +552,18 @@ class PostListCard extends StatelessWidget {
                   child: InkWell(
                     highlightColor: Colors.blueAccent,
                     onTap: () async {
-                      await showFlexibleBottomSheet(
-                        minHeight: 0,
-                        initHeight: 0.8,
-                        maxHeight: 1,
-                        context: context,
-                        builder: (context, scrollController, bottomSheet) {
-                          return ShareSheetCustom(
-                            scrollController: scrollController,
-                            currentUser: currentUser,
-                            postController: postController,
-                            post: post,
-                          );
-                        },
-                        duration: const Duration(milliseconds: 500),
-                        bottomSheetColor: Colors.transparent,
-                        bottomSheetBorderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
+                      await GeneralBottomsheetShowFunction
+                          .showScrollableGeneralBottomsheet(
+                        widgetBuilder: (context, controller) =>
+                            ShareSheetCustom(
+                          scrollController: controller,
+                          currentUser: currentUser,
+                          postController: postController,
+                          post: post,
                         ),
-                        isSafeArea: true,
+                        context: context,
+                        initHeight: 0.8,
+                        color: Colors.transparent,
                       );
                     },
                     child: const Row(

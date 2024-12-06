@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
@@ -19,6 +18,7 @@ class PostOthersTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController scrollController = ScrollController();
     return Obx(() {
       if (postNotificationController.sharedNotifications.isEmpty) {
         return Center(
@@ -35,100 +35,114 @@ class PostOthersTab extends StatelessWidget {
       } else {
         var sharedNotifications =
             postNotificationController.sharedNotifications.toList();
-        return ListView.builder(
-          itemCount: sharedNotifications.length,
-          itemBuilder: (context, index) {
-            var sharedNotification = sharedNotifications[index];
-            var shareUser = sharedNotification.senderModel!;
-            return Material(
-              color: sharedNotification.isReaded!
-                  ? Colors.transparent
-                  : Colors.lightBlueAccent.shade100,
-              child: InkWell(
-                splashColor: Colors.white,
-                onTap: () {},
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Row(
-                    children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          CircleAvatar(
-                            backgroundImage:
-                                CachedNetworkImageProvider(shareUser.image!),
-                            radius: 25,
-                          ),
-                          Positioned(
-                            bottom: -10,
-                            right: -10,
-                            child: Container(
-                              width: 30,
-                              height: 30,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.blueAccent,
-                              ),
-                              child: const Icon(
-                                Icons.share,
-                                color: Colors.white,
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        return NotificationListener<ScrollNotification>(
+          onNotification: (ScrollNotification scrollInfo) {
+            if (scrollInfo.metrics.pixels >=
+                scrollInfo.metrics.maxScrollExtent - 200) {
+              postNotificationController.loadMoreNotifications();
+            }
+            return true;
+          },
+          child: ListView.builder(
+            controller: scrollController,
+            physics: const BouncingScrollPhysics(),
+            itemCount: sharedNotifications.length,
+            itemBuilder: (context, index) {
+              var sharedNotification = sharedNotifications[index];
+              var sharedUser = sharedNotification.senderModel!;
+              return Material(
+                color: sharedNotification.isReaded!
+                    ? Colors.transparent
+                    : Colors.lightBlueAccent.shade100,
+                child: InkWell(
+                  splashColor: Colors.white,
+                  onTap: () {
+                    postNotificationController.markAsRead(sharedNotification.id!);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
                           children: [
-                            Text(
-                              TimeFunctions.timeAgo(
-                                  now: DateTime.now(),
-                                  createdAt:
-                                      sharedNotification.timestamp!.toDate()),
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 13,
+                            CircleAvatar(
+                              backgroundImage:
+                                  CachedNetworkImageProvider(sharedUser.image!),
+                              radius: 25,
+                            ),
+                            Positioned(
+                              bottom: -10,
+                              right: -10,
+                              child: Container(
+                                width: 30,
+                                height: 30,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.blueAccent,
+                                ),
+                                child: const Icon(
+                                  Icons.thumb_up,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            Text(
-                              sharedNotification.message!,
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.titleMedium,
-                            ),
-                            Text(
-                              "post : ${sharedNotification.postId!}",
-                              maxLines: 3,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.titleSmall,
-                            ),
+                            )
                           ],
                         ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Column(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              ImagePath.board_9x9,
-                              width: 50,
-                            ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                TimeFunctions.timeAgo(
+                                  now: DateTime.now(),
+                                  createdAt:
+                                      sharedNotification.timestamp!.toDate(),
+                                ),
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              Text(
+                                sharedNotification.message!,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleMedium,
+                              ),
+                              Text(
+                                "post : ${sharedNotification.postId!}",
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleSmall,
+                              ),
+                            ],
                           ),
-                        ],
-                      )
-                    ],
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                ImagePath.board_11x11,
+                                width: 50,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       }
     });

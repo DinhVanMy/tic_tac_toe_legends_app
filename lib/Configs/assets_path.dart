@@ -54,9 +54,12 @@ class GifsPath {
   static const tictactoeGif = "${basePath}tictactoe_gif.gif";
   static const androidGif = "${basePath}android_gif.gif";
   static const chatbotGif = "${basePath}chatbot_gif.gif";
-  static const transformerGif = "${basePath}transformer_gif.gif";
+  static const chloe1 = "${basePath}chloe_1.gif";
+  static const chloe2 = "${basePath}chloe_2.gif";
   static const loadingGif = "${basePath}loading_gif.gif";
    static const transitionGif = "${basePath}transition_gif.gif";
+   static const cyberpunk = "${basePath}cyperpunk_gif.gif";
+
 }
 
 class AudioSPath {

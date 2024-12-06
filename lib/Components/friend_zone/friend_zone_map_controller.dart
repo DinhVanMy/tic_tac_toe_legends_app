@@ -131,7 +131,7 @@ class LocationController extends GetxController {
       displayUsers.clear();
       for (var doc in snapshot.docs) {
         final data = doc.data();
-        if (data.containsKey('location')) {
+        if (data.containsKey('location') && data['location'] != null) {
           final GeoPoint location = data['location'];
           final distance = Geolocator.distanceBetween(
             userPosition.latitude,
@@ -143,7 +143,7 @@ class LocationController extends GetxController {
           if (distance <= radius) {
             final UserModel user = UserModel.fromJson(doc.data());
             displayUsers.add(user);
-            printInfo(info: "Distance: $distance");
+            // printInfo(info: "Distance: $distance");
           }
         }
       }

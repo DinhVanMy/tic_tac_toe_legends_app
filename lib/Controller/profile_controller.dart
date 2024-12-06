@@ -1,31 +1,76 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:confetti/confetti.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Models/queue_model.dart';
 import '../Configs/messages.dart';
 
 class ProfileController extends GetxController {
-  final _box = GetStorage();
   final ImagePicker picker = ImagePicker();
   final store = FirebaseStorage.instance;
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
-  RxBool isLoading = false.obs;
-  Rx<UserModel> user = UserModel().obs;
+  final String userId = Get.find<AuthController>().getCurrentUserId();
+  late final UserModel? user;
 
-  late final LatLng userLocation;
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   initialize();
+  // }
 
-  Future<void> updateProfile(String name, String imagePath) async {
-    isLoading.value = true;
+  Future<void> initialize() async {
+    user = await getUserById();
+  }
+
+  Future<UserModel?> getUserById() async {
     try {
-      if (imagePath != "" && name != "") {
+      // Thực hiện truy vấn Firestore để lấy document của user
+      DocumentSnapshot userDoc = await db.collection('users').doc(userId).get();
+
+      // Kiểm tra xem document có tồn tại không
+      if (userDoc.exists) {
+        // Nếu có, trả về UserModel từ document data
+        return UserModel.fromJson(userDoc.data() as Map<String, dynamic>);
+      } else {
+        errorMessage("User không tồn tại với id: $userId");
+        return null;
+      }
+    } catch (e) {
+      errorMessage("Lỗi khi lấy UserModel từ Firestore: $e");
+      return null;
+    }
+  }
+
+  Rx<UserModel?> rxUser = Rx<UserModel?>(null);
+  void listenToUserByIdRealTime(String userId) {
+    db
+        .collection('users')
+        .doc(userId)
+        .snapshots() // Lắng nghe sự thay đổi theo thời gian thực
+        .listen((documentSnapshot) {
+      if (documentSnapshot.exists) {
+        // Nếu document tồn tại, chuyển đổi dữ liệu thành UserModel và cập nhật vào Rx
+        rxUser.value =
+            UserModel.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      } else {
+        // Nếu không tồn tại, cập nhật Rx với giá trị null
+        rxUser.value = null;
+      }
+    });
+  }
+
+  Future<void> updateProfile(String name, String imagePath,
+      ConfettiController confettiController) async {
+    try {
+      bool exists = await isUserNameExists(name);
+      if (imagePath != "" && name != "" && exists == false) {
+        confettiController.play();
         var uploadedImageUrl = await uploadImageToFirebase(imagePath);
         var newQueue = QueueModel(
           userId: auth.currentUser!.uid,
@@ -38,6 +83,9 @@ class ProfileController extends GetxController {
           name: name,
           image: uploadedImageUrl,
           email: auth.currentUser!.email,
+          totalCoins: "0",
+          totalWins: "0",
+          status: "online",
         );
         await db
             .collection("users")
@@ -51,21 +99,14 @@ class ProfileController extends GetxController {
             .doc(auth.currentUser!.uid)
             .set(newQueue.toJson())
             .catchError((e) => errorMessage(e.toString()));
-        //store in local storage
-        final jsonString = jsonEncode(newUser.toJson());
-        await _box
-            .write('newUser', jsonString)
-            .catchError((e) => errorMessage(e.toString()));
-
-        successMessage("Profile Updated");
-        Get.offAllNamed("/mainHome");
+      } else if (exists == true) {
+        errorMessage("Username already exists");
       } else {
         errorMessage("Please fill all the fields");
       }
     } catch (e) {
       errorMessage("Profile Update Failed");
     }
-    isLoading.value = false;
   }
 
   Future<String> uploadImageToFirebase(String imagePath) async {
@@ -106,37 +147,14 @@ class ProfileController extends GetxController {
     return image;
   }
 
-  Future<void> fetchUserProfile() async {
+  Future<bool> isUserNameExists(String name) async {
     try {
-      String userId = auth.currentUser?.uid ?? "";
-      if (userId.isEmpty) {
-        errorMessage("User ID is empty.");
-        return;
-      }
-      DocumentSnapshot userDoc = await db.collection('users').doc(userId).get();
-
-      if (userDoc.exists) {
-        var userData = userDoc.data() as Map<String, dynamic>;
-        user.value = UserModel.fromJson(userData);
-        GeoPoint geo =
-            user.value.location ?? const GeoPoint(21.0000992, 105.8399243);
-        userLocation = LatLng(geo.latitude, geo.longitude);
-      } else {
-        errorMessage("Not found 404");
-      }
+      final querySnapshot =
+          await db.collection('users').where('name', isEqualTo: name).get();
+      return querySnapshot.docs.isNotEmpty;
     } catch (e) {
-      print("Failed to fetch user profile: $e");
+      errorMessage("Error checking username: $e");
+      return false;
     }
-  }
-
-  UserModel readProfileNewUser() {
-    //read in local storage
-    final storedString = _box.read('newUser');
-    final storedUser = UserModel.fromJson(jsonDecode(storedString));
-    return storedUser;
-  }
-
-  Future<void> removeProfileNewUser() async {
-    await _box.remove('newUser');
   }
 }

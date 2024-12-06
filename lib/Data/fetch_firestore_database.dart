@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
+import 'package:tictactoe_gameapp/Models/message_friend_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 
 class FirestoreController extends GetxController {
@@ -170,7 +171,11 @@ class FirestoreController extends GetxController {
   Future<void> fetchUserLocation() async {
     await _firestore.collection('users').doc(userId).get().then((value) {
       UserModel user = UserModel.fromJson(value.data()!);
-      latlng = LatLng(user.location!.latitude, user.location!.longitude);
+      if (user.location != null) {
+        latlng = LatLng(user.location!.latitude, user.location!.longitude);
+      } else {
+        latlng = const LatLng(21.0000992, 105.8399243);
+      }
     });
   }
 

@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Models/Functions/hyperlink_text_function.dart';
 
 class ExpandableText extends StatelessWidget {
   final String text;
@@ -67,53 +69,126 @@ class ExpandableContent extends StatelessWidget {
     required this.style,
     this.isAligCenter = false,
   });
-
   @override
   Widget build(BuildContext context) {
     RxBool isExpanded = false.obs;
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Tính toán để kiểm tra xem nội dung có vượt quá số dòng cho phép không
-        final span = TextSpan(
-          text: content,
-          style: style,
-        );
-        final textPainter = TextPainter(
-          text: span,
+        // Kiểm tra overflow dựa trên số dòng
+        final TextPainter textPainter = TextPainter(
+          text: TextSpan(text: content, style: style),
           maxLines: maxLines,
           textDirection: TextDirection.ltr,
         )..layout(maxWidth: constraints.maxWidth);
 
-        bool isOverflowing = textPainter.didExceedMaxLines;
+        final bool isOverflowing = textPainter.didExceedMaxLines;
 
         return Obx(() {
-          return GestureDetector(
-            onTap: () {
-              isExpanded.value = !isExpanded.value;
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  content,
-                  style: style,
-                  textAlign: isAligCenter ? TextAlign.center : TextAlign.start,
-                  maxLines: isExpanded.value ? 1000 : maxLines,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (isOverflowing)
-                  Text(
-                    isExpanded.value ? "See Less" : "See More",
-                    style: const TextStyle(
-                      color: Colors.blueGrey,
-                      fontStyle: FontStyle.italic,
-                    ),
+          if (!isOverflowing || isExpanded.value) {
+            // Hiển thị toàn bộ nội dung khi mở rộng
+            return GestureDetector(
+              onTap: () {
+                isExpanded.value = !isExpanded.value;
+              },
+              child: Text.rich(
+                TextSpan(children: [
+                  HyperlinkTextFunction.parseContent(
+                    content: content,
+                    defaultStyle: style,
+                    linkColor: Colors.deepPurpleAccent,
+                    tagColor: Colors.black,
                   ),
-              ],
-            ),
-          );
+                  isExpanded.value
+                      ? TextSpan(
+                          text: '\n See Less',
+                          style: style.copyWith(color: Colors.blue),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              isExpanded.value = !isExpanded.value;
+                            },
+                        )
+                      : const TextSpan(),
+                ]),
+                textAlign: isAligCenter ? TextAlign.center : TextAlign.start,
+                maxLines: isExpanded.value ? null : maxLines,
+              ),
+            );
+          } else {
+            // Thu gọn nội dung
+            final truncatedText = _getTruncatedTextByBinary(
+              textPainter,
+              content,
+              constraints.maxWidth,
+            );
+
+            return GestureDetector(
+              onTap: () {
+                isExpanded.value = !isExpanded.value;
+              },
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    HyperlinkTextFunction.parseContent(
+                      content: truncatedText,
+                      defaultStyle: style,
+                      linkColor: Colors.blue,
+                      tagColor: Colors.green,
+                    ),
+                    TextSpan(
+                      text: ' ...',
+                      style: style.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ' See More',
+                      style: style.copyWith(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          isExpanded.value = !isExpanded.value;
+                        },
+                    ),
+                  ],
+                ),
+                textAlign: isAligCenter ? TextAlign.center : TextAlign.start,
+              ),
+            );
+          }
         });
       },
     );
+  }
+
+  String _getTruncatedTextByBinary(
+      TextPainter textPainter, String content, double maxWidth) {
+    int start = 0;
+    int end = content.length;
+    String truncatedText = '';
+
+    while (start <= end) {
+      int mid = (start + end) ~/ 2;
+      final testText = content.substring(0, mid);
+
+      final testPainter = TextPainter(
+        text: TextSpan(text: testText, style: style),
+        maxLines: maxLines,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: maxWidth);
+
+      if (testPainter.didExceedMaxLines) {
+        end = mid - 1; // Cắt ngắn hơn
+      } else {
+        truncatedText = testText; // Lưu kết quả
+        start = mid + 1; // Mở rộng văn bản
+      }
+    }
+
+    return truncatedText.trim();
   }
 }

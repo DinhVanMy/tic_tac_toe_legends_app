@@ -70,12 +70,13 @@ class NotificationAddFunctions {
     required String receiverId,
     required String postId,
     required String commentId,
+    required String comment,
   }) async {
     await _createNotification(
       senderId: senderId,
       senderModel: senderModel,
       receiverId: receiverId,
-      message: "${senderModel.name} commented on your post.",
+      message: "${senderModel.name} commented on your post '$comment'",
       type: "comment",
       postId: postId,
       commentId: commentId,
@@ -112,5 +113,26 @@ class NotificationAddFunctions {
       type: "share",
       postId: postId,
     );
+  }
+
+  Future<dynamic> getFieldDataFromCollection ({
+    required String collectionPath,
+    required String docId,
+    required String fieldName,
+  }) async {
+    try {
+      final docSnapshot =
+          await firestore.collection(collectionPath).doc(docId).get();
+
+      if (docSnapshot.exists) {
+        return docSnapshot.data()![fieldName];
+      } else {
+        errorMessage("Document is not available");
+        return null;
+      }
+    } catch (e) {
+      errorMessage("Error fetching field data: $e");
+      return null;
+    }
   }
 }

@@ -17,7 +17,7 @@ class SocietyGamingPage extends StatelessWidget {
         GlobalKey<RefreshIndicatorState>();
     final ProfileController profileController = Get.find<ProfileController>();
     final PostController postController = Get.put(PostController());
-    final user = profileController.readProfileNewUser();
+    final user = profileController.user!;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       postController.listenToUnreadNotifications(userId: user.id!);
     });

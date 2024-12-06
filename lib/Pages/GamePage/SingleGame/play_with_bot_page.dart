@@ -19,7 +19,7 @@ class PlayWithBotPage extends StatelessWidget {
     final PlayWithBotController controller = Get.put(PlayWithBotController());
     // final DottedBorderAnimationController animationController =
     //     Get.put(DottedBorderAnimationController());
-    final user = Get.find<ProfileController>().readProfileNewUser();
+    final user = Get.find<ProfileController>().user!;
     final MusicController musicController = Get.find();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       musicController.playMusicOnScreen6();

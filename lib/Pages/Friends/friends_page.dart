@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/webview_controller.dart';
@@ -8,6 +9,7 @@ import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/friends_group_page.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/friends_home_page.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/friends_notifications_page.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/listen_latest_messages_controller.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Drawer/drawer_nav_bar.dart';
 
 class FriendsPage extends StatelessWidget {
@@ -22,7 +24,10 @@ class FriendsPage extends StatelessWidget {
     final FirestoreController firestoreController =
         Get.put(FirestoreController());
     final ProfileController profileController = Get.find<ProfileController>();
-    final user = profileController.readProfileNewUser();
+    final user = profileController.user!;
+    final ListenLatestMessagesController listenLatestMessagesController =
+        Get.find();
+
     return Scaffold(
       drawer: DrawerNavBar(
         firestoreController: firestoreController,
@@ -199,6 +204,9 @@ class FriendsPage extends StatelessWidget {
                     FriendsHomePage(
                       firestoreController: firestoreController,
                       theme: theme,
+                      listenLatestMessagesController:
+                          listenLatestMessagesController,
+                          notifyInMainController: notifyInMainController,
                     ),
                     const FriendsGroupPage(),
                     FriendsNotificationsPage(

@@ -194,6 +194,7 @@ class PostController extends GetxController {
       createdAt: DateTime.now(),
       taggedUserIds: taggedUserIds,
       privacy: privacy,
+      isNotified: true,
     );
 
     // Cập nhật vào Firestore
@@ -323,12 +324,14 @@ class PostController extends GetxController {
           FieldValue.arrayUnion([userModel.id]) // Thêm userId vào likedList
     }).catchError((e) => errorMessage(e));
 
-    await _notificationAddFunctions.createLikeNotification(
-      senderId: userModel.id!,
-      senderModel: userModel,
-      receiverId: postModel.postUser!.id!,
-      postId: postModel.postId!,
-    );
+    if (postModel.isNotified != null && postModel.isNotified == true) {
+      await _notificationAddFunctions.createLikeNotification(
+        senderId: userModel.id!,
+        senderModel: userModel,
+        receiverId: postModel.postUser!.id!,
+        postId: postModel.postId!,
+      );
+    }
   }
 
   // Hàm xóa userId khỏi likedList khi unlike
@@ -368,12 +371,14 @@ class PostController extends GetxController {
       }
     });
 
-    await _notificationAddFunctions.createShareNotification(
-      senderId: userModel.id!,
-      senderModel: userModel,
-      receiverId: postModel.postUser!.id!,
-      postId: postModel.postId!,
-    );
+    if (postModel.isNotified != null && postModel.isNotified == true) {
+      await _notificationAddFunctions.createShareNotification(
+        senderId: userModel.id!,
+        senderModel: userModel,
+        receiverId: postModel.postUser!.id!,
+        postId: postModel.postId!,
+      );
+    }
   }
 
   Future<List<UserModel>> fetchPostLikeUsers(List<String> likeUserIds) async {

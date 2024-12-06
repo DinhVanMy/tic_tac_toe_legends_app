@@ -21,10 +21,6 @@ class PlayWithPlayerController extends GetxController {
   RxList<RxList<String>> board = RxList<RxList<String>>();
   RxList<Offset> winningLineCoordinates = <Offset>[].obs;
   RxBool isXtime = true.obs;
-  // RxInt xScore = 0.obs;
-  // RxInt oScore = 0.obs;
-  RxBool isProcessing1 = false.obs;
-  RxBool isProcessing2 = false.obs;
   RxString winner = ''.obs;
   var roomModel = Rx<RoomModel?>(null);
   RxInt initialSize = 3.obs;
@@ -253,7 +249,7 @@ class PlayWithPlayerController extends GetxController {
   }
 
   void winnerDialog(String winner, RoomModel roomData) {
-    musicPlayController.playSoundWinner();
+    // musicPlayController.playSoundWinner();
     Get.defaultDialog(
       barrierDismissible: false,
       title: "VICTORY",
@@ -297,15 +293,25 @@ class PlayWithPlayerController extends GetxController {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        isProcessing1.value = true;
-                        await scoreCalculateWinner(
-                            winner: winner, roomData: roomData);
-                        await resetPlayValue(roomData.id!);
-                        // Get.back();
-                        // Get.back();
-                        // Get.back();
-                        isProcessing1.value = false;
-                        Get.until((route) => route.isFirst);
+                        await Get.showOverlay(
+                          asyncFunction: () async {
+                            await scoreCalculateWinner(
+                                winner: winner, roomData: roomData);
+                            await resetPlayValue(roomData.id!);
+                          },
+                          loadingWidget: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  GifsPath.transitionGif,
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ).then((_) => Get.back());
                       },
                       child: const Text("Play Again"),
                     ),
@@ -323,26 +329,6 @@ class PlayWithPlayerController extends GetxController {
               ],
             ),
           ),
-          isProcessing1.value
-              ? Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    child: const SizedBox(),
-                  ),
-                )
-              : const SizedBox(),
-          isProcessing1.value
-              ? Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: Image.asset(
-                      GifsPath.loadingGif,
-                      width: 200,
-                      height: 200,
-                    ),
-                  ),
-                )
-              : const SizedBox(),
           // const Center(
           //   child: ConfettiWidgetCustom(),
           // )
@@ -352,7 +338,7 @@ class PlayWithPlayerController extends GetxController {
   }
 
   void defeatDialog(String winner, RoomModel roomData) {
-    musicPlayController.playSoundLoser();
+    // musicPlayController.playSoundLoser();
     Get.defaultDialog(
       barrierDismissible: false,
       title: "DEFEAT",
@@ -396,15 +382,26 @@ class PlayWithPlayerController extends GetxController {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        isProcessing2.value = true;
-                        await scoreCalculateLoser(
-                            winner: winner, roomData: roomData);
-                        await resetPlayValue(roomData.id!);
-                        // Get.back();
-                        // Get.back();
-                        // Get.back();
-                        isProcessing2.value = false;
-                        Get.until((route) => route.isFirst);
+                        await Get.showOverlay(
+                          asyncFunction: () async {
+                            await scoreCalculateLoser(
+                                winner: winner, roomData: roomData);
+                            await resetPlayValue(roomData.id!);
+                          },
+                          loadingWidget: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                  GifsPath.transitionGif,
+                                ),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        ).then((_) => Get.back());
+                        // Get.until((route) => route.isFirst);
                       },
                       child: const Text("Play Again"),
                     ),
@@ -422,26 +419,6 @@ class PlayWithPlayerController extends GetxController {
               ],
             ),
           ),
-          isProcessing2.value
-              ? Positioned.fill(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    child: const SizedBox(),
-                  ),
-                )
-              : const SizedBox(),
-          isProcessing2.value
-              ? Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: Image.asset(
-                      GifsPath.loadingGif,
-                      width: 200,
-                      height: 200,
-                    ),
-                  ),
-                )
-              : const SizedBox(),
         ],
       ),
     );
