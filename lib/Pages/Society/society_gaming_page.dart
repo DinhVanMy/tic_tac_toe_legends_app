@@ -4,7 +4,7 @@ import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/create_post_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/friend_blog_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_notification_page.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Widgets/world_blog_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/live_stream_list_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
 
 class SocietyGamingPage extends StatelessWidget {

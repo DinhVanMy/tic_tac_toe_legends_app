@@ -60,8 +60,8 @@ class AgoraCallController extends GetxController {
     await agoraEngine.initialize(const RtcEngineContext(appId: apiAgoraAppId));
     await agoraEngine.enableAudio();
     await agoraEngine.enableVideo();
-    await agoraEngine
-        .setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
+    await agoraEngine.setChannelProfile(ChannelProfileType
+        .channelProfileCommunication); //channelProfileLiveBroadcasting
     await agoraEngine.setClientRole(role: ClientRoleType.clientRoleBroadcaster);
     await agoraEngine.muteLocalAudioStream(!isMicEnabled.value);
     await agoraEngine.muteLocalVideoStream(!isVideoEnabled.value);
@@ -69,8 +69,8 @@ class AgoraCallController extends GetxController {
 
   Future<void> _joinChannel() async {
     final int intUserId = int.parse(extractNumbers(userId));
-    final expireTimestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000 +
-        3600; // Thời gian hết hạn trong giây
+    final expireTimestamp =
+        DateTime.now().millisecondsSinceEpoch ~/ 1000 + 3600;
 
     final token = RtcTokenBuilder.build(
       appId: apiAgoraAppId,
@@ -112,6 +112,7 @@ class AgoraCallController extends GetxController {
                 color: Colors.black,
                 child: EndOfCallLay(
                   url: url,
+                  endTime: callDuration.value,
                 ),
               ),
               useSafeArea: false,
@@ -189,6 +190,52 @@ class AgoraCallController extends GetxController {
         return "Down";
       default:
         return "Unknown";
+    }
+  }
+
+  //todo: set virtual background
+  Future<void> setVirtualBackground({
+    required BackgroundSourceType backgroundType,
+    String? source,
+    int? color,
+    BackgroundBlurDegree? blurDegree,
+  }) async {
+    final virtualBackgroundSource = VirtualBackgroundSource(
+      backgroundSourceType: backgroundType,
+      source: source,
+      color: color,
+      blurDegree: blurDegree,
+    );
+
+    const segmentationProperty = SegmentationProperty(
+      modelType: SegModelType.segModelAi,
+      greenCapacity: 0.5,
+    );
+
+    await agoraEngine.enableVirtualBackground(
+      enabled: true,
+      backgroundSource: virtualBackgroundSource,
+      segproperty: segmentationProperty,
+    );
+  }
+
+  Future<void> resetVirtualBackground() async {
+    await agoraEngine.enableVirtualBackground(
+      enabled: false,
+      backgroundSource: const VirtualBackgroundSource(),
+      segproperty: const SegmentationProperty(),
+    );
+  }
+
+  RxBool isEnableFaceDetection = false.obs;
+  Future<void> toggleFaceDetection() async {
+    try {
+      // Bật nhận diện khuôn mặt
+      isEnableFaceDetection.value = !isEnableFaceDetection.value;
+      await agoraEngine.enableFaceDetection(isEnableFaceDetection.value);
+      successMessage("Face Detection enabled.");
+    } catch (e) {
+      errorMessage("Failed to enable face detection: $e");
     }
   }
 }

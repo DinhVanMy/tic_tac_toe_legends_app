@@ -208,7 +208,7 @@ class CallInviteRequestDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 300,
+      height: 400,
       width: 400,
       alignment: Alignment.center,
       // padding: const EdgeInsets.all(10.0),
@@ -272,7 +272,7 @@ class CallInviteRequestDialog extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const Spacer(),
           Container(
             decoration: const BoxDecoration(
               border: Border(
@@ -325,38 +325,12 @@ class CallInviteRequestDialog extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const Spacer(),
           CallSlider(
             onAccept: onPressedAccept,
             onDecline: onPressedRefuse,
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          //   children: [
-          //     ElevatedButton(
-          //       onPressed: onPressedRefuse,
-          //       style: ElevatedButton.styleFrom(
-          //         backgroundColor: Colors.redAccent,
-          //         fixedSize: const Size(120, 30),
-          //       ),
-          //       child: const Text(
-          //         'Refuse',
-          //         style: TextStyle(color: Colors.black),
-          //       ),
-          //     ),
-          //     ElevatedButton(
-          //       onPressed: onPressedAccept,
-          //       style: ElevatedButton.styleFrom(
-          //         backgroundColor: Colors.yellow[700],
-          //         fixedSize: const Size(120, 30),
-          //       ),
-          //       child: const Text(
-          //         'Accept',
-          //         style: TextStyle(color: Colors.black),
-          //       ),
-          //     ),
-          //   ],
-          // )
+          const Spacer(),
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:tictactoe_gameapp/Controller/MainHome/main_home_controller.dart'
 import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/check_network_controller.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/bottom_nav_bar.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/button_nav_bar_curve.dart';
 
 class MainHomePage extends StatelessWidget {
   const MainHomePage({super.key});
@@ -18,10 +19,10 @@ class MainHomePage extends StatelessWidget {
     // });
     return Scaffold(
       body: Obx(() => controller.pages[controller.currentIndex.value]),
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: CurvedBottomNavBar(
         currentIndex: controller.currentIndex.value,
         onTabChanged: (value) {
-          musicController.futuricSoundEffect();
+          // musicController.futuricSoundEffect();
           return controller.currentIndex.value = value;
         },
       ),

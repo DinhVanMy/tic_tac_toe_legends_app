@@ -161,9 +161,9 @@ class NotifyInMainController extends GetxController {
             call.senderModel!.name!, call.senderModel!.image!);
 
         // Xóa lời mời call từ Firestore sau 30 giây
-        Future.delayed(const Duration(seconds: 10), () {
+        Future.delayed(const Duration(seconds: 10), () async {
           if (call.id != null) {
-            db.collection('notifications').doc(call.id).delete();
+            await db.collection('notifications').doc(call.id).delete();
           }
           removePopup();
         });

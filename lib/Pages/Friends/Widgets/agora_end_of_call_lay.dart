@@ -1,10 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 
 class EndOfCallLay extends StatelessWidget {
   final String url;
-  const EndOfCallLay({super.key, required this.url});
+  final int endTime;
+  const EndOfCallLay({super.key, required this.url, required this.endTime});
 
   @override
   Widget build(BuildContext context) {
@@ -21,18 +23,18 @@ class EndOfCallLay extends StatelessWidget {
               const Spacer(
                 flex: 1,
               ),
-              const Column(
+               Column(
                 children: [
-                  Text(
+                  const Text(
                     "Call ended",
-                    style: TextStyle(
+                    style:  TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                     ),
                   ),
                   Text(
-                    "0 : 13",
-                    style: TextStyle(
+                    TimeFunctions.displayTimeCount(endTime),
+                    style: const TextStyle(
                       color: Colors.white54,
                       fontSize: 16,
                     ),

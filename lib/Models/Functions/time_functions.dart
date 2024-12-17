@@ -56,4 +56,10 @@ class TimeFunctions {
     String year = dateTime.year.toString();
     return "$day/$month/$year";
   }
+
+  static String displayTimeCount(int totalSeconds) {
+    int minutes = totalSeconds ~/ 60;
+    int seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')} : ${seconds.toString().padLeft(2, '0')}';
+  }
 }

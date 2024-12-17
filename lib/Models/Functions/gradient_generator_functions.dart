@@ -66,19 +66,15 @@ class GradientGeneratorFunctions {
     return colors;
   }
 
-  static List<Color> getRandomGradientColors({int colorCount = 5}) {
-    final Random random = Random();
-    final List<Color> colors = [];
-
-    for (int i = 0; i < colorCount; i++) {
-      colors.add(Color.fromARGB(
-        255,
-        random.nextInt(256),
-        random.nextInt(256),
-        random.nextInt(256),
-      ));
-    }
-    return colors;
+// Generate a random color
+  static Color generateRandomColor() {
+    final random = Random();
+    return Color.fromARGB(
+      255, // Always use full opacity
+      random.nextInt(256), // Red
+      random.nextInt(256), // Green
+      random.nextInt(256), // Blue
+    );
   }
 
   static String _getColorName(Color color) {
@@ -100,7 +96,7 @@ class GradientGeneratorFunctions {
   static String generateGradientName({required List<Color> colors}) {
     final Random random = Random();
     const adjectives = ["Vibrant", "Calm", "Energetic", "Peaceful", "Lively"];
-     String primaryColorName = _getColorName(colors.first);
+    String primaryColorName = _getColorName(colors.first);
     const themes = ["Sunset", "Ocean", "Forest", "Rainbow", "Dusk"];
 
     return "${adjectives[random.nextInt(adjectives.length)]} "

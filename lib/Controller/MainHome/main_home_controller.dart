@@ -7,11 +7,11 @@ import 'package:tictactoe_gameapp/Pages/Society/society_gaming_page.dart';
 import 'package:tictactoe_gameapp/Pages/Web/web_view_screen.dart';
 
 class MainHomeController extends GetxController {
-  RxInt currentIndex = 0.obs;
+  RxInt currentIndex = 2.obs;
   var pages = <Widget>[
-    const HomePage(),
-    const FriendsPage(),
     const ChatBotPage(),
+    const FriendsPage(),
+    const HomePage(),
     const UltizeScreen(),
     const SocietyGamingPage(),
   ];

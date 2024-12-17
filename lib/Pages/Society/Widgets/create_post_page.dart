@@ -10,7 +10,6 @@ import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
-import 'package:tictactoe_gameapp/Pages/Society/society_gaming_page.dart';
 
 class CreatePostPage extends StatelessWidget {
   final PostController postController;

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
+import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/Agoras_widget/agora_background_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/Agoras_widget/beauty_filter_option_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/agora_call_controller.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 
@@ -120,7 +124,7 @@ class AgoraCallPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Obx(() => Text(
-                            _getFormattedTime(
+                            TimeFunctions.displayTimeCount(
                                 agoraCallController.callDuration.value),
                             style: const TextStyle(
                               fontSize: 20,
@@ -192,14 +196,24 @@ class AgoraCallPage extends StatelessWidget {
                       ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            IconButton(
-                              icon: const Icon(
-                                Icons.emoji_emotions,
-                                color: Colors.blueAccent,
-                                size: 35,
-                              ),
-                              onPressed: () {},
-                            ),
+                            Obx(() => IconButton(
+                                  icon: agoraCallController
+                                          .isEnableFaceDetection.value
+                                      ? const Icon(
+                                          Icons.face_retouching_natural_rounded,
+                                          color: Colors.blueAccent,
+                                          size: 35,
+                                        )
+                                      : const Icon(
+                                          Icons.face_retouching_off_rounded,
+                                          color: Colors.blueAccent,
+                                          size: 35,
+                                        ),
+                                  onPressed: () async {
+                                    await agoraCallController
+                                        .toggleFaceDetection();
+                                  },
+                                )),
                             const SizedBox(
                               width: 20,
                             ),
@@ -209,7 +223,18 @@ class AgoraCallPage extends StatelessWidget {
                                 color: Colors.blueAccent,
                                 size: 35,
                               ),
-                              onPressed: () {},
+                              onPressed: () async {
+                                await GeneralBottomsheetShowFunction
+                                    .showScrollableGeneralBottomsheet(
+                                  widgetBuilder: (context, controller) =>
+                                      BeautyFiltersSheet(
+                                    agoraEngine:
+                                        agoraCallController.agoraEngine,
+                                  ),
+                                  context: context,
+                                  initHeight: 0.5,
+                                );
+                              },
                             ),
                             const SizedBox(
                               width: 20,
@@ -220,7 +245,18 @@ class AgoraCallPage extends StatelessWidget {
                                 color: Colors.blueAccent,
                                 size: 35,
                               ),
-                              onPressed: () {},
+                              onPressed: () async {
+                                await GeneralBottomsheetShowFunction
+                                    .showScrollableGeneralBottomsheet(
+                                  widgetBuilder: (context, controller) =>
+                                      AgoraBackgroundSheet(
+                                    scrollController: controller,
+                                    imageAvatar: userCurrent.image!,
+                                  ),
+                                  context: context,
+                                  initHeight: 0.9,
+                                );
+                              },
                             ),
                           ],
                         )
@@ -387,11 +423,5 @@ class AgoraCallPage extends StatelessWidget {
     } else {
       return Icons.wifi_password_rounded;
     }
-  }
-
-  String _getFormattedTime(int totalSeconds) {
-    int minutes = totalSeconds ~/ 60;
-    int seconds = totalSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')} : ${seconds.toString().padLeft(2, '0')}';
   }
 }

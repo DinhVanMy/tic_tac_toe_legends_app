@@ -31,7 +31,7 @@ class ExpandableText extends StatelessWidget {
             ),
             onPressed: () => isExpanded.value = !isExpanded.value,
             child: Text(
-              isExpanded.value ? 'See Less' : 'See More',
+              isExpanded.value ? 'Show less' : 'Show more',
               style: const TextStyle(
                 color: Colors.grey,
                 fontSize: 18,
@@ -101,7 +101,7 @@ class ExpandableContent extends StatelessWidget {
                   ),
                   isExpanded.value
                       ? TextSpan(
-                          text: '\n See Less',
+                          text: '\n Show less',
                           style: style.copyWith(color: Colors.blue),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
@@ -143,9 +143,9 @@ class ExpandableContent extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: ' See More',
+                      text: ' Show more',
                       style: style.copyWith(
-                        color: Colors.blue,
+                        color: Colors.blueAccent,
                         fontWeight: FontWeight.w400,
                         fontStyle: FontStyle.italic,
                       ),
