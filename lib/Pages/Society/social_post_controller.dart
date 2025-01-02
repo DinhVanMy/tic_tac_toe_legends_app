@@ -3,12 +3,14 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polls/flutter_polls.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/notification_add_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/post_polls_model.dart';
 import 'package:uuid/uuid.dart';
 
 class PostController extends GetxController {
@@ -172,6 +174,8 @@ class PostController extends GetxController {
     List<XFile>? imageFiles,
     List<String>? taggedUserIds,
     required String privacy,
+    String? gifUrl,
+    PostPollsModel? postPollsModel,
   }) async {
     var uuid = const Uuid();
     String postId = uuid.v4();
@@ -195,6 +199,8 @@ class PostController extends GetxController {
       taggedUserIds: taggedUserIds,
       privacy: privacy,
       isNotified: true,
+      gif: gifUrl,
+      postPolls: postPollsModel,
     );
 
     // Cập nhật vào Firestore
@@ -253,6 +259,85 @@ class PostController extends GetxController {
       }
     } else {
       errorMessage("No fields to update");
+    }
+  }
+
+  Future<bool> onVoteFunction({
+    required PollOption pollOption,
+    required int newTotalVotes,
+    required PostPollsModel postPolls,
+    required String postId,
+    required String userId,
+  }) async {
+    // Kiểm tra nếu user đã vote
+    if (postPolls.voterList?.contains(userId) ?? false) {
+      return false;
+    }
+
+    // Tìm option mà user đã vote
+    OptionalPolls? option = postPolls.options?.firstWhere(
+        (opt) => opt.id.toString() == pollOption.id,
+        orElse: () => OptionalPolls());
+
+    if (option == null) return false;
+
+    // Cập nhật số lượng votes và danh sách user đã vote
+    option.votes = (option.votes ?? 0) + 1;
+    option.votedUserIds ??= [];
+    option.votedUserIds!.add(userId);
+
+    // Thêm user vào danh sách voterList của poll
+    postPolls.voterList ??= [];
+    postPolls.voterList!.add(userId);
+
+    // Cập nhật dữ liệu trên Firestore
+    try {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .update({'postPolls': postPolls.toJson()});
+      return true;
+    } catch (e) {
+      errorMessage('Error updating vote: $e');
+      return false;
+    }
+  }
+
+  Future<void> undoVoteFunction({
+    required PostPollsModel postPolls,
+    required String postId,
+    required String userId,
+  }) async {
+    // postPolls.voterList ??= [];
+    // postPolls.options?.forEach((option) {
+    //   option.votedUserIds ??= [];
+    // });
+
+    // Kiểm tra nếu userId nằm trong voterList
+    if (!(postPolls.voterList?.contains(userId) ?? false)) return;
+
+    // Tìm tùy chọn mà user đã vote
+    OptionalPolls? votedOption = postPolls.options?.firstWhere(
+      (option) => option.votedUserIds?.contains(userId) ?? false,
+      orElse: () => OptionalPolls(),
+    );
+
+    if (votedOption == null) return;
+
+    // Loại bỏ userId khỏi voterList và votedUserIds
+    postPolls.voterList?.remove(userId);
+    votedOption.votedUserIds?.remove(userId);
+    votedOption.votes =
+        (votedOption.votes ?? 1) > 0 ? votedOption.votes! - 1 : 0;
+
+    // Cập nhật trên Firestore
+    try {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .update({'postPolls': postPolls.toJson()});
+    } catch (e) {
+      debugPrint("Undo vote failed: $e");
     }
   }
 

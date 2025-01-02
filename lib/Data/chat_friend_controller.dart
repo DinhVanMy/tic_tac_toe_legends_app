@@ -185,6 +185,7 @@ class ChatFriendController extends GetxController {
   // Hàm gửi tin nhắn lên Firestore
   Future<void> sendMessage(
     String content,
+    String? gifUrl,
   ) async {
     if (content.trim().isEmpty) {
       errorMessage("Please enter a message");
@@ -195,6 +196,7 @@ class ChatFriendController extends GetxController {
       senderId: currentUserId,
       receiverId: friendId,
       content: content,
+      gif: gifUrl,
       timestamp: Timestamp.now(),
       status: 'unseen',
     );
@@ -296,7 +298,6 @@ class ChatFriendController extends GetxController {
             .doc(doc.id)
             .delete()
             .catchError((e) => errorMessage('Error deleting old messages: $e'));
-        successMessage('Deleted messages 7 days ago');
       }
     } catch (e) {
       errorMessage('Error deleting old messages: $e');

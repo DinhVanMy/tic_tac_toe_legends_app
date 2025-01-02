@@ -7,14 +7,11 @@ import 'package:tictactoe_gameapp/Configs/theme/theme_dark.dart';
 import 'package:tictactoe_gameapp/Configs/theme/theme_light.dart';
 import 'package:tictactoe_gameapp/Configs/translation/translation.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
-import 'package:tictactoe_gameapp/Controller/check_network_controller.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
-import 'package:tictactoe_gameapp/Controller/notification_controller.dart';
-import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Splace/splace_page.dart';
-import 'package:tictactoe_gameapp/Test/test_widget.dart';
+import 'package:tictactoe_gameapp/Test/customed_error_widget.dart';
 import 'firebase_options.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -36,7 +33,7 @@ class MyApp extends StatelessWidget {
       initialBinding: BindingsBuilder(() {
         Get.put(ThemeController(), permanent: true);
         Get.put(AuthController(), permanent: true);
-        Get.put(MusicController(), permanent: true);
+        Get.put(BackgroundMusicController(), permanent: true);
         // Get.put(CheckNetworkController(),permanent: true);
       }),
       // initialRoute: '/splace',
@@ -48,6 +45,12 @@ class MyApp extends StatelessWidget {
       translations: AppTranslations(),
       locale: languageController.locale,
       fallbackLocale: const Locale('en'),
+      builder: (context, child) {
+        ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+          return CustomErrorWidget(errorDetails: errorDetails);
+        };
+        return child!;
+      },
       home: const SplacePage(),
       //  const MultiPlayer(
 

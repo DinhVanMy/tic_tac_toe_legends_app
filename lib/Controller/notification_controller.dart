@@ -112,6 +112,7 @@ class NotificationController extends GetxController {
         // icon: 'resource://drawable/tic-tac-toe-x',
       ),
     );
+    
   }
 
   Future<void> showCallNotification(

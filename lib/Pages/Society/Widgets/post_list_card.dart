@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
 import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
@@ -16,6 +16,8 @@ import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/share_sheet_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/post_polls_card.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/stack_image_widget.dart';
 
 class PostListCard extends StatelessWidget {
   final PostModel post;
@@ -34,7 +36,7 @@ class PostListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var currentIndex = 0.obs;
+    // var currentIndex = 0.obs;
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -195,94 +197,39 @@ class PostListCard extends StatelessWidget {
           const SizedBox(
             height: 10,
           ),
-          post.imageUrls != null
-              ? SizedBox(
-                  height: 100,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: post.imageUrls!.length,
-                      itemBuilder: (context, index) {
-                        return Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                currentIndex.value = index;
-                                Get.dialog(
-                                  Dialog(
-                                    backgroundColor: Colors.transparent,
-                                    insetPadding: const EdgeInsets.all(10),
-                                    child: GestureDetector(
-                                      onTap: () => Get.back(),
-                                      child: PageView.builder(
-                                        controller: PageController(
-                                            initialPage: currentIndex.value),
-                                        onPageChanged: (index) {
-                                          currentIndex.value = index;
-                                        },
-                                        itemCount: post.imageUrls!.length,
-                                        itemBuilder: (context, index) {
-                                          return Container(
-                                            width: double.infinity,
-                                            height: 200,
-                                            alignment: Alignment.topCenter,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                image: MemoryImage(
-                                                  base64Decode(
-                                                    post.imageUrls![index],
-                                                  ),
-                                                ),
-                                                fit: BoxFit.fitWidth,
-                                              ),
-                                            ),
-                                            child: Text(
-                                              "${index + 1} / ${post.imageUrls!.length}",
-                                              style: const TextStyle(
-                                                  fontSize: 25,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white),
-                                            ),
-                                          );
-                                          //  InteractiveViewer(
-                                          //   boundaryMargin:
-                                          //       const EdgeInsets.all(8),
-                                          //   minScale: 1,
-                                          //   maxScale: 3,
-                                          //   child:
-                                          //    ClipRRect(
-                                          //     borderRadius:
-                                          //         BorderRadius.circular(10),
-                                          //     child: Image.memory(
-                                          //       base64Decode(
-                                          //         post.imageUrls![index],
-                                          //       ),
-                                          //       width: double.infinity,
-                                          //     ),
-                                          //   ),
-                                          // );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.memory(
-                                  base64Decode(
-                                    post.imageUrls![index],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                          ],
-                        );
-                      }),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              post.imageUrls != null
+                  ? SizedBox(
+                      height: 100,
+                      width: MediaQuery.sizeOf(context).width / 2 - 25,
+                      child: StackImageWidget(
+                        imageUrls: post.imageUrls!,
+                      ),
+                    )
+                  : const SizedBox(),
+              const SizedBox(
+                width: 10,
+              ),
+              post.gif != null
+                  ? SizedBox(
+                      width: MediaQuery.sizeOf(context).width / 2 - 25,
+                      child: DisplayGifWidget(gifUrl: post.gif!))
+                  : const SizedBox(),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          post.postPolls != null
+              ? PostPollWidget(
+                  postPollsModel: post.postPolls!,
+                  postController: postController,
+                  postId: post.postId,
+                  userId: currentUser.id,
                 )
-              : const SizedBox(),
+              : const SizedBox.shrink(),
           const SizedBox(
             height: 10,
           ),

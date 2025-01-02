@@ -9,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/live_sream_model.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/livestream_doc_service.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_doc_service.dart';
 
 class AgoraLivestreamController extends GetxController {
   late final RtcEngine agoraEngine;
@@ -55,11 +55,10 @@ class AgoraLivestreamController extends GetxController {
 
   Future<void> _initialize() async {
     await _initializeAgora();
-    if (isStreamer) {
-      _addAgoraEventHandlers();
-    }
     await _joinChannel();
-    _listenToForestoreLiveStreamEvent();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _listenToForestoreLiveStreamEvent();
+    });
   }
 
   // 2.1. Khởi tạo Agora Engine
@@ -105,11 +104,6 @@ class AgoraLivestreamController extends GetxController {
             : ClientRoleType.clientRoleAudience,
       ),
     );
-
-    if (isStreamer) {
-      await liveStreamService.updateLiveStreamFields(
-          streamId, "hostUid", intUserId);
-    }
   }
 
   // 2.3. Bật chia sẻ màn hình (Host)
@@ -183,25 +177,6 @@ class AgoraLivestreamController extends GetxController {
     agoraEngine.muteLocalVideoStream(!isVideoEnabled.value);
   }
 
-  // 2.7. Xử lý sự kiện Agora
-  void _addAgoraEventHandlers() {
-    agoraEngine.registerEventHandler(
-      RtcEngineEventHandler(
-        onUserJoined: (connection, remoteUid, elapsed) async {
-          await liveStreamService.incrementViewerCount(streamId);
-        },
-        onUserOffline: (connection, remoteUid, reason) async {
-          if (reason == UserOfflineReasonType.userOfflineQuit) {
-            await liveStreamService.decrementViewerCount(streamId);
-          }
-        },
-        onLeaveChannel: (RtcConnection connection, RtcStats stats) {
-          successMessage('LiveSrteam is offline');
-        },
-      ),
-    );
-  }
-
   RxInt viewerCount = 1.obs;
   RxInt likeCount = 0.obs;
   RxList<Map<String, String>> comments = <Map<String, String>>[].obs;
@@ -229,6 +204,7 @@ class AgoraLivestreamController extends GetxController {
                     "name": entry.value['name']?.toString() ?? '',
                     "photoUrl": entry.value['photoUrl']?.toString() ?? '',
                     "content": entry.value['content']?.toString() ?? '',
+                    "gif": entry.value['gif']?.toString() ?? '',
                     "createdAt": entry.value['createdAt']?.toString() ?? '',
                   })
               .toList();

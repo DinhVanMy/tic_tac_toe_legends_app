@@ -4,7 +4,6 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 class LiveStreamModel {
   String? streamId; // ID của livestream
   String? channelId; // ID channel
-  int? hostUid;
   UserModel? streamer; // Người tạo livestream
   String? title; // Tiêu đề livestream
   String? description; // Mô tả livestream
@@ -19,7 +18,6 @@ class LiveStreamModel {
   LiveStreamModel({
     this.streamId,
     this.channelId,
-    this.hostUid,
     this.streamer,
     this.title,
     this.description,
@@ -36,7 +34,6 @@ class LiveStreamModel {
   LiveStreamModel.fromJson(Map<String, dynamic> json) {
     streamId = json['streamId'] as String?;
     channelId = json['channelId'] as String?;
-    hostUid = json['hostUid'] as int?;
     if (json["streamer"] is Map) {
       streamer = json["streamer"] == null
           ? null
@@ -69,7 +66,6 @@ class LiveStreamModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['streamId'] = streamId;
     data['channelId'] = channelId;
-    data['hostUid'] = hostUid;
     if (streamer != null) {
       data["streamer"] = streamer?.toJson();
     }

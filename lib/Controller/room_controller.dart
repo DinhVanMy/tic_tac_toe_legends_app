@@ -50,7 +50,10 @@ class RoomController extends GetxController {
             newRoom.toJson(),
           )
           .catchError((e) => errorMessage(e.toString()));
-      Get.to(LobbyPage(roomId: id));
+      Get.to(
+        LobbyPage(roomId: id),
+        transition: Transition.leftToRightWithFade,
+      );
     } catch (e) {
       errorMessage("Error");
     }
@@ -110,7 +113,10 @@ class RoomController extends GetxController {
           "player2Status": "waiting",
         },
       ).catchError((e) => errorMessage(e.toString()));
-      Get.to(LobbyPage(roomId: roomId));
+      Get.to(
+        LobbyPage(roomId: roomId),
+        transition: Transition.leftToRightWithFade,
+      );
     } catch (e) {
       errorMessage(e.toString());
     }

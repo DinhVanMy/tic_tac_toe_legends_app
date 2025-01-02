@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Models/Functions/gradient_generator_functions.dart';
 
@@ -76,12 +77,13 @@ class _AnimatedEmojiState extends State<AnimatedEmoji>
 
     // Opacity giảm dần
     _opacityAnimation = Tween<double>(begin: 1.0, end: 0.4).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOutCirc),
+      CurvedAnimation(
+          parent: _controller, curve: Curves.easeOut), //easeOut , easeInOut
     );
 
     // Kích thước emoji nhỏ dần
     _sizeAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
     );
 
     // Hiệu ứng thay đổi vị trí (Bezier Curve)
@@ -105,7 +107,7 @@ class _AnimatedEmojiState extends State<AnimatedEmoji>
     _colorAnimation = ColorTween(
       begin: Colors.white,
       end: GradientGeneratorFunctions.generateRandomColor(),
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
   }

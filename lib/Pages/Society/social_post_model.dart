@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/post_polls_model.dart';
 
 class PostModel {
   String? postId;
   UserModel? postUser;
   String? content; // Nội dung bài viết
+  PostPollsModel? postPolls;
   List<String>? backgroundPost;
   List<String>? imageUrls; // Danh sách URL ảnh đính kèm
+  String? gif;
   List<String>? likedList;
   int? commentCount;
   int? shareCount;
@@ -19,8 +22,10 @@ class PostModel {
     this.postId,
     this.postUser,
     this.content,
+    this.postPolls,
     this.backgroundPost,
     this.imageUrls,
+    this.gif,
     this.likedList,
     this.shareCount,
     this.commentCount,
@@ -39,12 +44,16 @@ class PostModel {
           : UserModel.fromJson(json["postUser"]);
     }
     content = json['content'] as String?;
+    if (json['postPolls'] is Map) {
+      postPolls = PostPollsModel.fromJson(json['postPolls']);
+    }
     if (json["backgroundPost"] is List) {
       backgroundPost = List<String>.from(json["backgroundPost"]);
     }
     if (json['imageUrls'] is List) {
       imageUrls = List<String>.from(json['imageUrls']);
     }
+    gif = json['gif'] as String?;
     if (json['likedList'] is List) {
       likedList = List<String>.from(json['likedList']);
     }
@@ -72,8 +81,12 @@ class PostModel {
       data["postUser"] = postUser?.toJson();
     }
     data['content'] = content;
+    if (postPolls != null) {
+      data['postPolls'] = postPolls?.toJson();
+    }
     data['backgroundPost'] = backgroundPost;
     data['imageUrls'] = imageUrls;
+    data['gif'] = gif;
     data['likedList'] = likedList;
     data['shareCount'] = shareCount;
     data['commentCount'] = commentCount;

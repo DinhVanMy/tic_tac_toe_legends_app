@@ -9,8 +9,8 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/countdown_animation_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_play_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/effective_music_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/minimax_arg.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Widgets/core/countdown_waiting_widget.dart';
@@ -18,7 +18,7 @@ import 'package:tictactoe_gameapp/Pages/GamePage/Widgets/core/countdown_waiting_
 class PlayWithBotController extends GetxController {
   RxList<RxList<String>> board = RxList<RxList<String>>();
   RxList<Offset> winningLineCoordinates = <Offset>[].obs;
-  final MusicController musicController = Get.find();
+  final BackgroundMusicController musicController = Get.find();
   RxBool isXtime = true.obs;
   RxInt xScore = 0.obs;
   RxInt oScore = 0.obs;
@@ -30,8 +30,8 @@ class PlayWithBotController extends GetxController {
   int currentWin = 0;
   int currentCoin = 0;
 
-  final MusicPlayController musicPlayController =
-      Get.put(MusicPlayController());
+  final EffectiveMusicController musicPlayController =
+      Get.put(EffectiveMusicController());
   final FirestoreController firestoreController =
       Get.put(FirestoreController());
 
@@ -855,7 +855,7 @@ class PlayWithBotController extends GetxController {
   void showMapPicker() {
     final CountdownController countdownController =
         Get.put(CountdownController());
-    final MusicController musicController = Get.find();
+    final BackgroundMusicController musicController = Get.find();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       musicController.playMusicOnScreen5();
     });

@@ -1,4 +1,6 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class OptionCard extends StatelessWidget {
   final IconData icon;
@@ -34,7 +36,7 @@ class OptionCard extends StatelessWidget {
                 title,
                 style: theme.textTheme.bodyLarge,
                 textAlign: TextAlign.center,
-              ),
+              ).animate().fadeIn(duration: const Duration(seconds: 1)),
               const SizedBox(height: 5),
               Text(
                 description,
@@ -42,7 +44,7 @@ class OptionCard extends StatelessWidget {
                     .copyWith(color: Colors.blueGrey),
                 textAlign: TextAlign.center,
                 maxLines: 4,
-              ),
+              ).animate().fadeIn(duration: const Duration(seconds: 3)),
             ],
           ),
         ),

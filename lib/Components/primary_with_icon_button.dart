@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -48,11 +49,24 @@ class PrimaryIconWithButton extends StatelessWidget {
             ),
             Text(
               buttonText,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     color: Theme.of(context).colorScheme.primaryContainer,
-                    fontWeight: FontWeight.bold,
                   ),
             ),
+            // AnimatedTextKit(
+            //   animatedTexts: [
+            //     WavyAnimatedText(
+            //       buttonText,
+            //       speed: const Duration(milliseconds: 400),
+            //       textStyle: Theme.of(context)
+            //           .textTheme
+            //           .headlineMedium
+            //           ?.copyWith(
+            //             color: Theme.of(context).colorScheme.primaryContainer,
+            //           ),
+            //     )
+            //   ],
+            // ),
           ],
         ),
       ),

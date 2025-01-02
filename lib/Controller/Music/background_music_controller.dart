@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 
-class MusicController extends GetxController {
+class BackgroundMusicController extends GetxController {
   late AudioPlayer _audioPlayer; // Player cho màn hình 1-4
   late AudioPlayer _audioPlayerScreen5; // Player cho màn hình 5
   late AudioPlayer _audioPlayerScreen6; // Player cho màn hình 6
@@ -25,6 +25,7 @@ class MusicController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
     _audioPlayer = AudioPlayer(); // Khởi tạo player cho màn hình 1-4
     _audioPlayerScreen5 = AudioPlayer(); // Khởi tạo player cho màn hình 5
     _audioPlayerScreen6 = AudioPlayer(); // Khởi tạo player cho màn hình 6

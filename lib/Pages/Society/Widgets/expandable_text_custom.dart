@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Models/Functions/hyperlink_text_function.dart';
 
@@ -112,7 +113,7 @@ class ExpandableContent extends StatelessWidget {
                 ]),
                 textAlign: isAligCenter ? TextAlign.center : TextAlign.start,
                 maxLines: isExpanded.value ? null : maxLines,
-              ),
+              ).animate().fade(duration: const Duration(milliseconds: 1000)),
             );
           } else {
             // Thu gọn nội dung

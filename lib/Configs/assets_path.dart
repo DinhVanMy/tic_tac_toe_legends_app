@@ -204,6 +204,7 @@ class Jajas {
   static const mission = "${basePath}mission.png";
   static const quest = "${basePath}quest.png";
   static const worldNews = "${basePath}world_news.png";
+  static const tinder = "${basePath}tinder.png";
   static const card0 = "${basePath}card_0.png";
   static const card1 = "${basePath}card_1.png";
   static const card2 = "${basePath}card_2.png";

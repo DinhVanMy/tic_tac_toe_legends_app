@@ -2,6 +2,11 @@ import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giphy_picker/giphy_picker.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/preview_gif_widget.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_controller.dart';
@@ -9,6 +14,7 @@ import 'package:tictactoe_gameapp/Pages/Society/Comment/sub_comment_controller.d
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/reply_comment_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
+import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
 
 class CommentListSheet extends StatelessWidget {
   final ScrollController scrollController;
@@ -24,10 +30,12 @@ class CommentListSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final CommentController commentController =
         Get.put(CommentController(post.postId!));
-    final TextEditingController textEditingController = TextEditingController();
+    final TextEditingController textController = TextEditingController();
     final FocusNode focusNode = FocusNode();
     RxString commentContent = "".obs;
     RxString commentId = "".obs;
+    RxBool isEmojiPickerVisible = false.obs;
+    var selectedGif = Rx<GiphyGif?>(null);
     return Column(
       children: [
         Row(
@@ -179,16 +187,21 @@ class CommentListSheet extends StatelessWidget {
                                         ),
                                         maxLines: 5,
                                       ),
+                                      comment.gif != null
+                                          ? DisplayGifWidget(
+                                              gifUrl: comment.gif!,
+                                            )
+                                          : const SizedBox(),
                                       GestureDetector(
                                         onTap: () {
                                           commentId.value = comment.id!;
-                                          textEditingController.text =
+                                          textController.text =
                                               "@${commentUser.name!} ";
-                                          textEditingController.selection =
+                                          textController.selection =
                                               TextSelection.fromPosition(
                                             TextPosition(
-                                                offset: textEditingController
-                                                    .text.length),
+                                                offset:
+                                                    textController.text.length),
                                           );
                                           focusNode.requestFocus();
                                         },
@@ -353,7 +366,7 @@ class CommentListSheet extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              "Replying to ${textEditingController.text} ",
+                              "Replying to ${textController.text} ",
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 15,
@@ -363,7 +376,7 @@ class CommentListSheet extends StatelessWidget {
                           GestureDetector(
                               onTap: () {
                                 commentId.value = "";
-                                textEditingController.clear();
+                                textController.clear();
                               },
                               child: const Text(
                                 "X",
@@ -376,6 +389,35 @@ class CommentListSheet extends StatelessWidget {
                       ),
                     )
                   : const SizedBox()),
+              PreviewGifWidget(
+                selectedGif: selectedGif,
+              ),
+              CustomEmojiPicker(
+                onEmojiSelected: (emoji) {
+                  textController.text += emoji;
+                  commentContent.value = textController.text;
+                  textController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: textController.text.length),
+                  );
+                },
+                onBackspacePressed: () {
+                  final text = textController.text;
+                  if (text.isNotEmpty) {
+                    // Xóa ký tự cuối (bao gồm cả emoji)
+                    textController.text =
+                        text.characters.skipLast(1).toString();
+                    commentContent.value = textController.text;
+                    textController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: textController.text.length),
+                    );
+                  }
+                },
+                isEmojiPickerVisible: isEmojiPickerVisible,
+                backgroundColor: const [
+                  Colors.blueGrey,
+                  Colors.blueGrey,
+                ],
+              ),
               Row(
                 children: [
                   CircleAvatar(
@@ -389,7 +431,7 @@ class CommentListSheet extends StatelessWidget {
                   Expanded(
                       child: TextField(
                     focusNode: focusNode,
-                    controller: textEditingController,
+                    controller: textController,
                     onChanged: (value) {
                       if (value.isNotEmpty) {
                         commentContent.value = value;
@@ -401,6 +443,52 @@ class CommentListSheet extends StatelessWidget {
                       fillColor: Colors.grey.shade400,
                       hintStyle: const TextStyle(color: Colors.black54),
                       hintText: "Write a comment...",
+                      prefixIcon: IconButton(
+                        icon: const Icon(
+                          Icons.gif_box_outlined,
+                          color: Colors.blueAccent,
+                          size: 30,
+                        ),
+                        onPressed: () async {
+                          final gif = await GiphyPicker.pickGif(
+                            context: context,
+                            apiKey: apiGifphy,
+                            showPreviewPage: false,
+                            showGiphyAttribution: false,
+                            loadingBuilder: (context) {
+                              return Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Image.asset(
+                                    GifsPath.loadingGif,
+                                    height: 200,
+                                    width: 200,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+
+                          if (gif != null) {
+                            selectedGif.value = gif;
+                          }
+                        },
+                      ),
+                      suffixIcon: Obx(() => IconButton(
+                          onPressed: () {
+                            isEmojiPickerVisible.toggle();
+                          },
+                          icon: isEmojiPickerVisible.value
+                              ? const Icon(
+                                  Icons.emoji_emotions,
+                                  color: Colors.blue,
+                                  size: 30,
+                                )
+                              : const Icon(
+                                  Icons.emoji_emotions_outlined,
+                                  color: Colors.blue,
+                                  size: 30,
+                                ))),
                     ),
                   )),
                   Obx(() => commentContent.value.isEmpty ||
@@ -419,9 +507,12 @@ class CommentListSheet extends StatelessWidget {
                                     ));
                                     await subCommentController.addSubComment(
                                         content: commentContent.value,
+                                        gifUrl: selectedGif
+                                            .value?.images.original!.url!,
                                         currentUser: currentUser);
-                                    textEditingController.clear();
+                                    textController.clear();
                                     commentContent.value = "";
+                                    selectedGif.value = null;
                                     commentId.value = "";
                                   },
                                   icon: const Icon(
@@ -437,8 +528,11 @@ class CommentListSheet extends StatelessWidget {
                                       content: commentContent.value,
                                       currentUser: currentUser,
                                       receiverId: post.postUser!.id!,
+                                      gifUrl: selectedGif
+                                          .value?.images.original!.url!,
                                     );
-                                    textEditingController.clear();
+                                    textController.clear();
+                                    selectedGif.value = null;
                                     commentContent.value = "";
                                   },
                                   icon: const Icon(

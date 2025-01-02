@@ -1,17 +1,22 @@
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giphy_picker/giphy_picker.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/preview_gif_widget.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
-import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/live_sream_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/Agoras_widget/agora_background_sheet.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/Widgets/bubbles_effect_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/Widgets/bubbles_effect_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/Widgets/livestream_comment_list_widget.dart';
 
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/agora_livestreaming_controller.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/livestream_doc_service.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/agora_livestreaming_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_doc_service.dart';
+import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
 
 class AgoraLivestreamingPage extends StatelessWidget {
   final UserModel currentUser;
@@ -37,16 +42,20 @@ class AgoraLivestreamingPage extends StatelessWidget {
       url: currentUser.image!,
       streamId: liveStreamModel.streamId!,
     ));
+    // final int hostUid =
+    //     int.parse(_extractNumbers(liveStreamModel.streamer!.id!));
     final UserModel streamUser = liveStreamModel.streamer!;
     final ThemeData theme = Theme.of(context);
-    final TextEditingController commentTextEditingController =
-        TextEditingController();
+    final TextEditingController textController = TextEditingController();
     RxBool isSeeComment = true.obs;
     RxString comment = "".obs;
     RxBool isEmoteOpen = false.obs;
+    RxBool isEmojiPickerVisible = false.obs;
+    var selectedGif = Rx<GiphyGif?>(null);
 
     LiveStreamService liveStreamService = LiveStreamService();
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
           isStreamer
@@ -59,9 +68,11 @@ class AgoraLivestreamingPage extends StatelessWidget {
               : AgoraVideoView(
                   controller: VideoViewController.remote(
                     rtcEngine: livestreamController.agoraEngine,
-                    canvas: VideoCanvas(uid: liveStreamModel.hostUid),
+                    canvas: VideoCanvas(
+                        uid: int.parse(
+                            _extractNumbers(liveStreamModel.streamer!.id!))),
                     connection: RtcConnection(
-                      channelId: channelId,
+                      channelId: liveStreamModel.channelId,
                     ),
                   ),
                 ),
@@ -152,7 +163,7 @@ class AgoraLivestreamingPage extends StatelessWidget {
                                     width: 5,
                                   ),
                                   Obx(() => Text(
-                                        livestreamController.viewerCount
+                                        livestreamController.viewerCount.value
                                             .toString(),
                                         style: const TextStyle(
                                             color: Colors.white),
@@ -189,6 +200,8 @@ class AgoraLivestreamingPage extends StatelessWidget {
                                       liveStreamModel.streamId!);
                                   Get.toNamed("mainHome");
                                 } else {
+                                  await liveStreamService.decrementViewerCount(
+                                      liveStreamModel.streamId!);
                                   Get.back();
                                 }
                               },
@@ -210,128 +223,9 @@ class AgoraLivestreamingPage extends StatelessWidget {
                       children: [
                         Obx(
                           () => isSeeComment.value
-                              ? SizedBox(
-                                  height: 300,
-                                  width: 300,
-                                  child: Obx(() => livestreamController
-                                          .comments.isNotEmpty
-                                      ? ListView.builder(
-                                          clipBehavior: Clip.none,
-                                          controller: livestreamController
-                                              .scrollController,
-                                          itemCount: livestreamController
-                                              .comments
-                                              .toList()
-                                              .length,
-                                          itemBuilder: (context, index) {
-                                            final comment = livestreamController
-                                                .comments[index];
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 10.0),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  AvatarUserWidget(
-                                                    radius: 25,
-                                                    imagePath:
-                                                        comment['photoUrl']!,
-                                                    borderThickness: 2,
-                                                    gradientColors: const [
-                                                      Colors.lightBlueAccent,
-                                                      Colors.lightGreenAccent
-                                                    ],
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(comment['name']!,
-                                                            style: theme
-                                                                .textTheme
-                                                                .bodyLarge!),
-                                                        Text(
-                                                          comment["content"]!,
-                                                          softWrap: true,
-                                                          overflow: TextOverflow
-                                                              .visible,
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                        ),
-                                                        SingleChildScrollView(
-                                                          scrollDirection:
-                                                              Axis.horizontal,
-                                                          child: Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              Text(
-                                                                  TimeFunctions.timeAgo(
-                                                                      now: DateTime
-                                                                          .now(),
-                                                                      createdAt:
-                                                                          DateTime.parse(comment[
-                                                                              'createdAt']!)),
-                                                                  style: theme
-                                                                      .textTheme
-                                                                      .bodySmall!
-                                                                      .copyWith(
-                                                                          color:
-                                                                              Colors.blueGrey)),
-                                                              IconButton(
-                                                                  onPressed:
-                                                                      () {},
-                                                                  icon:
-                                                                      const Icon(
-                                                                    Icons
-                                                                        .thumb_up_alt_rounded,
-                                                                    size: 20,
-                                                                    color: Colors
-                                                                        .blueAccent,
-                                                                  )),
-                                                              IconButton(
-                                                                  onPressed:
-                                                                      () {},
-                                                                  icon:
-                                                                      const Icon(
-                                                                    Icons
-                                                                        .thumb_down_alt_rounded,
-                                                                    size: 20,
-                                                                    color: Colors
-                                                                        .blueAccent,
-                                                                  )),
-                                                              IconButton(
-                                                                  onPressed:
-                                                                      () {},
-                                                                  icon:
-                                                                      const Icon(
-                                                                    Icons
-                                                                        .reply_all_rounded,
-                                                                    size: 25,
-                                                                    color: Colors
-                                                                        .white,
-                                                                  )),
-                                                            ],
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            );
-                                          })
-                                      : const SizedBox()),
-                                )
+                              ? LiveStreamCommentListWidget(
+                                  theme: theme,
+                                  livestreamController: livestreamController)
                               : const SizedBox(),
                         ),
                         Positioned.fill(
@@ -345,6 +239,35 @@ class AgoraLivestreamingPage extends StatelessWidget {
                         ),
                       ],
                     ),
+                    PreviewGifWidget(selectedGif: selectedGif),
+                    CustomEmojiPicker(
+                      height: 200,
+                      isSearchEmo: false,
+                      onEmojiSelected: (emoji) {
+                        textController.text += emoji;
+                        comment.value = textController.text;
+                        textController.selection = TextSelection.fromPosition(
+                          TextPosition(offset: textController.text.length),
+                        );
+                      },
+                      onBackspacePressed: () {
+                        final text = textController.text;
+                        if (text.isNotEmpty) {
+                          // Xóa ký tự cuối (bao gồm cả emoji)
+                          textController.text =
+                              text.characters.skipLast(1).toString();
+                          comment.value = textController.text;
+                          textController.selection = TextSelection.fromPosition(
+                            TextPosition(offset: textController.text.length),
+                          );
+                        }
+                      },
+                      isEmojiPickerVisible: isEmojiPickerVisible,
+                      backgroundColor: const [
+                        Colors.blueGrey,
+                        Colors.blueGrey,
+                      ],
+                    ),
                     Row(
                       children: [
                         Obx(
@@ -354,12 +277,12 @@ class AgoraLivestreamingPage extends StatelessWidget {
                             },
                             icon: isSeeComment.value
                                 ? const Icon(
-                                    Icons.keyboard_arrow_up_rounded,
+                                    Icons.comment_rounded,
                                     size: 35,
                                     color: Colors.blue,
                                   )
                                 : const Icon(
-                                    Icons.keyboard_arrow_down_rounded,
+                                    Icons.comments_disabled_rounded,
                                     size: 35,
                                     color: Colors.blue,
                                   ),
@@ -374,7 +297,7 @@ class AgoraLivestreamingPage extends StatelessWidget {
                                 comment.value = '';
                               }
                             },
-                            controller: commentTextEditingController,
+                            controller: textController,
                             decoration: InputDecoration(
                               fillColor: Colors.transparent,
                               contentPadding: const EdgeInsets.symmetric(
@@ -387,14 +310,45 @@ class AgoraLivestreamingPage extends StatelessWidget {
                               labelText: 'Send a comment',
                               labelStyle: theme.textTheme.bodyLarge!
                                   .copyWith(color: Colors.grey),
-                              suffixIcon: Obx(
-                                () => IconButton(
+                              prefixIcon: IconButton(
+                                icon: const Icon(
+                                  Icons.gif_box_outlined,
+                                  color: Colors.blueAccent,
+                                  size: 30,
+                                ),
+                                onPressed: () async {
+                                  final gif = await GiphyPicker.pickGif(
+                                    context: context,
+                                    apiKey: apiGifphy,
+                                    showPreviewPage: false,
+                                    showGiphyAttribution: false,
+                                    loadingBuilder: (context) {
+                                      return Center(
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          child: Image.asset(
+                                            GifsPath.loadingGif,
+                                            height: 200,
+                                            width: 200,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+
+                                  if (gif != null) {
+                                    selectedGif.value = gif;
+                                  }
+                                },
+                              ),
+                              suffixIcon: Obx(() => IconButton(
                                   onPressed: () {
-                                    isEmoteOpen.toggle();
+                                    isEmojiPickerVisible.toggle();
                                   },
-                                  icon: isEmoteOpen.value
+                                  icon: isEmojiPickerVisible.value
                                       ? const Icon(
-                                          Icons.emoji_emotions_rounded,
+                                          Icons.emoji_emotions,
                                           color: Colors.blue,
                                           size: 30,
                                         )
@@ -402,12 +356,25 @@ class AgoraLivestreamingPage extends StatelessWidget {
                                           Icons.emoji_emotions_outlined,
                                           color: Colors.blue,
                                           size: 30,
-                                        ),
-                                ),
-                              ),
+                                        ))),
                             ),
                           ),
                         ),
+                        Obx(() => IconButton(
+                            onPressed: () {
+                              isEmoteOpen.toggle();
+                            },
+                            icon: isEmoteOpen.value
+                                ? const Icon(
+                                    Icons.card_giftcard_rounded,
+                                    color: Colors.blue,
+                                    size: 30,
+                                  )
+                                : const Icon(
+                                    Icons.card_giftcard_outlined,
+                                    color: Colors.blue,
+                                    size: 30,
+                                  ))),
                         Obx(
                           () => IconButton(
                             onPressed: () async {
@@ -418,8 +385,9 @@ class AgoraLivestreamingPage extends StatelessWidget {
                                   comment.value,
                                   currentUser.image!,
                                   currentUser.name!,
+                                  selectedGif.value?.images.original!.url!,
                                 );
-                                commentTextEditingController.clear();
+                                textController.clear();
                               }
                             },
                             icon: comment.value.isNotEmpty
@@ -562,5 +530,9 @@ class AgoraLivestreamingPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _extractNumbers(String userId) {
+    return userId.replaceAll(RegExp(r'[^0-9]'), '');
   }
 }

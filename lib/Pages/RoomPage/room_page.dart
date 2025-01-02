@@ -6,7 +6,7 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/dot_matching_animation_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/room_controller.dart';
 import 'package:tictactoe_gameapp/Controller/matching_controller.dart';
 
@@ -21,7 +21,7 @@ class RoomPage extends StatelessWidget {
         Get.put(MatchingAnimationController());
     TextEditingController roomId = TextEditingController();
     final formKey = GlobalKey<FormState>();
-    final MusicController musicController = Get.find();
+    final BackgroundMusicController musicController = Get.find();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/theme/colors.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 
 class ChangeLang extends StatelessWidget {
   final Color color;
   final Widget icon;
-  final MusicController musicController;
+  final BackgroundMusicController musicController;
   const ChangeLang(
       {this.color = bgColor,
       this.icon = const Icon(
         Icons.more_vert,
         color: Colors.lightBlueAccent,
       ),
-      super.key, required this.musicController});
+      super.key,
+      required this.musicController});
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/online_status_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Login/change_password_dialog.dart';
@@ -17,11 +17,14 @@ class SettingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!GetStorage().hasData('isDarkMode')) {
-      GetStorage().write('isDarkMode', false);
+    final BackgroundMusicController musicController =
+        Get.find<BackgroundMusicController>();
+    final storage = GetStorage();
+    if (!storage.hasData('isDarkMode')) {
+      storage.write('isDarkMode', false);
     }
     final ThemeController themeController = Get.find<ThemeController>();
-    final MusicController musicController = Get.find<MusicController>();
+
     final LanguageController languageController =
         Get.find<LanguageController>();
     final OnlineStatusController onlineStatusController =
@@ -109,13 +112,6 @@ class SettingScreen extends StatelessWidget {
                   return Switch(
                     value: themeController.isDarkMode.value,
                     onChanged: (value) {
-                      // musicController.stopMusic();
-                      if (value) {
-                        musicController.playMusic(playlistDark);
-                      } else {
-                        musicController.playMusic(playlistLight);
-                      }
-
                       themeController.toggleTheme();
                     },
                     activeTrackColor: Colors.lightBlueAccent,

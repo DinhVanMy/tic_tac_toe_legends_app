@@ -11,8 +11,8 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/countdown_animation_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_play_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/effective_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Models/room_model.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Widgets/core/countdown_waiting_widget.dart';
@@ -39,9 +39,9 @@ class PlayWithPlayerController extends GetxController {
   final db = FirebaseFirestore.instance;
   final String currentUserEmail =
       Get.find<AuthController>().getCurrentUserEmail();
-  final MusicPlayController musicPlayController =
-      Get.put(MusicPlayController());
-  final MusicController musicController = Get.find();
+  final EffectiveMusicController musicPlayController =
+      Get.put(EffectiveMusicController());
+  final BackgroundMusicController musicController = Get.find();
 
   void getRoomDetails(String roomId) async {
     try {

@@ -23,71 +23,74 @@ class AgoraBackgroundSheet extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () => Get.back(),
-                icon: const Icon(
-                  Icons.arrow_back_rounded,
-                  size: 35,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: const Icon(
+                    Icons.arrow_back_rounded,
+                    size: 35,
+                  ),
                 ),
-              ),
-              const Text(
-                "Virtual Background",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                const Text(
+                  "Virtual Background",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      final ProfileController profileController = Get.find();
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        final ProfileController profileController = Get.find();
 
-                      image =
-                          await profileController.pickFileX(ImageSource.camera);
-                      if (image != null) {
-                        imagePath.value = image!.path;
-                      } else {
-                        imagePath.value = "";
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.camera_alt_rounded,
-                      size: 30,
+                        image = await profileController
+                            .pickFileX(ImageSource.camera);
+                        if (image != null) {
+                          imagePath.value = image!.path;
+                        } else {
+                          imagePath.value = "";
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt_rounded,
+                        size: 30,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      final ProfileController profileController = Get.find();
+                    IconButton(
+                      onPressed: () async {
+                        final ProfileController profileController = Get.find();
 
-                      image = await profileController
-                          .pickFileX(ImageSource.gallery);
-                      if (image != null) {
-                        imagePath.value = image!.path;
-                      } else {
+                        image = await profileController
+                            .pickFileX(ImageSource.gallery);
+                        if (image != null) {
+                          imagePath.value = image!.path;
+                        } else {
+                          imagePath.value = "";
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.image_rounded,
+                        size: 30,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
                         imagePath.value = "";
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.image_rounded,
-                      size: 30,
+                      },
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        size: 30,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      imagePath.value = "";
-                    },
-                    icon: const Icon(
-                      Icons.refresh_rounded,
-                      size: 30,
-                    ),
-                  ),
-                ],
-              )
-            ],
+                  ],
+                )
+              ],
+            ),
           ),
           const SizedBox(
             height: 10,
@@ -107,7 +110,7 @@ class AgoraBackgroundSheet extends StatelessWidget {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
-                      childAspectRatio: 0.65,
+                      childAspectRatio: 0.55,
                       mainAxisSpacing: 20,
                       crossAxisSpacing: 20,
                     ),

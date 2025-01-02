@@ -10,8 +10,8 @@ import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Models/live_sream_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/agora_livestreaming_page.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/livestream_doc_service.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/agora_livestreaming_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_doc_service.dart';
 import 'package:uuid/uuid.dart';
 
 class CreateLivestreamRoomPage extends StatelessWidget {

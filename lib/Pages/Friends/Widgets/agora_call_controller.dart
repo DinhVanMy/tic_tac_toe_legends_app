@@ -20,6 +20,10 @@ class AgoraCallController extends GetxController {
   final RxBool isMicEnabled = false.obs;
   final RxBool isVideoEnabled = false.obs;
   final RxBool isAudioEnabled = true.obs;
+  RxInt callDuration = 0.obs; // Thời gian cuộc gọi (giây)
+  Timer? _callTimer; // Bộ đếm thời gian
+  RxBool isExtendIcons = true.obs; // Biến trạng thái để hiển thị/ẩn icon
+  Timer? _inactivityTimer;
 
   final String channelId;
   final String userId;
@@ -53,6 +57,20 @@ class AgoraCallController extends GetxController {
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
     await _joinChannel();
+    _initialActivityTimer();
+  }
+
+  void _initialActivityTimer() {
+    // Lắng nghe mọi thay đổi của biến isExtendIcons
+    ever(isExtendIcons, (_) {
+      if (isExtendIcons.value) {
+        _startInactivityTimer(); // Khởi động lại Timer khi isExtendIcons thay đổi thành true
+      } else {
+        _inactivityTimer?.cancel(); // Hủy Timer nếu không cần ẩn icon
+      }
+    });
+    // Khởi động timer ban đầu
+    _startInactivityTimer();
   }
 
   Future<void> _initAgoraRtcEngine() async {
@@ -155,8 +173,13 @@ class AgoraCallController extends GetxController {
 
   void switchCamera() => agoraEngine.switchCamera();
 
-  RxInt callDuration = 0.obs; // Thời gian cuộc gọi (giây)
-  Timer? _callTimer; // Bộ đếm thời gian
+  // Hàm khởi động lại Timer
+  void _startInactivityTimer() {
+    _inactivityTimer?.cancel(); // Hủy timer cũ nếu có
+    _inactivityTimer = Timer(const Duration(seconds: 10), () {
+      isExtendIcons.value = false; // Ẩn icon sau 5 giây không tương tác
+    });
+  }
 
   void _startCallTimer() {
     _callTimer?.cancel(); // Hủy timer trước đó nếu tồn tại
@@ -166,6 +189,7 @@ class AgoraCallController extends GetxController {
   }
 
   void _stopCallTimer() {
+    _inactivityTimer?.cancel(); // Hủy timer khi kết thúc cuộc gọi
     _callTimer?.cancel(); // Hủy timer khi kết thúc cuộc gọi
     _callTimer = null;
   }

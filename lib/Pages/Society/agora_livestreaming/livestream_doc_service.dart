@@ -115,7 +115,6 @@ class LiveStreamService {
       });
     } catch (e) {
       errorMessage("Error decrementing viewer count: $e");
-      rethrow;
     }
   }
 
@@ -125,6 +124,7 @@ class LiveStreamService {
     String content,
     String avtCommentUser,
     String nameCommentUser,
+    String? gifUrl,
   ) async {
     try {
       var uuid = const Uuid();
@@ -134,6 +134,7 @@ class LiveStreamService {
         "photoUrl": avtCommentUser,
         "content": content,
         "createdAt": DateTime.now().toIso8601String(),
+        "gif":gifUrl??"",
       };
       await _liveStreamCollection
           .doc(streamId)

@@ -126,7 +126,10 @@ class MatchingController extends GetxController {
           .doc(id)
           .set(newRoom.toJson())
           .catchError((e) => errorMessage(e.toString()));
-      Get.to(LobbyPage(roomId: id));
+      Get.to(
+        LobbyPage(roomId: id),
+        transition: Transition.leftToRightWithFade,
+      );
       isSearching.value = false;
     } catch (e) {
       errorMessage(e.toString());
@@ -164,7 +167,10 @@ class MatchingController extends GetxController {
               "player2Status": "waiting",
             }).catchError((e) => errorMessage(e.toString()));
             cancelMatching();
-            Get.to(LobbyPage(roomId: roomId));
+            Get.to(
+              LobbyPage(roomId: roomId),
+              transition: Transition.leftToRightWithFade,
+            );
           }
         });
       }
@@ -268,7 +274,11 @@ class MatchingController extends GetxController {
 
   // Lấy thông tin người chơi hiện tại
   Future<void> getUserDetails() async {
-    await _firestore.collection("users").doc(auth.currentUser?.uid).get().then((value) {
+    await _firestore
+        .collection("users")
+        .doc(auth.currentUser?.uid)
+        .get()
+        .then((value) {
       user.value = UserModel.fromJson(value.data()!);
     });
   }

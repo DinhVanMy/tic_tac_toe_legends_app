@@ -8,6 +8,7 @@ const String url2 = "https://poki.com/";
 const String apiGemini = "AIzaSyBhZLp795GpY6xGzOd1wnH_7zYVJahHSk4";
 const String apiAgoraAppId = "8e6122e4c440452ea9820c570212c24b";
 const String apiAgoraAppCertificate = "42729d5877ea49658fda7815e8e9abfa";
+const String apiGifphy = "3MUVQ2qkbp0XB4oo2CHcs6wKJfHziqkh";
 
 //----------------------------------------------------------------
 final roomCodeValidator = MultiValidator([

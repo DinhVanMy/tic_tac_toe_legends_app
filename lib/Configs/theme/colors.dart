@@ -29,3 +29,6 @@ const kTitleTextDarkColor = Colors.white;
 
 const kShadowColor = Color(0xFF364564);
 //----------------------------------------------------------------
+
+const colorPalette = Color(0x007a0177);
+const colorPaletteDark = Color(0x00b0f2bc);

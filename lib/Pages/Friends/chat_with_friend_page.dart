@@ -3,7 +3,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giphy_picker/giphy_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/preview_gif_widget.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
@@ -17,6 +21,7 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/agora_call_page.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/background_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/chat_friend_item.dart';
+import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatWithFriendPage extends StatelessWidget {
@@ -36,11 +41,14 @@ class ChatWithFriendPage extends StatelessWidget {
         Get.find<FirestoreController>();
     final ProfileController profileController = Get.find<ProfileController>();
     RxString imagePath = "".obs;
+    var selectedGif = Rx<GiphyGif?>(null);
     XFile? image;
     final chatController = Get.put(ChatFriendController(
       firestoreController.userId,
       userFriend.id!,
     ));
+
+    RxBool isEmojiPickerVisible = false.obs;
 
     return Obx(() {
       var themColors = chatController.chatSettings.value.themeColors;
@@ -130,13 +138,16 @@ class ChatWithFriendPage extends StatelessWidget {
                     senderUser: userCurrent,
                     channelId: channelId,
                   );
-                  Get.to(() => AgoraCallPage(
-                        userFriend: userFriend,
-                        userCurrent: userCurrent,
-                        channelId: channelId,
-                        initialMicState: true,
-                        initialVideoState: false,
-                      ));
+                  Get.to(
+                    () => AgoraCallPage(
+                      userFriend: userFriend,
+                      userCurrent: userCurrent,
+                      channelId: channelId,
+                      initialMicState: true,
+                      initialVideoState: false,
+                    ),
+                    transition: Transition.upToDown,
+                  );
                 } else {
                   errorMessage("Please microphone permission");
                 }
@@ -158,13 +169,16 @@ class ChatWithFriendPage extends StatelessWidget {
                   var userCurrent = profileController.user!;
                   var uuid = const Uuid();
                   final String channelId = uuid.v4().substring(0, 12);
-                  Get.to(() => AgoraCallPage(
-                        userFriend: userFriend,
-                        userCurrent: userCurrent,
-                        channelId: channelId,
-                        initialMicState: true,
-                        initialVideoState: true,
-                      ));
+                  Get.to(
+                    () => AgoraCallPage(
+                      userFriend: userFriend,
+                      userCurrent: userCurrent,
+                      channelId: channelId,
+                      initialMicState: true,
+                      initialVideoState: true,
+                    ),
+                    transition: Transition.upToDown,
+                  );
                 } else {
                   errorMessage("Please camera permission");
                 }
@@ -249,6 +263,7 @@ class ChatWithFriendPage extends StatelessWidget {
                   return const SizedBox();
                 }
               }),
+              PreviewGifWidget(selectedGif: selectedGif),
               Row(
                 children: [
                   Obx(() => chatController.isFocused.value
@@ -304,14 +319,6 @@ class ChatWithFriendPage extends StatelessWidget {
                                 }
                               },
                             ),
-                            IconButton(
-                              icon: const Icon(
-                                Icons.mic,
-                                color: Colors.blueAccent,
-                                size: 30,
-                              ),
-                              onPressed: () {},
-                            ),
                           ],
                         )),
                   Expanded(
@@ -329,13 +336,52 @@ class ChatWithFriendPage extends StatelessWidget {
                         labelText: 'Message',
                         labelStyle: theme.textTheme.bodyLarge!
                             .copyWith(color: Colors.grey),
-                        suffixIcon: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.emoji_emotions,
-                              color: Colors.blue,
-                              size: 30,
-                            )),
+                        prefixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.gif_box_outlined,
+                            color: Colors.blueAccent,
+                            size: 30,
+                          ),
+                          onPressed: () async {
+                            final gif = await GiphyPicker.pickGif(
+                              context: context,
+                              apiKey: apiGifphy,
+                              showPreviewPage: false,
+                              showGiphyAttribution: false,
+                              loadingBuilder: (context) {
+                                return Center(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: Image.asset(
+                                      GifsPath.loadingGif,
+                                      height: 200,
+                                      width: 200,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+
+                            if (gif != null) {
+                              selectedGif.value = gif;
+                            }
+                          },
+                        ),
+                        suffixIcon: Obx(() => IconButton(
+                            onPressed: () {
+                              isEmojiPickerVisible.toggle();
+                            },
+                            icon: isEmojiPickerVisible.value
+                                ? const Icon(
+                                    Icons.emoji_emotions,
+                                    color: Colors.blue,
+                                    size: 30,
+                                  )
+                                : const Icon(
+                                    Icons.emoji_emotions_outlined,
+                                    color: Colors.blue,
+                                    size: 30,
+                                  ))),
                       ),
                     ),
                   ),
@@ -352,7 +398,10 @@ class ChatWithFriendPage extends StatelessWidget {
                             if (textController.text.isNotEmpty) {
                               await chatController.sendMessage(
                                 textController.text,
+                                selectedGif.value?.images.original!.url!,
                               );
+
+                              selectedGif.value = null;
                               textController.clear();
                               chatController.focusNode.unfocus();
                             } else {
@@ -372,6 +421,27 @@ class ChatWithFriendPage extends StatelessWidget {
                         },
                       )),
                 ],
+              ),
+              CustomEmojiPicker(
+                onEmojiSelected: (emoji) {
+                  textController.text += emoji;
+                  textController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: textController.text.length),
+                  );
+                },
+                onBackspacePressed: () {
+                  final text = textController.text;
+                  if (text.isNotEmpty) {
+                    // Xóa ký tự cuối (bao gồm cả emoji)
+                    textController.text =
+                        text.characters.skipLast(1).toString();
+                    textController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: textController.text.length),
+                    );
+                  }
+                },
+                isEmojiPickerVisible: isEmojiPickerVisible,
+                backgroundColor: backgroundColors,
               )
             ],
           ),

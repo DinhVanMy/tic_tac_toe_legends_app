@@ -107,6 +107,7 @@ class SubCommentController extends GetxController {
   // Thêm sub-comment
   Future<void> addSubComment(
       {required String content,
+      String? gifUrl,
       List<String>? taggedUserIds,
       required UserModel currentUser}) async {
     try {
@@ -115,6 +116,7 @@ class SubCommentController extends GetxController {
       CommentModel newSubComment = CommentModel(
         id: commentId,
         postId: commentId,
+        gif: gifUrl,
         content: content,
         commentUser: currentUser,
         createdAt: DateTime.now(),

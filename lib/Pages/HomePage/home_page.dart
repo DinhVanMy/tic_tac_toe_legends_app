@@ -4,30 +4,28 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
-import 'package:tictactoe_gameapp/Components/invite_request_dialog.dart';
 import 'package:tictactoe_gameapp/Components/primary_with_icon_button.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
-import 'package:tictactoe_gameapp/Controller/Animations/carousel_controller.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Console/play_with_bot_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/webview_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/listen_latest_messages_controller.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Shop/shop_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/bottom_button_custom.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Drawer/drawer_nav_bar.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/expansion_side_left.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/expansion_side_right.dart';
+import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/jajas_top_icon_widget.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/middle_custom_widget.dart';
 import 'package:tictactoe_gameapp/Components/fortune_wheel/fortune_wheel_page.dart';
 import 'package:tictactoe_gameapp/Components/daily_gift/daily_gift_page.dart';
 import 'package:tictactoe_gameapp/Components/daily_mission/missions_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/looping_carousel_widget.dart';
-import 'package:tictactoe_gameapp/Pages/Friends/Widgets/agora_end_of_call_lay.dart';
+import 'package:tictactoe_gameapp/Test/tinder_cards/tinder_cards_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -43,7 +41,8 @@ class HomePage extends StatelessWidget {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final theme = Theme.of(context);
 
-    final MusicController musicController = Get.find<MusicController>();
+    final BackgroundMusicController musicController =
+        Get.find<BackgroundMusicController>();
     final FirestoreController firestoreController =
         Get.put(FirestoreController());
     final ProfileController profileController = Get.find<ProfileController>();
@@ -247,7 +246,7 @@ class HomePage extends StatelessWidget {
                           const SizedBox(width: 10),
                           IconButton(
                             onPressed: () {
-                              Get.toNamed("settings");
+                              Get.toNamed("/settings");
                             },
                             icon: const Icon(
                               Icons.settings,
@@ -331,7 +330,7 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {
                         musicController.buttonSoundEffect();
-                        Get.to(const ShopPage());
+                        Get.toNamed("/shoppage");
                       },
                       child: Container(
                         padding: const EdgeInsets.all(10),
@@ -369,247 +368,69 @@ class HomePage extends StatelessWidget {
           Positioned(
             top: 100,
             left: 30,
-            child: Row(
+            child: Wrap(
               children: [
-                Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.dialog(
-                          const Dialog(
-                              backgroundColor: Colors.transparent,
-                              child: DailyRewardPage()),
-                          barrierDismissible: true,
-                        );
-                      },
-                      child: Image.asset(
-                        Jajas.banner,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const Text(
-                      "Daily",
-                      style: TextStyle(
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.dialog(
-                          Dialog(
-                              backgroundColor: Colors.transparent,
-                              child: Center(
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child:
-                                            Image.asset(GifsPath.chatbotGif)),
-                                    Positioned(
-                                      top: -20,
-                                      left: 50,
-                                      right: 50,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.lightBlueAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          border: Border.all(
-                                              color: Colors.purpleAccent,
-                                              width: 5),
-                                        ),
-                                        child: const Text(
-                                          "Coming Soon...",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        );
-                      },
-                      child: Image.asset(
-                        Jajas.event,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const Text(
-                      "Event",
-                      style: TextStyle(
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.dialog(
-                          const Dialog(
+                JajasTopIconWidget(
+                    onTap: () {
+                      Get.dialog(
+                        const Dialog(
                             backgroundColor: Colors.transparent,
-                            child: FortuneWheelMain(),
-                          ),
-                          barrierDismissible: false,
-                        );
-                      },
-                      child: Image.asset(
-                        Jajas.spinner,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const Text(
-                      "Spinner",
-                      style: TextStyle(
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
-                ),
+                            child: DailyRewardPage()),
+                        barrierDismissible: true,
+                      );
+                    },
+                    icon: Jajas.banner,
+                    name: "Daily"),
                 const SizedBox(
                   width: 20,
                 ),
-                Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.dialog(
-                          Dialog(
-                              backgroundColor: Colors.transparent,
-                              child: Center(
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child:
-                                            Image.asset(GifsPath.chatbotGif)),
-                                    Positioned(
-                                      top: -20,
-                                      left: 50,
-                                      right: 50,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.lightBlueAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          border: Border.all(
-                                              color: Colors.purpleAccent,
-                                              width: 5),
-                                        ),
-                                        child: const Text(
-                                          "Coming Soon...",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        );
-                      },
-                      child: Image.asset(
-                        Jajas.worldNews,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const Text(
-                      "Discovery",
-                      style: TextStyle(
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
-                ),
+                JajasTopIconWidget(
+                    onTap: _onTapCommingSoon, icon: Jajas.event, name: "Event"),
                 const SizedBox(
                   width: 20,
                 ),
-                Column(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Get.dialog(
-                          Dialog(
-                              backgroundColor: Colors.transparent,
-                              child: Center(
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    ClipRRect(
-                                        borderRadius: BorderRadius.circular(20),
-                                        child:
-                                            Image.asset(GifsPath.chatbotGif)),
-                                    Positioned(
-                                      top: -20,
-                                      left: 50,
-                                      right: 50,
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                          color: Colors.lightBlueAccent,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          border: Border.all(
-                                              color: Colors.purpleAccent,
-                                              width: 5),
-                                        ),
-                                        child: const Text(
-                                          "Coming Soon...",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 25,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        );
-                      },
-                      child: Image.asset(
-                        Jajas.clans,
-                        width: 50,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    const Text(
-                      "Clans",
-                      style: TextStyle(
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
+                JajasTopIconWidget(
+                    onTap: () {
+                      Get.dialog(
+                        const Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: FortuneWheelMain(),
+                        ),
+                        barrierDismissible: false,
+                      );
+                    },
+                    icon: Jajas.spinner,
+                    name: "Spinner"),
+                const SizedBox(
+                  width: 20,
+                ),
+                JajasTopIconWidget(
+                    onTap: _onTapCommingSoon,
+                    icon: Jajas.worldNews,
+                    name: "Discovery"),
+                const SizedBox(
+                  width: 20,
+                ),
+                JajasTopIconWidget(
+                    onTap: _onTapCommingSoon, icon: Jajas.clans, name: "Clans"),
+                const SizedBox(
+                  width: 20,
+                ),
+                JajasTopIconWidget(
+                    onTap: () {
+                      Get.dialog(
+                        const Dialog(
+                          backgroundColor: Colors.transparent,
+                          child: Example(),
+                        ),
+                      );
+                      // Get.to(() => const Example(),
+                      //     transition: Transition.zoom);
+                    },
+                    icon: Jajas.tinder,
+                    name: "Tinder"),
+                const SizedBox(
+                  width: 20,
                 ),
                 const SizedBox(
                   width: 20,
@@ -620,73 +441,87 @@ class HomePage extends StatelessWidget {
           Positioned(
             top: 180,
             right: 2,
-            child: Column(
-              children: [
-                InkWell(
-                  onTap: () async {
-                    late LatLng latlng;
-                    if (user.location != null) {
-                      latlng = LatLng(
-                          user.location!.latitude, user.location!.longitude);
-                    } else {
-                      latlng = const LatLng(21.0000992, 105.8399243);
-                    }
-                    Get.to(() => FriendZoneMapPage(
-                          user: user,
-                          firestoreController: firestoreController,
-                          latlng: latlng,
-                        ));
-                  },
-                  child: Image.asset(
-                    Jajas.mission,
-                    width: 50,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const Text(
-                  "Pass",
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-              ],
-            ),
+            child: JajasTopIconWidget(
+                onTap: () {
+                  late LatLng latlng;
+                  if (user.location != null) {
+                    latlng = LatLng(
+                        user.location!.latitude, user.location!.longitude);
+                  } else {
+                    latlng = const LatLng(21.0000992, 105.8399243);
+                  }
+                  Get.to(
+                    () => FriendZoneMapPage(
+                      user: user,
+                      firestoreController: firestoreController,
+                      latlng: latlng,
+                    ),
+                    transition: Transition.zoom,
+                  );
+                },
+                icon: Jajas.mission,
+                name: "Map"),
           ),
           Positioned(
             top: 180,
             left: 2,
-            child: Column(
-              children: [
-                InkWell(
-                  onTap: () {
-                    Get.dialog(
-                      Dialog(
-                        backgroundColor: Colors.transparent,
-                        child: MissionsPage(
-                          userId: user.id!,
-                        ),
+            child: JajasTopIconWidget(
+                onTap: () {
+                  Get.dialog(
+                    Dialog(
+                      backgroundColor: Colors.transparent,
+                      child: MissionsPage(
+                        userId: user.id!,
                       ),
-                    );
-                  },
-                  child: Image.asset(
-                    Jajas.quest,
-                    width: 50,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                const Text(
-                  "Missions",
-                  style: TextStyle(
-                    color: Colors.purple,
-                  ),
-                ),
-              ],
-            ),
+                    ),
+                  );
+                },
+                icon: Jajas.quest,
+                name: "Missions"),
           ),
           const ExpansionSideWidgetLeft(),
           const ExpansionSideWidgetRight(),
         ],
       ),
+    );
+  }
+
+  void _onTapCommingSoon() {
+    Get.dialog(
+      Dialog(
+          backgroundColor: Colors.transparent,
+          child: Center(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(GifsPath.chatbotGif)),
+                Positioned(
+                  top: -20,
+                  left: 50,
+                  right: 50,
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlueAccent,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.purpleAccent, width: 5),
+                    ),
+                    child: const Text(
+                      "Comming Soon...",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )),
     );
   }
 }

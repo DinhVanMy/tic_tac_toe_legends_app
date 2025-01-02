@@ -5,6 +5,7 @@ class CommentModel {
   String? id;
   UserModel? commentUser; // Người bình luận
   String? content; // Nội dung bình luận
+  String? gif;
   List<String>? likedList;
   DateTime? createdAt; // Thời gian bình luận
   String? postId; // Bài viết mà bình luận thuộc về
@@ -15,6 +16,7 @@ class CommentModel {
     this.id,
     this.commentUser,
     this.content,
+    this.gif,
     this.likedList,
     this.createdAt,
     this.postId,
@@ -43,6 +45,8 @@ class CommentModel {
       createdAt = (json['createdAt'] as Timestamp).toDate();
     }
 
+    gif = json['gif'] as String?;
+
     postId = json['postId'] as String?;
     countReplies = json['countReplies'] as int? ?? 0;
 
@@ -68,13 +72,15 @@ class CommentModel {
       data['likedList'] = likedList;
     }
 
+    data['gif'] = gif; // Gif
+
     // Convert createdAt to UTC
     if (createdAt != null) {
       data['createdAt'] = createdAt?.toUtc();
     }
 
     data['postId'] = postId;
-    data['countReplies'] = countReplies; 
+    data['countReplies'] = countReplies;
 
     if (taggedUserIds != null) {
       data['taggedUserIds'] = taggedUserIds;

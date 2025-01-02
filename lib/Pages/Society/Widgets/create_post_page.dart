@@ -3,13 +3,18 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giphy_picker/giphy_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/preview_gif_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/create_polls_inpost_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/post_polls_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/post_polls_card.dart';
 
 class CreatePostPage extends StatelessWidget {
   final PostController postController;
@@ -24,8 +29,10 @@ class CreatePostPage extends StatelessWidget {
     RxString audienceMode = "Public".obs;
     RxList<Color> backgroundPost = <Color>[].obs;
     RxList<String>? imagePath = <String>[].obs;
+    var selectedGif = Rx<GiphyGif?>(null); // Quản lý GIF đã chọn
     List<XFile>? images;
     XFile? image;
+    var postPollsModel = Rx<PostPollsModel?>(null);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -73,6 +80,8 @@ class CreatePostPage extends StatelessWidget {
                                   .toList(),
                               privacy: audienceMode.value,
                               imageFiles: images,
+                              gifUrl: selectedGif.value?.images.original!.url,
+                              postPollsModel: postPollsModel.value,
                             );
                           },
                           loadingWidget: Center(
@@ -412,6 +421,17 @@ class CreatePostPage extends StatelessWidget {
                   ],
                 );
               }),
+              Column(
+                children: [
+                  PreviewGifWidget(selectedGif: selectedGif),
+                  IconButton(
+                    onPressed: () {
+                      selectedGif.value = null;
+                    },
+                    icon: const Icon(Icons.delete, size: 40, color: Colors.red),
+                  ),
+                ],
+              ),
               const SizedBox(
                 height: 10,
               ),
@@ -453,9 +473,22 @@ class CreatePostPage extends StatelessWidget {
                   const Divider(
                     color: Colors.grey,
                   ),
+                  Obx(() => postPollsModel.value != null
+                      ? PostPollWidget(
+                          postPollsModel: postPollsModel.value!,
+                        )
+                      : const SizedBox.shrink()),
                   OptionalTileWidget(
-                    onTap: () {},
-                    title: "Tag people",
+                    onTap: () async {
+                      final PostPollsModel? result = await Get.to(
+                        () => const CreatePollsInpostPage(),
+                        transition: Transition.downToUp,
+                      );
+                      if (result != null) {
+                        postPollsModel.value = result;
+                      }
+                    },
+                    title: "Add Polls / Votes",
                     icon: Icons.person_add_alt_1_sharp,
                     color: Colors.blue,
                   ),
@@ -463,8 +496,31 @@ class CreatePostPage extends StatelessWidget {
                     color: Colors.grey,
                   ),
                   OptionalTileWidget(
-                    onTap: () {},
-                    title: "Feeling / Activity",
+                    onTap: () async {
+                      final gif = await GiphyPicker.pickGif(
+                        context: context,
+                        apiKey: apiGifphy,
+                        showPreviewPage: false,
+                        showGiphyAttribution: false,
+                        loadingBuilder: (context) {
+                          return Center(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: Image.asset(
+                                GifsPath.loadingGif,
+                                height: 200,
+                                width: 200,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+
+                      if (gif != null) {
+                        selectedGif.value = gif;
+                      }
+                    },
+                    title: "Feeling / Gifphy",
                     icon: Icons.emoji_emotions_outlined,
                     color: Colors.orange,
                   ),

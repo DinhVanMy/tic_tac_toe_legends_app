@@ -65,9 +65,12 @@ class SocietyGamingPage extends StatelessWidget {
                             children: [
                               IconButton(
                                 onPressed: () {
-                                  Get.to(() => PostNotificationPage(
-                                        user: user,
-                                      ));
+                                  Get.to(
+                                    () => PostNotificationPage(
+                                      user: user,
+                                    ),
+                                    transition: Transition.upToDown,
+                                  );
                                 },
                                 icon: const Icon(
                                   Icons.notifications,
@@ -105,10 +108,13 @@ class SocietyGamingPage extends StatelessWidget {
                             ],
                           ),
                           IconButton(
-                            onPressed: () => Get.to(CreatePostPage(
-                              userModel: user,
-                              postController: postController,
-                            )),
+                            onPressed: () => Get.to(
+                              CreatePostPage(
+                                userModel: user,
+                                postController: postController,
+                              ),
+                              transition: Transition.upToDown,
+                            ),
                             icon: const Icon(
                               Icons.add_circle_rounded,
                               size: 35,
@@ -171,7 +177,7 @@ class SocietyGamingPage extends StatelessWidget {
                             width: 10,
                           ),
                           Text(
-                            "Friend",
+                            "Posts",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -200,7 +206,7 @@ class SocietyGamingPage extends StatelessWidget {
                           ),
                           SizedBox(width: 10),
                           Text(
-                            "World",
+                            "Lives",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,

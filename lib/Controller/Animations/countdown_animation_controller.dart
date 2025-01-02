@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 
 class CountdownController extends GetxController
     with GetTickerProviderStateMixin {
   late AnimationController animationController;
-  final MusicController musicController = Get.find();
+  final BackgroundMusicController musicController = Get.find();
   var timeLeft = 95.obs;
   var progressColor = Colors.blue.obs;
 
@@ -49,7 +49,6 @@ class CountdownController extends GetxController
     musicController.stopMusicOnScreen5();
     animationController.stop();
   }
-
 
   String getFormattedTime() {
     // Định dạng thời gian phút:giây

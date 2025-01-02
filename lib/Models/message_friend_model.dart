@@ -6,9 +6,11 @@ class MessageFriendModel {
   String? receiverId;
   String? content;
   String? imagePath;
+    String? gif;
   Timestamp? timestamp;
   String? status;
   String? replyTo;
+  
 
   MessageFriendModel({
     this.messageId,
@@ -16,6 +18,7 @@ class MessageFriendModel {
     this.receiverId,
     this.content,
     this.imagePath,
+    this.gif,
     this.timestamp,
     this.status,
     this.replyTo,
@@ -37,6 +40,9 @@ class MessageFriendModel {
     if (json['imagePath'] is String) {
       imagePath = json['imagePath'];
     }
+    if (json['gif'] is String) {
+      gif = json['gif'];
+    }
     if (json['timestamp'] is Timestamp) {
       timestamp = json['timestamp'];
     }
@@ -55,6 +61,7 @@ class MessageFriendModel {
     data['receiverId'] = receiverId;
     data['content'] = content;
     data['imagePath'] = imagePath;
+    data['gif'] = gif;
     data['timestamp'] = timestamp;
     data['status'] = status;
     data['replyTo'] = replyTo;

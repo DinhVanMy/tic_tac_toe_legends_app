@@ -3,7 +3,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 
-class MusicPlayController extends GetxController {
+class EffectiveMusicController extends GetxController {
   late AudioPlayer _player;
 
   @override
@@ -64,11 +64,11 @@ class MusicPlayController extends GetxController {
   // Future<void> playSoundPlayer3() async {
   //   await _player.setAsset(AudioSPath.coins); // Load file nhạc
   //     _player.play(); // Phát nhạc
-  // } 
+  // }
   // Future<void> playSoundPlayer4() async {
   //   await _player.setAsset(AudioSPath.coins); // Load file nhạc
   //     _player.play(); // Phát nhạc
-  // } 
+  // }
 
   // @override
   // void onClose() {

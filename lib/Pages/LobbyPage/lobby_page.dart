@@ -5,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/user_card.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/PlayerGame/multi_player.dart';
 import 'package:tictactoe_gameapp/Pages/LobbyPage/Widget/end_drawer_lobby.dart';
@@ -37,12 +37,12 @@ class LobbyPage extends StatelessWidget {
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     // final musicController = Get.find<MusicController>();
     // WidgetsBinding.instance.addPostFrameCallback((_) {
-      // musicController.playMusicOnScreen7();
-      // Get.find<NotificationController>().showNotification(
-      //   'Your Great!',
-      //   'You have joined room: $roomId',
-      //   {'screen': 'SplacePage'},
-      // );
+    // musicController.playMusicOnScreen7();
+    // Get.find<NotificationController>().showNotification(
+    //   'Your Great!',
+    //   'You have joined room: $roomId',
+    //   {'screen': 'SplacePage'},
+    // );
     // });
     return Scaffold(
       key: scaffoldKey,
@@ -104,9 +104,12 @@ class LobbyPage extends StatelessWidget {
                     WidgetsBinding.instance.addPostFrameCallback((_) async {
                       await Future.delayed(const Duration(seconds: 2));
                       // musicController.stopMusicOnScreen7();
-                      Get.to(MultiPlayer(
-                        roomId: roomId,
-                      ));
+                      Get.to(
+                        MultiPlayer(
+                          roomId: roomId,
+                        ),
+                        transition: Transition.zoom,
+                      );
                     });
                   } else {}
 

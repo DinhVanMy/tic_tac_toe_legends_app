@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Controller/Music/music_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Console/play_with_bot_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/SingleGame/ui_playing_board.dart';
@@ -20,7 +20,7 @@ class PlayWithBotPage extends StatelessWidget {
     // final DottedBorderAnimationController animationController =
     //     Get.put(DottedBorderAnimationController());
     final user = Get.find<ProfileController>().user!;
-    final MusicController musicController = Get.find();
+    final BackgroundMusicController musicController = Get.find();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       musicController.playMusicOnScreen6();
     });

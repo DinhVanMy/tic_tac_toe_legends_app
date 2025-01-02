@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
 import 'package:tictactoe_gameapp/Pages/Auth/auth_page.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/friends_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Shop/shop_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/home_page.dart';
 import 'package:tictactoe_gameapp/Pages/MainHome/main_home.dart';
 import 'package:tictactoe_gameapp/Pages/RoomPage/room_page.dart';
@@ -14,6 +16,7 @@ var pages = [
   GetPage(
     name: "/room",
     page: () => const RoomPage(),
+    transition: Transition.leftToRightWithFade,
   ),
   GetPage(
     name: "/auth",
@@ -34,6 +37,7 @@ var pages = [
   GetPage(
     name: "/updateProfile",
     page: () => const UpdateProfile(),
+    transition: Transition.zoom,
   ),
   GetPage(
     name: "/welcome",
@@ -42,13 +46,22 @@ var pages = [
   GetPage(
     name: "/singlePlayer", //Todo rename
     page: () => const PlayWithBotPage(),
+    transition: Transition.zoom,
   ),
   GetPage(
     name: "/settings",
     page: () => const SettingScreen(),
+    transition: Transition.upToDown,
   ),
   GetPage(
     name: "/guides",
     page: () => const FriendsPage(),
+  ),
+
+  // pages in home page
+  GetPage(
+    name: "/shoppage",
+    page: () => const ShopPage(),
+    transition: Transition.zoom,
   ),
 ];

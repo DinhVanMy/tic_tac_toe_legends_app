@@ -6,9 +6,10 @@ import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/agora_livestreaming_page.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/create_livestream_room_page.dart';
-import 'package:tictactoe_gameapp/Test/agora_livestreaming/livestream_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/agora_livestreaming_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/create_livestream_room_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_doc_service.dart';
 
 class WorldBlogPage extends StatelessWidget {
   final UserModel user;
@@ -28,7 +29,10 @@ class WorldBlogPage extends StatelessWidget {
           children: [
             ElevatedButton(
                 onPressed: () {
-                  Get.to(() => CreateLivestreamRoomPage(currentUser: user));
+                  Get.to(
+                    () => CreateLivestreamRoomPage(currentUser: user),
+                    transition: Transition.leftToRightWithFade,
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
@@ -123,13 +127,20 @@ class WorldBlogPage extends StatelessWidget {
                             var liveStream = liveStreams[index];
                             var streamer = liveStream.streamer!;
                             return InkWell(
-                              onTap: () {
-                                Get.to(() => AgoraLivestreamingPage(
-                                      currentUser: user,
-                                      channelId: liveStream.channelId!,
-                                      isStreamer: false,
-                                      liveStreamModel: liveStream,
-                                    ));
+                              onTap: () async {
+                                final LiveStreamService liveStreamService =
+                                    LiveStreamService();
+                                await liveStreamService
+                                    .incrementViewerCount(liveStream.streamId!);
+                                Get.to(
+                                  () => AgoraLivestreamingPage(
+                                    currentUser: user,
+                                    channelId: liveStream.channelId!,
+                                    isStreamer: false,
+                                    liveStreamModel: liveStream,
+                                  ),
+                                  transition: Transition.zoom,
+                                );
                               },
                               splashColor: Colors.blueAccent,
                               borderRadius: BorderRadius.circular(10),
@@ -179,62 +190,38 @@ class WorldBlogPage extends StatelessWidget {
                                                 ),
                                               ),
                                             ),
-                                            Row(
-                                              children: [
-                                                const Icon(
-                                                  Icons.visibility_rounded,
-                                                  color: Colors.lightBlue,
-                                                ),
-                                                const SizedBox(
-                                                  width: 5,
-                                                ),
-                                                Text(
-                                                  liveStream.viewerCount
-                                                      .toString(),
-                                                  style: const TextStyle(
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                                vertical: 5,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.visibility_rounded,
                                                     color: Colors.lightBlue,
-                                                    fontSize: 16,
+                                                    size: 20,
                                                   ),
-                                                )
-                                              ],
+                                                  const SizedBox(
+                                                    width: 5,
+                                                  ),
+                                                  Text(
+                                                    liveStream.viewerCount
+                                                        .toString(),
+                                                    style: const TextStyle(
+                                                      color: Colors.lightBlue,
+                                                      fontSize: 14,
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             )
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            AvatarUserWidget(
-                                              radius: 20,
-                                              imagePath: streamer.image!,
-                                            ),
-                                            const SizedBox(
-                                              width: 5,
-                                            ),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  streamer.name!,
-                                                  style: theme
-                                                      .textTheme.bodyLarge!
-                                                      .copyWith(
-                                                          color: Colors
-                                                              .lightBlueAccent),
-                                                ),
-                                                Text(
-                                                  liveStream.category ??
-                                                      "friend",
-                                                  style: const TextStyle(
-                                                    color: Colors.blueGrey,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
                                           ],
                                         ),
                                       ],
@@ -243,13 +230,52 @@ class WorldBlogPage extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        SingleChildScrollView(
+                                          scrollDirection: Axis.horizontal,
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              AvatarUserWidget(
+                                                radius: 20,
+                                                imagePath: streamer.image!,
+                                              ),
+                                              const SizedBox(
+                                                width: 5,
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    streamer.name!,
+                                                    style: theme
+                                                        .textTheme.bodyMedium!
+                                                        .copyWith(
+                                                      color: Colors
+                                                          .lightBlueAccent,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    liveStream.category ??
+                                                        "Default",
+                                                    style: const TextStyle(
+                                                      color: Colors.blueGrey,
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                         Text(
                                           liveStream.title!,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             color: Colors.lightGreenAccent,
-                                            fontSize: 16,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
@@ -271,7 +297,7 @@ class WorldBlogPage extends StatelessWidget {
                                                     liveStream.createdAt!),
                                             style: const TextStyle(
                                               color: Colors.greenAccent,
-                                              fontSize: 12,
+                                              fontSize: 10,
                                             ),
                                           ),
                                         ),

@@ -1,12 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:giphy_picker/giphy_picker.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/preview_gif_widget.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/sub_comment_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
+import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
 
 class ReplyCommentListSheet extends StatelessWidget {
   final CommentController commentController;
@@ -27,10 +33,12 @@ class ReplyCommentListSheet extends StatelessWidget {
     final SubCommentController subCommentController =
         Get.put(SubCommentController(postId, commentModel.id!));
     final UserModel commentUser = commentModel.commentUser!;
-    final TextEditingController textEditingController = TextEditingController();
+    final TextEditingController textController = TextEditingController();
     final FocusNode focusNode = FocusNode();
     RxString commentContent = "".obs;
     RxString replyCommentId = "".obs;
+    RxBool isEmojiPickerVisible = false.obs;
+    var selectedGif = Rx<GiphyGif?>(null);
     return Column(
       children: [
         Row(
@@ -80,29 +88,13 @@ class ReplyCommentListSheet extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    commentUser.name!,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.purpleAccent,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                    TimeFunctions.timeAgo(
-                                        now: DateTime.now(),
-                                        createdAt: commentModel.createdAt!),
-                                    style: const TextStyle(
-                                      color: Colors.blueGrey,
-                                      fontSize: 13,
-                                    ),
-                                  )
-                                ],
+                              Text(
+                                commentUser.name!,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.purpleAccent,
+                                ),
                               ),
                               ExpandableContent(
                                 content: commentModel.content!,
@@ -112,6 +104,15 @@ class ReplyCommentListSheet extends StatelessWidget {
                                 ),
                                 maxLines: 5,
                               ),
+                              Text(
+                                TimeFunctions.timeAgo(
+                                    now: DateTime.now(),
+                                    createdAt: commentModel.createdAt!),
+                                style: const TextStyle(
+                                  color: Colors.blueGrey,
+                                  fontSize: 13,
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -273,16 +274,20 @@ class ReplyCommentListSheet extends StatelessWidget {
                                         ),
                                         maxLines: 5,
                                       ),
+                                      comment.gif != null
+                                          ? DisplayGifWidget(
+                                              gifUrl: comment.gif!)
+                                          : const SizedBox(),
                                       GestureDetector(
                                         onTap: () {
                                           replyCommentId.value = comment.id!;
-                                          textEditingController.text =
+                                          textController.text =
                                               "@${commentUser.name!} ";
-                                          textEditingController.selection =
+                                          textController.selection =
                                               TextSelection.fromPosition(
                                             TextPosition(
-                                                offset: textEditingController
-                                                    .text.length),
+                                                offset:
+                                                    textController.text.length),
                                           );
                                           focusNode.requestFocus();
                                         },
@@ -352,7 +357,7 @@ class ReplyCommentListSheet extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              "Replying to ${textEditingController.text} ",
+                              "Replying to ${textController.text} ",
                               style: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 15,
@@ -362,7 +367,7 @@ class ReplyCommentListSheet extends StatelessWidget {
                           GestureDetector(
                               onTap: () {
                                 replyCommentId.value = "";
-                                textEditingController.clear();
+                                textController.clear();
                               },
                               child: const Text(
                                 "X",
@@ -375,6 +380,33 @@ class ReplyCommentListSheet extends StatelessWidget {
                       ),
                     )
                   : const SizedBox()),
+              PreviewGifWidget(selectedGif: selectedGif),
+              CustomEmojiPicker(
+                onEmojiSelected: (emoji) {
+                  textController.text += emoji;
+                  commentContent.value = textController.text;
+                  textController.selection = TextSelection.fromPosition(
+                    TextPosition(offset: textController.text.length),
+                  );
+                },
+                onBackspacePressed: () {
+                  final text = textController.text;
+                  if (text.isNotEmpty) {
+                    // Xóa ký tự cuối (bao gồm cả emoji)
+                    textController.text =
+                        text.characters.skipLast(1).toString();
+                    commentContent.value = textController.text;
+                    textController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: textController.text.length),
+                    );
+                  }
+                },
+                isEmojiPickerVisible: isEmojiPickerVisible,
+                backgroundColor: const [
+                  Colors.blueGrey,
+                  Colors.blueGrey,
+                ],
+              ),
               Row(
                 children: [
                   CircleAvatar(
@@ -388,7 +420,7 @@ class ReplyCommentListSheet extends StatelessWidget {
                   Expanded(
                       child: TextField(
                     focusNode: focusNode,
-                    controller: textEditingController,
+                    controller: textController,
                     onChanged: (value) {
                       if (value.isNotEmpty) {
                         commentContent.value = value;
@@ -401,6 +433,52 @@ class ReplyCommentListSheet extends StatelessWidget {
                       hintStyle: const TextStyle(color: Colors.black54),
                       hintText:
                           "Reply a comment of @${commentModel.commentUser!.name!}",
+                      prefixIcon: IconButton(
+                        icon: const Icon(
+                          Icons.gif_box_outlined,
+                          color: Colors.blueAccent,
+                          size: 30,
+                        ),
+                        onPressed: () async {
+                          final gif = await GiphyPicker.pickGif(
+                            context: context,
+                            apiKey: apiGifphy,
+                            showPreviewPage: false,
+                            showGiphyAttribution: false,
+                            loadingBuilder: (context) {
+                              return Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Image.asset(
+                                    GifsPath.loadingGif,
+                                    height: 200,
+                                    width: 200,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+
+                          if (gif != null) {
+                            selectedGif.value = gif;
+                          }
+                        },
+                      ),
+                      suffixIcon: Obx(() => IconButton(
+                          onPressed: () {
+                            isEmojiPickerVisible.toggle();
+                          },
+                          icon: isEmojiPickerVisible.value
+                              ? const Icon(
+                                  Icons.emoji_emotions,
+                                  color: Colors.blue,
+                                  size: 30,
+                                )
+                              : const Icon(
+                                  Icons.emoji_emotions_outlined,
+                                  color: Colors.blue,
+                                  size: 30,
+                                ))),
                     ),
                   )),
                   Obx(
@@ -413,7 +491,7 @@ class ReplyCommentListSheet extends StatelessWidget {
                               await subCommentController.addSubComment(
                                   content: commentContent.value,
                                   currentUser: currentUser);
-                              textEditingController.clear();
+                              textController.clear();
                               commentContent.value = "";
                             },
                             icon: const Icon(

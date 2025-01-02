@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
 import 'package:tictactoe_gameapp/Data/chat_friend_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/Functions/hyperlink_text_function.dart';
@@ -77,7 +79,8 @@ class ChatFriendItem extends StatelessWidget {
                       final message = chatController.filtermessages[index];
                       final isMe =
                           message.senderId == chatController.currentUserId;
-                      return _buildMessageBubble(userFriend, message, isMe);
+                      return _buildMessageBubble(
+                          userFriend, message, isMe, index);
                     },
                   ),
                   SizedBox(
@@ -121,7 +124,19 @@ class ChatFriendItem extends StatelessWidget {
   }
 
   Widget _buildMessageBubble(
-      UserModel userFriend, MessageFriendModel message, bool isMe) {
+    UserModel userFriend,
+    MessageFriendModel message,
+    bool isMe,
+    int index,
+  ) {
+    // Kiểm tra nếu người gửi tin nhắn trước đó giống người hiện tại
+    bool showAvatar = true;
+    if (index < chatController.filtermessages.length - 1) {
+      final previousMessage = chatController.filtermessages[index + 1];
+      if (previousMessage.senderId == message.senderId) {
+        showAvatar = false;
+      }
+    }
     return GestureDetector(
       onTap: () {
         _showMessageActions(message, chatController);
@@ -132,59 +147,104 @@ class ChatFriendItem extends StatelessWidget {
         crossAxisAlignment:
             isMe ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
-          if (!isMe)
+          if (!isMe && showAvatar)
             CircleAvatar(
               backgroundImage: CachedNetworkImageProvider(userFriend.image!),
               radius: 25,
             ),
-          if (!isMe) const SizedBox(width: 10),
+          if (!isMe && !showAvatar) const SizedBox(width: 50),
           Flexible(
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: message.imagePath != null && message.imagePath != ""
-                    ? Colors.transparent
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(15),
-                gradient: LinearGradient(
-                  colors: _checkColors(isMe, color),
+            child: ChatBubble(
+              alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+              clipper: isMe
+                  ? ChatBubbleClipper3(type: BubbleType.sendBubble)
+                  : ChatBubbleClipper8(type: BubbleType.receiverBubble),
+              padding: const EdgeInsets.all(0),
+              margin: const EdgeInsets.only(top: 5),
+              backGroundColor: Colors.blue,
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  gradient: LinearGradient(
+                    colors: _checkColors(isMe, color),
+                  ),
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment:
-                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-                children: [
-                  SelectableText.rich(
-                    HyperlinkTextFunction.buildMessageText(
-                      text: message.content!,
-                      color: _checkColor(isMe: isMe, colors: color),
+                child: Column(
+                  crossAxisAlignment:
+                      isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  children: [
+                    SelectableText.rich(
+                      HyperlinkTextFunction.buildMessageText(
+                        text: message.content!,
+                        color: _checkColor(isMe: isMe, colors: color),
+                      ),
+                      style: TextStyle(
+                        color: _checkColor(isMe: isMe, colors: color),
+                      ),
                     ),
-                    style: TextStyle(
-                      color: _checkColor(isMe: isMe, colors: color),
+                    message.imagePath != null && message.imagePath != ""
+                        ? GestureDetector(
+                            onTap: () {
+                              Get.dialog(
+                                Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  insetPadding: const EdgeInsets.all(10),
+                                  child: GestureDetector(
+                                    onTap: () => Get.back(),
+                                    child: InteractiveViewer(
+                                      boundaryMargin: const EdgeInsets.all(8),
+                                      minScale: 0.0005,
+                                      maxScale: 3,
+                                      child: Container(
+                                        width: double.infinity,
+                                        height: 200,
+                                        alignment: Alignment.topCenter,
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: MemoryImage(
+                                              base64Decode(
+                                                message.imagePath!,
+                                              ),
+                                            ),
+                                            fit: BoxFit.fitWidth,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.memory(
+                                base64Decode(
+                                  message.imagePath!,
+                                ),
+                              ),
+                            ),
+                          )
+                        : const SizedBox(),
+                    message.gif != null
+                        ? DisplayGifWidget(gifUrl: message.gif!)
+                        : const SizedBox(),
+                    const SizedBox(height: 5),
+                    Text(
+                      TimeFunctions.displayTime(message.timestamp!),
+                      style: TextStyle(
+                          color: isMe
+                              ? color.length == 2 &&
+                                      color[0] == Colors.transparent &&
+                                      color[1] == Colors.transparent
+                                  ? Colors.blueGrey.shade600
+                                  : Colors.white54
+                              : Colors.blueGrey,
+                          fontSize: 10),
                     ),
-                  ),
-                  message.imagePath != null && message.imagePath != ""
-                      ? Image.memory(
-                          base64Decode(
-                            message.imagePath!,
-                          ),
-                        )
-                      : const SizedBox(),
-                  const SizedBox(height: 5),
-                  Text(
-                    TimeFunctions.displayTime(message.timestamp!),
-                    style: TextStyle(
-                        color: isMe
-                            ? color.length == 2 &&
-                                    color[0] == Colors.transparent &&
-                                    color[1] == Colors.transparent
-                                ? Colors.blueGrey.shade600
-                                : Colors.white54
-                            : Colors.blueGrey,
-                        fontSize: 10),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

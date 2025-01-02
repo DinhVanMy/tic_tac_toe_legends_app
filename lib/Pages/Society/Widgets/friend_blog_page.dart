@@ -97,12 +97,15 @@ class FriendBlogPage extends StatelessWidget {
                                               ),
                                               Expanded(
                                                   child: GestureDetector(
-                                                onTap: () =>
-                                                    Get.to(CreatePostPage(
-                                                  userModel: user,
-                                                  postController:
-                                                      postController,
-                                                )),
+                                                onTap: () => Get.to(
+                                                  CreatePostPage(
+                                                    userModel: user,
+                                                    postController:
+                                                        postController,
+                                                  ),
+                                                  transition:
+                                                      Transition.zoom,
+                                                ),
                                                 child: Container(
                                                   height: 45,
                                                   padding:

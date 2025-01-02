@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -12,13 +14,13 @@ class ChatController extends GetxController {
   var isLoading = false.obs;
   late GenerativeModel flashModel;
   late GenerativeModel proModel;
-  late ScrollController scrollController;
+  late final ScrollController scrollController;
 
   @override
   void onInit() {
     super.onInit();
     flashModel = GenerativeModel(
-      model: 'gemini-1.5-flash-latest',
+      model: 'gemini-1.5-flash-latest', //"gemini-2.0-flash-latest",
       apiKey: apiGemini,
     );
     proModel = GenerativeModel(
@@ -26,9 +28,7 @@ class ChatController extends GetxController {
       apiKey: apiGemini,
     );
     scrollController = ScrollController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollDown();
-    });
+    scrollDown();
   }
 
   Future<void> sendPrompt(String userInput) async {
@@ -52,17 +52,15 @@ class ChatController extends GetxController {
         isUser: false,
         timestamp: DateTime.now(),
       );
+
       messages.add(botMessage);
+      displayMessage(botMessage);
+
       if (response.text != null) {
-        _scrollDown();
+        scrollDown();
       }
     } catch (e) {
-      errorMessage(e.toString());
-      messages.add(Message(
-        content: 'Failed to get response from API',
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
+      generalCatcheFunction(e);
     } finally {
       isLoading.value = false;
     }
@@ -106,36 +104,71 @@ class ChatController extends GetxController {
         timestamp: DateTime.now(),
       );
       messages.add(botMessage);
+      displayMessage(botMessage);
       if (response.text != null) {
-        _scrollDown();
+        scrollDown();
       }
     } catch (e) {
-      errorMessage(e.toString());
-      messages.add(Message(
-        content: contentAlertChatBot,
-        isUser: false,
-        timestamp: DateTime.now(),
-      ));
+      generalCatcheFunction(e);
     } finally {
       isLoading.value = false;
     }
   }
 
-  void _scrollDown() {
+  void generalCatcheFunction(Object e) {
+    errorMessage(e.toString());
+    final alertFromBot = Message(
+      content: contentAlertChatBot,
+      isUser: false,
+      timestamp: DateTime.now(),
+    );
+    messages.add(alertFromBot);
+    displayMessage(alertFromBot);
+  }
+
+  void scrollDown() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
         scrollController.animateTo(
           scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 750),
-          curve: Curves.easeOutCirc,
+          curve: Curves.easeOut,
         );
       }
+    });
+  }
+
+  Timer? _hideButtonTimer;
+  RxBool isOpenedJumpButton = false.obs;
+  void resetHideButtonTimer() {
+    _hideButtonTimer?.cancel();
+    _hideButtonTimer = Timer(const Duration(seconds: 3), () {
+      isOpenedJumpButton.value = false;
     });
   }
 
   Future<void> refreshChat() async {
     await Future.delayed(const Duration(milliseconds: 500));
     messages.clear();
+  }
+
+  void displayMessage(Message botMessage) {
+    // Reset danh sách từ hiển thị của tin nhắn
+    botMessage.displayedWords.clear();
+
+    // Tách câu trả lời thành các từ
+    final allWords = botMessage.content.split(' ');
+
+    // Khởi chạy timer để hiển thị từng từ
+    int index = 0;
+    Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      if (index < allWords.length) {
+        botMessage.displayedWords.add(allWords[index]);
+        index++;
+      } else {
+        timer.cancel(); // Dừng khi đã hiển thị xong
+      }
+    });
   }
 
   @override

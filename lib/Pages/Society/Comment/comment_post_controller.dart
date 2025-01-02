@@ -173,6 +173,7 @@ class CommentController extends GetxController {
   Future<void> addComment(
       {required String content,
       List<String>? taggedUserIds,
+      String? gifUrl,
       required String receiverId,
       required UserModel currentUser}) async {
     try {
@@ -182,6 +183,7 @@ class CommentController extends GetxController {
         id: commentId,
         postId: postId,
         content: content,
+        gif: gifUrl,
         commentUser: currentUser,
         createdAt: DateTime.now(),
         taggedUserIds: taggedUserIds,
@@ -206,6 +208,7 @@ class CommentController extends GetxController {
         receiverId: receiverId,
         postId: postId,
         commentId: commentId,
+        
         comment: content,
       );
     } catch (e) {
