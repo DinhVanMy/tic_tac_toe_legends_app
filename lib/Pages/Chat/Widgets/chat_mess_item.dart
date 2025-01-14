@@ -73,11 +73,14 @@ class ChatMessageItem extends StatelessWidget {
                       Obx(() {
                         final displayedText = message.displayedWords.join(' ');
                         return SelectableText.rich(
-                          HyperlinkTextFunction.buildMessageText(
-                            text: message.isUser
-                                ? message.content
-                                : displayedText,
-                            color: Colors.blueAccent,
+                          TextSpan(
+                            children: HyperlinkTextFunction.buildMessageText(
+                              context,
+                              text: message.isUser
+                                  ? message.content
+                                  : displayedText,
+                              color: Colors.blueAccent,
+                            ),
                           ),
                           style: const TextStyle(color: Colors.black),
                         );

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 
 class TimeFunctions {
@@ -68,6 +69,16 @@ class TimeFunctions {
   static String formatDateTime(DateTime dateTime) {
     return "${_padZero(dateTime.day)}/${_padZero(dateTime.month)}/${dateTime.year} - "
         "${_padZero(dateTime.hour)}:${_padZero(dateTime.minute)}";
+  }
+
+  static String getFormattedTime(RxInt timeLeft) {
+    // Định dạng thời gian phút:giây
+    int minutes = timeLeft.value ~/ 60;
+    int seconds = timeLeft.value % 60;
+    // Nếu còn nhiều hơn 60 giây, hiển thị phút:giây
+    return timeLeft.value >= 60
+        ? '$minutes:${seconds.toString().padLeft(2, '0')}'
+        : '$seconds';
   }
 
   /// Hàm thêm số 0 phía trước nếu số nhỏ hơn 10

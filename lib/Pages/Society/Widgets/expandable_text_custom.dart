@@ -113,7 +113,7 @@ class ExpandableContent extends StatelessWidget {
                 ]),
                 textAlign: isAligCenter ? TextAlign.center : TextAlign.start,
                 maxLines: isExpanded.value ? null : maxLines,
-              ).animate().fade(duration: const Duration(milliseconds: 1000)),
+              ).animate().fadeIn(duration: const Duration(milliseconds: 750)),
             );
           } else {
             // Thu gọn nội dung

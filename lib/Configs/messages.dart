@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/theme/colors.dart';
@@ -177,4 +178,69 @@ void showNoConnectionDialog({required Function() onPressed}) {
       barrierDismissible: false,
     );
   }
+}
+
+void winnerDialog(
+    {required Function()? onPlayAgain, required Function()? onExit}) {
+  // musicPlayController.playSoundWinner();
+  Get.defaultDialog(
+    barrierDismissible: false,
+    title: "VICTORY",
+    backgroundColor: Colors.white,
+    titleStyle: const TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Colors.blue,
+      fontSize: 30,
+    ),
+    content: Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.blueAccent, width: 5),
+          ),
+          child: Column(
+            children: [
+              SvgPicture.asset(
+                IconsPath.wonIcon,
+                width: 100,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Congratulations",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              const Text(
+                "You won the match",
+                style: TextStyle(
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: onPlayAgain,
+                    child: const Text("Play Again"),
+                  ),
+                  ElevatedButton(
+                    onPressed: onExit,
+                    child: const Text("Exit"),
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+        // const Center(
+        //   child: ConfettiWidgetCustom(),
+        // )
+      ],
+    ),
+  );
 }

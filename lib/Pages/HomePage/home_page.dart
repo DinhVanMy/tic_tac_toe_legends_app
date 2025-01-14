@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
@@ -25,6 +25,7 @@ import 'package:tictactoe_gameapp/Components/fortune_wheel/fortune_wheel_page.da
 import 'package:tictactoe_gameapp/Components/daily_gift/daily_gift_page.dart';
 import 'package:tictactoe_gameapp/Components/daily_mission/missions_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/looping_carousel_widget.dart';
+import 'package:tictactoe_gameapp/Test/game_history/game_history_page.dart';
 import 'package:tictactoe_gameapp/Test/tinder_cards/tinder_cards_widget.dart';
 
 class HomePage extends StatelessWidget {
@@ -212,7 +213,10 @@ class HomePage extends StatelessWidget {
                             clipBehavior: Clip.none,
                             children: [
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Get.to(() => const GameHistoryPage(),
+                                      transition: Transition.upToDown);
+                                },
                                 icon: const Icon(
                                   Icons.email,
                                   color: Colors.white,
@@ -274,7 +278,7 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                const SizedBox(height: 250, child: MiddleCustomWidget()),
+                SizedBox(height: 250, child: MiddleCustomWidget()),
                 Column(
                   children: [
                     PrimaryIconWithButton(
@@ -374,8 +378,10 @@ class HomePage extends StatelessWidget {
                     onTap: () {
                       Get.dialog(
                         const Dialog(
-                            backgroundColor: Colors.transparent,
-                            child: DailyRewardPage()),
+                                backgroundColor: Colors.transparent,
+                                child: DailyRewardPage())
+                            .animate()
+                            .scale(),
                         barrierDismissible: true,
                       );
                     },
@@ -395,7 +401,7 @@ class HomePage extends StatelessWidget {
                         const Dialog(
                           backgroundColor: Colors.transparent,
                           child: FortuneWheelMain(),
-                        ),
+                        ).animate().scale(),
                         barrierDismissible: false,
                       );
                     },
@@ -422,7 +428,7 @@ class HomePage extends StatelessWidget {
                         const Dialog(
                           backgroundColor: Colors.transparent,
                           child: Example(),
-                        ),
+                        ).animate().scale(),
                       );
                       // Get.to(() => const Example(),
                       //     transition: Transition.zoom);
@@ -473,7 +479,7 @@ class HomePage extends StatelessWidget {
                       child: MissionsPage(
                         userId: user.id!,
                       ),
-                    ),
+                    ).animate().scale(),
                   );
                 },
                 icon: Jajas.quest,
@@ -521,7 +527,7 @@ class HomePage extends StatelessWidget {
                 ),
               ],
             ),
-          )),
+          )).animate().scale(),
     );
   }
 }

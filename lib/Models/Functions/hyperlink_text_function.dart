@@ -1,3 +1,4 @@
+import 'package:any_link_preview/any_link_preview.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,9 +15,16 @@ class HyperlinkTextFunction {
   );
 
   // Hàm để xây dựng `TextSpan` với định dạng cho các liên kết và tag
-  static TextSpan buildMessageText(
-      {required String text, required Color color}) {
-    final List<TextSpan> spans = [];
+
+// Hàm để xây dựng `TextSpan` với định dạng cho các liên kết và tag
+  static List<InlineSpan> buildMessageText(
+    BuildContext context, {
+    required String text,
+    required Color color,
+    bool previewUrlMode = false,
+    List<Color> colors = const [Colors.grey, Colors.grey],
+  }) {
+    final List<InlineSpan> spans = [];
     final Iterable<RegExpMatch> matches = combinedRegExp.allMatches(text);
 
     int lastMatchEnd = 0;
@@ -47,21 +55,48 @@ class HyperlinkTextFunction {
           ),
         );
       } else {
-        // Liên kết URL
-        spans.add(
-          TextSpan(
-            text: matchedText,
-            style: TextStyle(
-              color: color,
-              decoration: TextDecoration.underline,
-              decorationColor: color,
-              decorationThickness: 2,
-              fontStyle: FontStyle.italic,
+        if (previewUrlMode) {
+          spans.add(
+            WidgetSpan(
+              child: AnyLinkPreview(
+                onTap: () => openLinkInWebView(matchedText),
+                link: matchedText,
+                displayDirection: UIDirection.uiDirectionHorizontal,
+                cache: const Duration(hours: 1),
+                backgroundColor: colors.last,
+                titleStyle: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+                bodyStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+                errorWidget: Container(
+                  color: Colors.grey[300],
+                  child: const Text('Oops!'),
+                ),
+                errorImage:
+                    "https://i.ytimg.com/vi/z8wrRRR7_qU/maxresdefault.jpg",
+                errorBody: 'Show my custom error body',
+                errorTitle: 'Next one is youtube link, error title',
+              ),
             ),
-            recognizer: TapGestureRecognizer()
-              ..onTap = () => openLinkInWebView(matchedText),
-          ),
-        );
+          );
+        } else {
+          spans.add(
+            TextSpan(
+              text: matchedText,
+              style: TextStyle(
+                color: color,
+                decoration: TextDecoration.underline,
+                decorationColor: color,
+                decorationThickness: 2,
+                fontStyle: FontStyle.italic,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () => openLinkInWebView(matchedText),
+            ),
+          );
+        }
       }
 
       lastMatchEnd = match.end;
@@ -72,13 +107,18 @@ class HyperlinkTextFunction {
       spans.add(TextSpan(text: text.substring(lastMatchEnd)));
     }
 
-    return TextSpan(children: spans);
+    return spans;
   }
+
+// Hàm để xây dựng TextSpan với định dạng cho các liên kết và tag
+  // static TextSpan buildMessageText(
+  //   return TextSpan(children: spans);
+  // }
 
   // Mở liên kết trong WebView
   static void openLinkInWebView(String url) {
     final String formattedUrl = url.contains('http') ? url : 'https://$url';
-    Get.to(() => WebViewOpen(url: formattedUrl), curve: Curves.easeInCirc);
+    Get.to(() => WebViewOpen(url: formattedUrl), transition: Transition.zoom);
   }
 
   // Điều hướng đến trang hồ sơ của người dùng
@@ -88,10 +128,12 @@ class HyperlinkTextFunction {
     final UserModel? tagUser =
         await fetchFirestoreDataFunctions.fetchUserByName(username);
     if (tagUser != null) {
-      Get.to(() => UserAboutPage(
-            intdexString: username,
-            unknownableUser: tagUser,
-          ));
+      Get.to(
+          () => UserAboutPage(
+                intdexString: username,
+                unknownableUser: tagUser,
+              ),
+          transition: Transition.zoom);
     } else {
       errorMessage("This player profile is not exist");
     }

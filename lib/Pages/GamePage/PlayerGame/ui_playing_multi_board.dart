@@ -1,5 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/room_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
@@ -145,9 +147,9 @@ class UiPlayingMultiPlayerBoard {
     RoomModel roomData,
   ) {
     if (value == "X") {
-      return Image.asset(roomData.champX!);
+      return Image.asset(roomData.champX!).animate().fadeIn(duration: duration750);
     } else if (value == "O") {
-      return Image.asset(roomData.champO!);
+      return Image.asset(roomData.champO!).animate().scale(duration: duration750);
     } else {
       return const SizedBox();
     }

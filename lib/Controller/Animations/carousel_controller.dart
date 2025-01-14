@@ -3,11 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
-
 class CarouselController extends GetxController {
   final int realItemCount = images.length;
   late final int virtualItemCount;
-  late final PageController pageController;
+  late PageController pageController;
   late var currentPage = (realItemCount * 500).toDouble().obs;
 
   @override
@@ -17,21 +16,22 @@ class CarouselController extends GetxController {
     _initializePageController();
   }
 
-  // Khởi tạo hoặc tái khởi tạo PageController
   void _initializePageController() {
-    pageController =
-        PageController(viewportFraction: 0.4, initialPage: realItemCount * 500);
+    pageController = PageController(viewportFraction: 0.4, initialPage: realItemCount * 500);
     pageController.addListener(_pageListener);
   }
 
-  // Lắng nghe sự thay đổi của PageController
+  void reinitializePageController() {
+    pageController.removeListener(_pageListener);
+    _initializePageController();
+  }
+
   void _pageListener() {
-    if (pageController.positions.isNotEmpty) {
+    if (pageController.positions.length == 1) {
       currentPage.value = pageController.page!;
     }
   }
 
-  // Điều chỉnh lại chỉ số thực tế
   int getRealIndex(int virtualIndex) {
     return virtualIndex % realItemCount;
   }
@@ -40,7 +40,7 @@ class CarouselController extends GetxController {
     double offsetFromCenter = index - currentPage.value;
     double angle = offsetFromCenter * pi / 5;
     double scale = 1 - (offsetFromCenter.abs() * 0.3);
-    double depth = -300 * cos(angle); // Điều chỉnh chiều sâu
+    double depth = -300 * cos(angle);
 
     return Matrix4.identity()
       ..rotateY(angle)
@@ -51,11 +51,9 @@ class CarouselController extends GetxController {
   Color itemColor(int index) {
     double offsetFromCenter = (index - currentPage.value).abs();
     double opacity = 1 - offsetFromCenter * 0.5;
-
-    // Đảm bảo rằng opacity luôn nằm trong khoảng từ 0 đến 1
     opacity = opacity.clamp(0.0, 1.0);
 
-    return Colors.red.withOpacity(opacity); // Điều chỉnh opacity
+    return Colors.red.withOpacity(opacity);
   }
 
   @override

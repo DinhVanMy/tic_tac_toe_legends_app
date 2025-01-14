@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/room_model.dart';
 
 class GameInfo extends StatelessWidget {
@@ -37,7 +39,7 @@ class GameInfo extends StatelessWidget {
                   child: roomData.pickedMap != null
                       ? Image.asset(
                           roomData.pickedMap!,
-                        )
+                        ).animate().scale(duration: duration750)
                       : Icon(
                           Icons.question_mark,
                           color: Colors.white,
@@ -65,7 +67,7 @@ class GameInfo extends StatelessWidget {
                   child: roomData.imageMode != null
                       ? Image.asset(
                           roomData.imageMode!,
-                        )
+                        ).animate().scale(duration: duration750)
                       : Icon(
                           Icons.question_mark,
                           color: Colors.white,
@@ -93,7 +95,7 @@ class GameInfo extends StatelessWidget {
                   child: roomData.pickedMap != null
                       ? Image.asset(
                           roomData.champX!,
-                        )
+                        ).animate().scale(duration: duration750)
                       : Icon(
                           Icons.question_mark,
                           color: Colors.white,
@@ -120,6 +122,8 @@ class GameInfo extends StatelessWidget {
                   decoration: const BoxDecoration(color: Colors.grey),
                   child: roomData.pickedMap != null
                       ? Image.asset(roomData.champO!)
+                          .animate()
+                          .scale(duration: duration750)
                       : Icon(
                           Icons.question_mark,
                           color: Colors.white,
@@ -159,7 +163,7 @@ class GameInfo extends StatelessWidget {
                             style: theme.textTheme.headlineLarge!
                                 .copyWith(color: Colors.yellowAccent),
                           ),
-                        )
+                        ).animate().scale(duration: duration750)
                       : Icon(
                           Icons.question_mark,
                           color: Colors.white,

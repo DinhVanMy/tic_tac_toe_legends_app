@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/champion_model.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/sodoku_game/sodoku_gamelobby_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/sodoku_game/sodoku_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Match3_Game/match3_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Match3_Game/match3_lobby_page.dart';
+import 'package:tictactoe_gameapp/Test/Minesweeper_Game/minesweeper_game_page.dart';
+import 'package:tictactoe_gameapp/Test/NumberMerge_Game/number_merge_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Test/UI/Breakout_Game/breakout_gameplay_page.dart';
 
 const String url1 = "https://github.com/DinhVanMy?tab=repositories";
 const String url2 = "https://poki.com/";
@@ -10,6 +17,7 @@ const String apiAgoraAppId = "8e6122e4c440452ea9820c570212c24b";
 const String apiAgoraAppCertificate = "42729d5877ea49658fda7815e8e9abfa";
 const String apiGifphy = "3MUVQ2qkbp0XB4oo2CHcs6wKJfHziqkh";
 
+const duration750 = Duration(milliseconds: 750);
 //----------------------------------------------------------------
 final roomCodeValidator = MultiValidator([
   RequiredValidator(errorText: 'Room code is required'),
@@ -48,17 +56,46 @@ Alert Message:
 class Cards {
   final String title;
   final String image;
+  final Widget page;
 
-  Cards({required this.title, required this.image});
+  Cards({required this.title, required this.image, required this.page});
 }
 
 final List<Cards> images = [
-  Cards(image: Jajas.card0, title: "SPRING"),
-  Cards(image: Jajas.card1, title: "SUMMER"),
-  Cards(image: Jajas.card2, title: "FALLEN"),
-  Cards(image: Jajas.card3, title: "WINTER"),
-  Cards(image: Jajas.card4, title: "ETERNAL ERA"),
-  Cards(image: Jajas.card5, title: "CHAOS ERA"),
+  Cards(
+    image: Jajas.card0,
+    title: "SODOKU",
+    page: const SodokuGamelobbyPage(),
+  ),
+  Cards(
+    image: Jajas.card1,
+    title: "MINESWEEPER",
+    page: MinesweeperGame(
+      rows: 20,
+      columns: 8,
+      cellSize: 30,
+    ),
+  ),
+  Cards(
+    image: Jajas.card2,
+    title: "NUMBER MERGE",
+    page: const NumberMergeGame(),
+  ),
+  Cards(
+    image: Jajas.card3,
+    title: "MATCH 3",
+    page: const Match3LobbyPage(),
+  ),
+  Cards(
+    image: Jajas.card4,
+    title: "Breaking Bad",
+    page: const BreakoutGame(),
+  ),
+  // Cards(
+  //   image: Jajas.card5,
+  //   title: "CHAOS ERA",
+  //   page: const SodokuGamelobbyPage(),
+  // ),
 ];
 
 List<List<Color>> gradientColors = [

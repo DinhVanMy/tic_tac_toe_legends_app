@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:giphy_picker/giphy_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -186,7 +187,7 @@ class ChatWithFriendPage extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(
-                Icons.info,
+                Icons.color_lens_rounded,
                 color: Colors.deepPurpleAccent,
                 size: 30,
               ),
@@ -228,7 +229,9 @@ class ChatWithFriendPage extends StatelessWidget {
                           color: backgroundColors,
                           theme: theme,
                         ),
-                      ),
+                      )
+                        .animate()
+                        .slide(duration: const Duration(milliseconds: 750)),
               ),
               Obx(() {
                 if (imagePath.value.isNotEmpty) {
@@ -457,7 +460,7 @@ class ChatWithFriendPage extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundImage: CachedNetworkImageProvider(userFriend.image!),
-            radius: 100,
+            radius: 80,
           ),
           const SizedBox(
             height: 10,

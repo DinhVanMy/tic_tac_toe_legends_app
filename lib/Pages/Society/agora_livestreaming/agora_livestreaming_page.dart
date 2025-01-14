@@ -278,12 +278,12 @@ class AgoraLivestreamingPage extends StatelessWidget {
                             icon: isSeeComment.value
                                 ? const Icon(
                                     Icons.comment_rounded,
-                                    size: 35,
+                                    size: 30,
                                     color: Colors.blue,
                                   )
                                 : const Icon(
                                     Icons.comments_disabled_rounded,
-                                    size: 35,
+                                    size: 30,
                                     color: Colors.blue,
                                   ),
                           ),

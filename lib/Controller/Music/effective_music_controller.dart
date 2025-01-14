@@ -5,6 +5,7 @@ import 'package:tictactoe_gameapp/Configs/messages.dart';
 
 class EffectiveMusicController extends GetxController {
   late AudioPlayer _player;
+  bool isPlaying = false;
 
   @override
   void onInit() {
@@ -13,20 +14,27 @@ class EffectiveMusicController extends GetxController {
     _player.setLoopMode(LoopMode.off);
   }
 
+  @override
+  void onClose() {
+    _player.dispose();
+    super.onClose();
+  }
+
   // Hàm chung để phát âm thanh
   Future<void> _playSound(String assetPath, Duration duration) async {
+    if (isPlaying) return; // Nếu đang phát nhạc thì không phát lại
     try {
-      if (_player.playing) {
-        await _player.stop();
-      }
+      isPlaying = true;
 
       await _player.setAsset(assetPath); // Load file nhạc
       _player.play(); // Phát nhạc
 
       await Future.delayed(duration);
-      _player.stop();
+      await _player.stop();
     } catch (e) {
       errorMessage(e.toString());
+    } finally {
+      isPlaying = false; // Đặt lại trạng thái sau khi phát xong
     }
   }
 
@@ -60,19 +68,4 @@ class EffectiveMusicController extends GetxController {
       const Duration(seconds: 1),
     );
   }
-
-  // Future<void> playSoundPlayer3() async {
-  //   await _player.setAsset(AudioSPath.coins); // Load file nhạc
-  //     _player.play(); // Phát nhạc
-  // }
-  // Future<void> playSoundPlayer4() async {
-  //   await _player.setAsset(AudioSPath.coins); // Load file nhạc
-  //     _player.play(); // Phát nhạc
-  // }
-
-  // @override
-  // void onClose() {
-  //   _player.dispose();
-  //   super.onClose();
-  // }
 }

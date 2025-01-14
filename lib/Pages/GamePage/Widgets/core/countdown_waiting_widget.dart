@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/countdown_animation_controller.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 
 class CountdownWaitingWidget extends StatelessWidget {
   const CountdownWaitingWidget({super.key});
@@ -31,7 +32,7 @@ class CountdownWaitingWidget extends StatelessWidget {
             ),
             // Text hiển thị thời gian còn lại
             Text(
-              countdownController.getFormattedTime(),
+              TimeFunctions.getFormattedTime(countdownController.timeLeft),
               style: TextStyle(
                 fontSize: 30,
                 color: countdownController.progressColor.value,

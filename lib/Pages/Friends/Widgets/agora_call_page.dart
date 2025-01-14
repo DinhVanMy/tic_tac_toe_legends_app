@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
@@ -39,7 +40,7 @@ class AgoraCallPage extends StatelessWidget {
 
     return Scaffold(
       body: GestureDetector(
-        onTap: ()=>agoraCallController.isExtendIcons.value = true,
+        onTap: () => agoraCallController.isExtendIcons.value = true,
         child: Stack(
           children: [
             Obx(() {
@@ -49,13 +50,13 @@ class AgoraCallPage extends StatelessWidget {
                   ? AgoraVideoView(
                       controller: VideoViewController.remote(
                         rtcEngine: agoraCallController.agoraEngine,
-                        canvas:
-                            VideoCanvas(uid: agoraCallController.friendUid.value),
+                        canvas: VideoCanvas(
+                            uid: agoraCallController.friendUid.value),
                         connection: RtcConnection(
                           channelId: channelId,
                         ),
                       ),
-                    )
+                    ).animate().fadeIn(duration: const Duration(seconds: 1))
                   : Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
@@ -88,12 +89,15 @@ class AgoraCallPage extends StatelessWidget {
                             ),
                           ),
                         )
+                          .animate()
+                          .fadeIn(duration: const Duration(milliseconds: 1000))
                       : Container(
                           color: Colors.black,
                           child: const Center(
                             child: Text(
                               'Your video is off',
-                              style: TextStyle(color: Colors.white, fontSize: 12),
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 12),
                             ),
                           ),
                         ),
@@ -101,7 +105,7 @@ class AgoraCallPage extends StatelessWidget {
               }),
             ),
             // Back và menu phía trên
-        
+
             Positioned(
               top: 20,
               left: 5,
@@ -147,7 +151,8 @@ class AgoraCallPage extends StatelessWidget {
                   IconButton(
                     icon: Icon(
                       _getPingIcon(agoraCallController.remotePing.value),
-                      color: _getPingColor(agoraCallController.remotePing.value),
+                      color:
+                          _getPingColor(agoraCallController.remotePing.value),
                       size: 35,
                     ),
                     onPressed: () {
@@ -231,8 +236,9 @@ class AgoraCallPage extends StatelessWidget {
                                       onPressed: () async {
                                         await GeneralBottomsheetShowFunction
                                             .showScrollableGeneralBottomsheet(
-                                          widgetBuilder: (context, controller) =>
-                                              BeautyFiltersSheet(
+                                          widgetBuilder:
+                                              (context, controller) =>
+                                                  BeautyFiltersSheet(
                                             agoraEngine:
                                                 agoraCallController.agoraEngine,
                                           ),
@@ -253,8 +259,9 @@ class AgoraCallPage extends StatelessWidget {
                                       onPressed: () async {
                                         await GeneralBottomsheetShowFunction
                                             .showScrollableGeneralBottomsheet(
-                                          widgetBuilder: (context, controller) =>
-                                              AgoraBackgroundSheet(
+                                          widgetBuilder:
+                                              (context, controller) =>
+                                                  AgoraBackgroundSheet(
                                             scrollController: controller,
                                             imageAvatar: userCurrent.image!,
                                           ),
@@ -276,27 +283,28 @@ class AgoraCallPage extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Obx(() => !agoraCallController.isVideoEnabled.value
-                                  ? IconButton(
-                                      icon: const Icon(
-                                        Icons.videocam_off_sharp,
-                                        color: Colors.white,
-                                        size: 35,
-                                      ),
-                                      onPressed: () {
-                                        agoraCallController.toggleVideo();
-                                      },
-                                    )
-                                  : IconButton(
-                                      icon: const Icon(
-                                        Icons.videocam,
-                                        color: Colors.white,
-                                        size: 35,
-                                      ),
-                                      onPressed: () {
-                                        agoraCallController.toggleVideo();
-                                      },
-                                    )),
+                              Obx(() =>
+                                  !agoraCallController.isVideoEnabled.value
+                                      ? IconButton(
+                                          icon: const Icon(
+                                            Icons.videocam_off_sharp,
+                                            color: Colors.white,
+                                            size: 35,
+                                          ),
+                                          onPressed: () {
+                                            agoraCallController.toggleVideo();
+                                          },
+                                        )
+                                      : IconButton(
+                                          icon: const Icon(
+                                            Icons.videocam,
+                                            color: Colors.white,
+                                            size: 35,
+                                          ),
+                                          onPressed: () {
+                                            agoraCallController.toggleVideo();
+                                          },
+                                        )),
                               Obx(() => !agoraCallController.isMicEnabled.value
                                   ? IconButton(
                                       icon: const Icon(
@@ -359,7 +367,7 @@ class AgoraCallPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
+                  ).animate().slide()
                 : const SizedBox.shrink()),
           ],
         ),
@@ -405,7 +413,7 @@ class AgoraCallPage extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ).animate().slide();
   }
 
   Color _getPingColor(int ping) {

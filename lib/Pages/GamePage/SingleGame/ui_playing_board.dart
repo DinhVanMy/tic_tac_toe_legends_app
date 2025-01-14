@@ -1,5 +1,6 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/Console/play_with_bot_controller.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Widgets/core/line_painter.dart';
@@ -83,7 +84,8 @@ class UiPlayingBoard {
                                     controller,
                                   ),
                                 ),
-                              ),
+                              ).animate().fadeIn(
+                                  duration: const Duration(milliseconds: 750)),
                             );
                           },
                         ),
@@ -98,7 +100,9 @@ class UiPlayingBoard {
                                 ? Colors.lightBlueAccent
                                 : Colors.yellowAccent),
                         size: Size(gridSize * 50, gridSize * 50),
-                      ),
+                      )
+                          .animate()
+                          .fadeIn(duration: const Duration(milliseconds: 750)),
                   ],
                 );
               },
@@ -138,9 +142,13 @@ class UiPlayingBoard {
   Widget _buildTileContent(
       String value, BuildContext context, PlayWithBotController controller) {
     if (value == "X") {
-      return Image.asset(controller.selectedImageX.value);
+      return Image.asset(controller.selectedImageX.value)
+          .animate()
+          .fadeIn(duration: const Duration(milliseconds: 750));
     } else if (value == "O") {
-      return Image.asset(controller.selectedImageO.value);
+      return Image.asset(controller.selectedImageO.value)
+          .animate()
+          .scale(duration: const Duration(milliseconds: 750));
     } else {
       return const SizedBox();
     }

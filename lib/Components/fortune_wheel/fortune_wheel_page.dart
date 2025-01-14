@@ -73,8 +73,6 @@ class _FortuneWheelMainState extends State<FortuneWheelMain> {
                 height: 20,
               ),
               SizedBox(
-                width: 400,
-                height: 400,
                 child: FortuneWheel<int>(
                   controller: fortuneWheelController,
                   children: [

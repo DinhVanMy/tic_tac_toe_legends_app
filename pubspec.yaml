@@ -11,6 +11,7 @@ dependencies:
   agora_rtc_engine: ^6.3.2
   agora_token_service: ^0.1.2
   animated_text_kit: ^4.2.2
+  any_link_preview: ^3.0.2
   awesome_notifications: null
   bottom_sheet: ^4.0.4
   cached_network_image: ^3.3.1
@@ -19,6 +20,7 @@ dependencies:
   confetti: ^0.7.0
   cupertino_icons: ^1.0.6
   curved_navigation_bar: ^1.0.6
+  cyber_punk_tool_kit_ui: ^0.1.2
   dotted_border: ^2.1.0
   emoji_picker_flutter: null
   firebase_auth: ^4.18.0
@@ -86,4 +88,12 @@ flutter:
         - asset: assets/fonts/Poppins-Medium.ttf
           weight: 500
         - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+    - family: Orbitron
+      fonts:
+        - asset: assets/fonts/Orbitron-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Orbitron-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Orbitron-SemiBold.ttf
           weight: 600

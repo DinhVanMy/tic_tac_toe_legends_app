@@ -1,11 +1,12 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Configs/draws.dart';
+import 'package:tictactoe_gameapp/Configs/paint_draws/star_confetti_draws.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/confetti_controller.dart';
 
 class ConfettiWidgetCustom extends StatelessWidget {
-  const ConfettiWidgetCustom({super.key});
+  final int quantity;
+  const ConfettiWidgetCustom({super.key,  this.quantity = 100});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class ConfettiWidgetCustom extends StatelessWidget {
         // Tạo hạt với các hình dạng khác nhau
         return DrawPath.drawStarOfficial(size);
       },
-      numberOfParticles: 100, // Số lượng hạt nổ ra
+      numberOfParticles: quantity, // Số lượng hạt nổ ra
       emissionFrequency: 0.05, // Tần suất nổ
       gravity: 1, // Lực hấp dẫn, tốc độ rơi của các hạt
       minBlastForce: 10, // Lực nổ nhỏ nhất

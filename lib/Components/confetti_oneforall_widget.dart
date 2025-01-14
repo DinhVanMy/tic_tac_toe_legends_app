@@ -1,6 +1,6 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:tictactoe_gameapp/Configs/draws.dart';
+import 'package:tictactoe_gameapp/Configs/paint_draws/star_confetti_draws.dart';
 
 class ConfettiOneforallWidget extends StatelessWidget {
   final ConfettiController confettiController;

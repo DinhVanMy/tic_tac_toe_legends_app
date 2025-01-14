@@ -1,9 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/user_card.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
@@ -327,7 +329,7 @@ class LobbyPage extends StatelessWidget {
                                     ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                                 child: const SizedBox(),
                               ),
-                            )
+                            ).animate().fadeIn(duration: duration750)
                           : const SizedBox(),
                       room.player1Status == "ready" &&
                               room.player2Status == "ready"
@@ -345,7 +347,7 @@ class LobbyPage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                            )
+                            ).animate().slide(duration: duration750)
                           : const SizedBox(),
                     ],
                   );

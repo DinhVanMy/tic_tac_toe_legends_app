@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:isolate';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/confetti_widget_custom.dart';
@@ -236,7 +237,7 @@ class PlayWithBotController extends GetxController {
                 )
               : const SizedBox(),
         ],
-      ),
+      ).animate().slide(duration: duration750),
     );
   }
 
@@ -803,7 +804,7 @@ class PlayWithBotController extends GetxController {
   var selectedModeIndex = (-1).obs;
   var selectedDifficultyIndex = (-1).obs;
 
-  List<String> imagePaths = [
+  final List<String> imagePaths = [
     ImagePath.map1,
     ImagePath.map2,
     ImagePath.map4,
@@ -1250,7 +1251,7 @@ class PlayWithBotController extends GetxController {
             ),
           ],
         ),
-      ),
+      ).animate().scale(),
     );
   }
 }

@@ -50,15 +50,6 @@ class CountdownController extends GetxController
     animationController.stop();
   }
 
-  String getFormattedTime() {
-    // Định dạng thời gian phút:giây
-    int minutes = timeLeft.value ~/ 60;
-    int seconds = timeLeft.value % 60;
-    // Nếu còn nhiều hơn 60 giây, hiển thị phút:giây
-    return timeLeft.value >= 60
-        ? '$minutes:${seconds.toString().padLeft(2, '0')}'
-        : '$seconds';
-  }
 
   @override
   void onClose() {

@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
@@ -287,7 +288,9 @@ class ChatBotPage extends StatelessWidget {
                                       message: message,
                                       user: user,
                                       ttsController: ttsController,
-                                    );
+                                    ).animate().slide(
+                                        duration:
+                                            const Duration(milliseconds: 750));
                                   },
                                 ),
                               ),
