@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:cyber_punk_tool_kit_ui/src/containers/cyber_container_two.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Match3_Game/match3_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_gameplay_page.dart';
 
 class Match3LobbyPage extends StatelessWidget {
   const Match3LobbyPage({super.key});

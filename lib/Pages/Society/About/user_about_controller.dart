@@ -14,7 +14,7 @@ class UserAboutController extends GetxController {
   UserAboutController({required this.userId});
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     fetchFriendsList();
     fetchPostsList();

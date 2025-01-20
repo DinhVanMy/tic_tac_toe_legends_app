@@ -8,6 +8,7 @@ import 'package:tictactoe_gameapp/Data/gemini_api_controller.dart';
 import 'package:tictactoe_gameapp/Models/Functions/hyperlink_text_function.dart';
 import 'package:tictactoe_gameapp/Models/gemini_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/chat_friend_item.dart';
 
 class ChatMessageItem extends StatelessWidget {
   final ChatController chatController;
@@ -49,65 +50,72 @@ class ChatMessageItem extends StatelessWidget {
                         : BubbleType.receiverBubble),
                 padding: const EdgeInsets.all(0),
                 margin: const EdgeInsets.only(top: 20),
-                backGroundColor: Colors.blueGrey,
+                backGroundColor: _checkColors().first,
                 child: Container(
                   margin:
                       const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     gradient: LinearGradient(
-                      colors: message.isUser
-                          ? [
-                              Colors.lightBlue,
-                              Colors.lightBlueAccent,
-                            ]
-                          : [Colors.greenAccent, Colors.lightGreenAccent],
+                      colors: _checkColors(),
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: message.isUser
-                        ? CrossAxisAlignment.end
-                        : CrossAxisAlignment.start,
-                    children: [
-                      Obx(() {
-                        final displayedText = message.displayedWords.join(' ');
-                        return SelectableText.rich(
-                          TextSpan(
-                            children: HyperlinkTextFunction.buildMessageText(
-                              context,
-                              text: message.isUser
-                                  ? message.content
-                                  : displayedText,
-                              color: Colors.blueAccent,
-                            ),
-                          ),
-                          style: const TextStyle(color: Colors.black),
-                        );
-                      }),
-                      message.imagePath != null
-                          ? SizedBox(
-                              width: 100,
-                              height: 100,
-                              child: Image.file(
-                                File(
-                                  message.imagePath!,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: BubbleBackground(
+                      colors: _checkColors(),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: message.isUser
+                              ? CrossAxisAlignment.end
+                              : CrossAxisAlignment.start,
+                          children: [
+                            Obx(() {
+                              final displayedText =
+                                  message.displayedWords.join(' ');
+                              return SelectableText.rich(
+                                TextSpan(
+                                  children:
+                                      HyperlinkTextFunction.buildMessageText(
+                                    context,
+                                    text: message.isUser
+                                        ? message.content
+                                        : displayedText,
+                                    color: Colors.blueAccent,
+                                    colors: _checkColors(),
+                                    previewUrlMode: true,
+                                  ),
                                 ),
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : const SizedBox(),
-                      const SizedBox(height: 5),
-                      Text(
-                        message.timestamp
-                            .toLocal()
-                            .toString()
-                            .split(' ')[1]
-                            .substring(0, 5),
-                        style: const TextStyle(
-                            color: Colors.blueGrey, fontSize: 10),
+                                style: const TextStyle(color: Colors.black),
+                              );
+                            }),
+                            message.imagePath != null
+                                ? SizedBox(
+                                    width: 100,
+                                    height: 100,
+                                    child: Image.file(
+                                      File(
+                                        message.imagePath!,
+                                      ),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            const SizedBox(height: 5),
+                            Text(
+                              message.timestamp
+                                  .toLocal()
+                                  .toString()
+                                  .split(' ')[1]
+                                  .substring(0, 5),
+                              style: const TextStyle(
+                                  color: Colors.blueGrey, fontSize: 10),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -144,5 +152,16 @@ class ChatMessageItem extends StatelessWidget {
         //   )
       ],
     );
+  }
+
+  List<Color> _checkColors() {
+    if (message.isUser) {
+      return [
+        Colors.lightBlue,
+        Colors.lightBlueAccent,
+      ];
+    } else {
+      return [Colors.greenAccent, Colors.lightGreenAccent];
+    }
   }
 }

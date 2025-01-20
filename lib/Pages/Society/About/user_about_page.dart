@@ -15,11 +15,13 @@ import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
 class UserAboutPage extends StatelessWidget {
   final String intdexString;
   final UserModel unknownableUser;
+  final bool isCardTinder;
 
   const UserAboutPage({
     super.key,
     required this.unknownableUser,
     required this.intdexString,
+    this.isCardTinder = false,
   });
 
   @override
@@ -37,6 +39,7 @@ class UserAboutPage extends StatelessWidget {
     var selectedOption = 'Newest'.obs;
 
     return Scaffold(
+        backgroundColor: isCardTinder ? Colors.transparent : null,
         appBar: AppBar(
           centerTitle: false,
           title: Text(
@@ -180,7 +183,11 @@ class UserAboutPage extends StatelessWidget {
                                           SizedBox(
                                             width: 10,
                                           ),
-                                          Text("Friend"),
+                                          Flexible(
+                                            child: Text(
+                                              "Friend",
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     )
@@ -201,14 +208,11 @@ class UserAboutPage extends StatelessWidget {
                                           SizedBox(
                                             width: 10,
                                           ),
-                                          Text("Add Friend"),
+                                          Flexible(child: Text("Add Friend")),
                                         ],
                                       ),
                                     );
                             }),
-                          ),
-                          const SizedBox(
-                            width: 20,
                           ),
                           Expanded(
                             child: ElevatedButton(
@@ -218,9 +222,11 @@ class UserAboutPage extends StatelessWidget {
                                       Get.put(NotifyInMainController());
                                   Get.to(() => ChatWithFriendPage(
                                         userFriend: unknownableUser,
-                                        notifyInMainController: notifyInMainController,
+                                        notifyInMainController:
+                                            notifyInMainController,
                                       ));
                                 },
+                                clipBehavior: Clip.antiAlias,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.blue,
                                   foregroundColor: Colors.white,
@@ -233,22 +239,29 @@ class UserAboutPage extends StatelessWidget {
                                     SizedBox(
                                       width: 10,
                                     ),
-                                    Text("Message"),
+                                    Flexible(child: Text("Message")),
                                   ],
                                 )),
                           ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                foregroundColor: Colors.white,
-                                shadowColor: Colors.redAccent,
-                                elevation: 5,
-                              ),
-                              child: const Icon(Icons.menu_open_rounded))
+                          Expanded(
+                            child: ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  foregroundColor: Colors.white,
+                                  shadowColor: Colors.redAccent,
+                                  elevation: 5,
+                                ),
+                                child: const Row(
+                                  children: [
+                                    Icon(Icons.menu_open_rounded),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Flexible(child: Text("Menu")),
+                                  ],
+                                )),
+                          )
                         ],
                       ),
                       const SizedBox(

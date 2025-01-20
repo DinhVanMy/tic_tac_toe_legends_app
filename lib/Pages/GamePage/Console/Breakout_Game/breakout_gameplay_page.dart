@@ -1,22 +1,22 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
-import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Test/Minesweeper_Game/minesweeper_game_page.dart';
-import 'package:tictactoe_gameapp/Test/UI/Breakout_Game/breakout_gameplay_controller.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_controller.dart';
 
 class BreakoutGame extends StatelessWidget {
-  const BreakoutGame({super.key});
+  final Level level;
+  final String backgroundUrl;
+
+  const BreakoutGame(
+      {super.key, required this.level, required this.backgroundUrl});
 
   @override
   Widget build(BuildContext context) {
     final BallController ballController = Get.put(BallController());
     final PaddleController paddleController = Get.put(PaddleController());
     final BrickController brickController = Get.put(BrickController());
-    final GameController gameController =
-        Get.put(GameController(level: Level.easy));
+    final GameController gameController = Get.put(GameController(level: level));
 
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
@@ -67,9 +67,9 @@ class BreakoutGame extends StatelessWidget {
             Container(
               width: double.infinity,
               height: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(GifsPath.lightGif),
+                  image: AssetImage(backgroundUrl),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -121,6 +121,7 @@ class BreakoutGame extends StatelessWidget {
                                       child: BrickWidget(
                                         width: brick.width * width,
                                         height: brick.height * height,
+                                        hero: brick.hero,
                                       ),
                                     ))
                                 .toList(),
@@ -163,8 +164,10 @@ class Ball extends StatelessWidget {
       width: 20,
       height: 20,
       decoration: const BoxDecoration(
-        color: Colors.blue,
         shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: [Colors.lightBlueAccent, Colors.blue, Colors.lightBlue],
+        ),
       ),
     );
   }
@@ -194,21 +197,25 @@ class Paddle extends StatelessWidget {
 class BrickWidget extends StatelessWidget {
   final double width;
   final double height;
+  final String hero;
 
-  const BrickWidget({super.key, required this.width, required this.height});
+  const BrickWidget(
+      {super.key,
+      required this.width,
+      required this.height,
+      required this.hero});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: width,
       height: height,
-      child: AnimatedOpacity(
-        opacity: 1.0, // Chuyển về 0 khi bị phá
-        duration: const Duration(milliseconds: 300),
-        child: ClipPath(
-            clipper: HexagonClipper(),
-            child: Image.asset(ChampionsPathA.aatrox)),
+      child: ClipPath(
+        clipper: HexagonClipper(),
+        child: Image.asset(hero),
       ),
     );
   }
+
+  
 }

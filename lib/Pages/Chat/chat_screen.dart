@@ -296,6 +296,20 @@ class ChatBotPage extends StatelessWidget {
                               ),
                               Align(
                                 alignment: Alignment.bottomCenter,
+                                child: Obx(() => chatController
+                                        .isOpenedJumpButton.value
+                                    ? IconButton(
+                                        onPressed: chatController.scrollDown,
+                                        icon: const Icon(
+                                          Icons.arrow_downward,
+                                          size: 35,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    : const SizedBox.shrink()),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomCenter,
                                 child: Obx(() => chatController.isLoading.value
                                     ? Container(
                                         height: 40,
@@ -389,16 +403,6 @@ class ChatBotPage extends StatelessWidget {
                   return const SizedBox.shrink();
                 }
               }),
-              Obx(() => chatController.isOpenedJumpButton.value
-                  ? FloatingActionButton(
-                      onPressed: chatController.scrollDown,
-                      child: const Icon(
-                        Icons.arrow_downward,
-                        size: 35,
-                        color: Colors.blueAccent,
-                      ),
-                    )
-                  : const SizedBox.shrink()),
               CustomEmojiPicker(
                 onEmojiSelected: (emoji) {
                   textController.text += emoji;

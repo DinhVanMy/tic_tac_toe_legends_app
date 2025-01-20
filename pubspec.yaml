@@ -12,6 +12,7 @@ dependencies:
   agora_token_service: ^0.1.2
   animated_text_kit: ^4.2.2
   any_link_preview: ^3.0.2
+  audio_session: ^0.1.23
   awesome_notifications: null
   bottom_sheet: ^4.0.4
   cached_network_image: ^3.3.1

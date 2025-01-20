@@ -2,24 +2,28 @@ import 'package:cyber_punk_tool_kit_ui/cyber_punk_tool_kit_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/dynamic_sodoku_controller.dart';
 import 'package:cyber_punk_tool_kit_ui/src/containers/cyber_container_two.dart';
-import 'package:tictactoe_gameapp/Test/UI/Breakout_Game/breakout_gameplay_controller.dart';
-import 'package:tictactoe_gameapp/Test/UI/Breakout_Game/breakout_gameplay_page.dart';
+import 'sodoku_gameplay_page.dart';
 
-class BreakoutGamelobbyPage extends StatelessWidget {
-  const BreakoutGamelobbyPage({super.key});
+class SodokuGamelobbyPage extends StatelessWidget {
+  const SodokuGamelobbyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Rxn<Level> selectedLevel = Rxn<Level>();
+    Rxn<Levels> selectedLevel = Rxn<Levels>();
     RxnInt selectedMode = RxnInt();
     RxnString selectedImageIndex = RxnString();
     final List<String> imagePaths = [
-      GifsPath.chloe1,
-      GifsPath.chloe2,
-      GifsPath.lightGif,
-      GifsPath.cyberpunk,
-      GifsPath.loadingGif4,
+      ImagePath.map1,
+      ImagePath.map2,
+      ImagePath.map4,
+      ImagePath.map5,
+      ImagePath.map6,
+      ImagePath.map7,
+      ImagePath.map8,
+      ImagePath.map9,
+      ImagePath.map10,
     ];
     const TextStyle textStyle = TextStyle(
       color: Colors.black,
@@ -60,7 +64,7 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: Level.values.map((level) {
+                      children: Levels.values.map((level) {
                         return InkWell(
                           splashColor: Colors.blueAccent,
                           borderRadius: BorderRadius.circular(10),
@@ -181,7 +185,11 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                           selectedLevel.value != null &&
                           selectedImageIndex.value != null
                       ? InkWell(
-                          onTap: () => Get.to(() => const BreakoutGame()),
+                          onTap: () => Get.to(() => SudokuGamePlayPage(
+                                selectedLevel: selectedLevel.value!,
+                                size: selectedMode.value!,
+                                map: selectedImageIndex.value!,
+                              )),
                           child: Ink(
                             height: 50,
                             width: 100,

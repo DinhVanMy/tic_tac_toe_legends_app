@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/sodoku_game/Widgets/gaming_button_custom.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/sodoku_game/dynamic_sodoku_controller.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/General_Widgets/gaming_button_custom.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/dynamic_sodoku_controller.dart';
 
 class SudokuGamePlayPage extends StatelessWidget {
   final Levels selectedLevel;

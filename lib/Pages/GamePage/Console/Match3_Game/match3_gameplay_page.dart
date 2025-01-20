@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/paint_draws/star_confetti_draws.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Match3_Game/match3_gameplay_controller.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_gameplay_controller.dart';
 
 class Match3GamePlayPage extends StatelessWidget {
   final String selectedLevel;

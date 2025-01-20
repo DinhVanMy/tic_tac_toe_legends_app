@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/create_post_page.dart';
@@ -103,8 +105,7 @@ class FriendBlogPage extends StatelessWidget {
                                                     postController:
                                                         postController,
                                                   ),
-                                                  transition:
-                                                      Transition.zoom,
+                                                  transition: Transition.zoom,
                                                 ),
                                                 child: Container(
                                                   height: 45,
@@ -287,7 +288,10 @@ class FriendBlogPage extends StatelessWidget {
                                         currentUser: user,
                                         theme: theme,
                                         postController: postController,
-                                      ),
+                                      )
+                                        .animate()
+                                        .scale(duration: duration750)
+                                        .fadeIn(duration: duration750),
                                 const SizedBox(
                                   height: 10,
                                 ),

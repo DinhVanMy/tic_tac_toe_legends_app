@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/champion_model.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/sodoku_game/sodoku_gamelobby_page.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/sodoku_game/sodoku_gameplay_page.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Match3_Game/match3_gameplay_page.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Match3_Game/match3_lobby_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/sodoku_gamelobby_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/sodoku_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_lobby_page.dart';
+import 'package:tictactoe_gameapp/Test/Bubble_Shooter/bubble_shooter_gameplay_page.dart';
 import 'package:tictactoe_gameapp/Test/Minesweeper_Game/minesweeper_game_page.dart';
 import 'package:tictactoe_gameapp/Test/NumberMerge_Game/number_merge_gameplay_page.dart';
-import 'package:tictactoe_gameapp/Test/UI/Breakout_Game/breakout_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gamelobby_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_page.dart';
 
 const String url1 = "https://github.com/DinhVanMy?tab=repositories";
 const String url2 = "https://poki.com/";
@@ -89,13 +91,13 @@ final List<Cards> images = [
   Cards(
     image: Jajas.card4,
     title: "Breaking Bad",
-    page: const BreakoutGame(),
+    page: const BreakoutGamelobbyPage(),
   ),
-  // Cards(
-  //   image: Jajas.card5,
-  //   title: "CHAOS ERA",
-  //   page: const SodokuGamelobbyPage(),
-  // ),
+  Cards(
+    image: Jajas.card5,
+    title: "BUBBLE SHOOTER",
+    page: const BubbleShooterGame(),
+  ),
 ];
 
 List<List<Color>> gradientColors = [

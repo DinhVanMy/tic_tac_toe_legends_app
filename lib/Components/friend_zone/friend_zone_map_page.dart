@@ -1,17 +1,21 @@
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_controller.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/Overlays/profile_tooltip.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Enums/popup_position.dart';
 
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Components/rippleanimation/ripple_animation_widget.dart';
+import 'package:tictactoe_gameapp/Test/tinder_cards/tinder_cards_widget.dart';
 
 class FriendZoneMapPage extends StatelessWidget {
   final FirestoreController firestoreController;
@@ -437,73 +441,75 @@ class FriendZoneMapPage extends StatelessWidget {
           Positioned(
             top: 90,
             right: 10,
-            child: Obx(() => AnimatedOpacity(
-                  opacity: isExpanded.value ? 1.0 : 0.0, // Thay đổi độ mờ dần
-                  duration: const Duration(milliseconds: 500),
-                  child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 500),
-                      height: isExpanded.value ? 80 : 0,
-                      width: MediaQuery.sizeOf(context).width * 0.8,
-                      padding: const EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
+            child: Obx(() => AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                height: isExpanded.value ? 80 : 0,
+                width: MediaQuery.sizeOf(context).width * 0.8,
+                padding: const EdgeInsets.only(top: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                child: Obx(() {
+                  if (locationController.displayUsers.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No User is here?",
+                        style: TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      child: Obx(() {
-                        if (locationController.displayUsers.isEmpty) {
-                          return const Center(
-                            child: Text(
-                              "No User is here?",
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                    );
+                  } else {
+                    var nearUsers = locationController.displayUsers.toList();
+                    return ListView.builder(
+                        itemCount: nearUsers.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final nearUser = nearUsers[index];
+                          return GestureDetector(
+                            onTap: nearUsers.isEmpty
+                                ? null
+                                : () async {
+                                    await Get.dialog(
+                                      Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        child: Example(
+                                          users: nearUsers,
+                                          initialIndex: index,
+                                        ),
+                                      )
+                                          .animate()
+                                          .scale(duration: duration750)
+                                          .fadeIn(duration: duration750),
+                                    );
+                                  },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    AvatarUserWidget(
+                                        radius: 20, imagePath: nearUser.image!),
+                                    Text(
+                                      nearUser.name!,
+                                      style: TextStyle(
+                                        color: index % 2 == 0
+                                            ? Colors.green
+                                            : Colors.deepPurple,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           );
-                        } else {
-                          var nearUsers =
-                              locationController.displayUsers.toList();
-                          return ListView.builder(
-                              itemCount: nearUsers.length,
-                              scrollDirection: Axis.horizontal,
-                              itemBuilder: (context, index) {
-                                final nearUser = nearUsers[index];
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 20,
-                                          child: nearUser.image != null &&
-                                                  nearUser.image!.isNotEmpty
-                                              ? CircleAvatar(
-                                                  backgroundImage:
-                                                      CachedNetworkImageProvider(
-                                                          nearUser.image!),
-                                                  maxRadius: 55,
-                                                )
-                                              : const Icon(
-                                                  Icons.person_2_outlined),
-                                        ),
-                                        Text(
-                                          nearUser.name!,
-                                          style: TextStyle(
-                                            color: index % 2 == 0
-                                                ? Colors.green
-                                                : Colors.deepPurple,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              });
-                        }
-                      })),
-                )),
+                        });
+                  }
+                }))),
           ),
         ],
       ),

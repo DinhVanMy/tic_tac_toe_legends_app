@@ -427,7 +427,7 @@ class HomePage extends StatelessWidget {
                       Get.dialog(
                         const Dialog(
                           backgroundColor: Colors.transparent,
-                          child: Example(),
+                          // child: Example(),
                         ).animate().scale(),
                       );
                       // Get.to(() => const Example(),

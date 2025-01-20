@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/agora_livestreaming_page.dart';
@@ -306,7 +308,10 @@ class WorldBlogPage extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                            );
+                            )
+                                .animate()
+                                .scale(duration: duration750)
+                                .fadeIn(duration: duration750);
                           }),
                     ),
                   );
