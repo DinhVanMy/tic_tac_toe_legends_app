@@ -12,7 +12,7 @@ class AvatarUserWidget extends StatelessWidget {
     required this.radius,
     required this.imagePath,
     this.gradientColors,
-    this.borderThickness = 5,
+    this.borderThickness = 3,
   });
 
   @override
@@ -21,6 +21,7 @@ class AvatarUserWidget extends StatelessWidget {
         ? Container(
             width: radius * 2,
             height: radius * 2,
+            padding: EdgeInsets.all(borderThickness),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
@@ -29,23 +30,54 @@ class AvatarUserWidget extends StatelessWidget {
                 end: Alignment.bottomRight,
               ),
             ),
-            child: Padding(
-              padding: EdgeInsets.all(borderThickness), // Độ dày viền
-              child: Container(
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white, // Màu viền trong cùng
+            child: ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: imagePath,
+                placeholder: (context, url) => ColoredBox(
+                  color: Colors.blueGrey,
+                  child: Icon(
+                    Icons.person,
+                    size: radius,
+                    color: Colors.grey[500],
+                  ),
                 ),
-                child: CircleAvatar(
-                  backgroundImage: CachedNetworkImageProvider(imagePath),
-                  radius: radius - 5, // Kích thước CircleAvatar
+                errorWidget: (context, url, error) => ColoredBox(
+                  color: Colors.blueGrey,
+                  child: Icon(
+                    Icons.error,
+                    size: radius,
+                    color: Colors.red,
+                  ),
                 ),
+                fit: BoxFit.cover,
+                width: radius * 2 - borderThickness * 2,
+                height: radius * 2 - borderThickness * 2,
               ),
             ),
           )
-        : CircleAvatar(
-            backgroundImage: CachedNetworkImageProvider(imagePath),
-            radius: radius,
+        : ClipOval(
+            child: CachedNetworkImage(
+              imageUrl: imagePath,
+              placeholder: (context, url) => ColoredBox(
+                color: Colors.blueGrey,
+                child: Icon(
+                  Icons.person,
+                  size: radius,
+                  color: Colors.grey[500],
+                ),
+              ),
+              errorWidget: (context, url, error) => ColoredBox(
+                color: Colors.blueGrey,
+                child: Icon(
+                  Icons.error,
+                  size: radius,
+                  color: Colors.red,
+                ),
+              ),
+              fit: BoxFit.cover,
+              width: radius * 2,
+              height: radius * 2,
+            ),
           );
   }
 }

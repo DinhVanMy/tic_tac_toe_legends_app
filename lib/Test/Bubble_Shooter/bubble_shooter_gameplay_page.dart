@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Test/Bubble_Shooter/bubble_models.dart';
@@ -119,6 +117,22 @@ class BubbleGridUI extends StatelessWidget {
               ),
             );
           }),
+          Positioned(
+            left: controller.targetPosition.value.dx *
+                    MediaQuery.of(context).size.width -
+                10,
+            top: controller.targetPosition.value.dy *
+                    MediaQuery.of(context).size.height -
+                10,
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: const BoxDecoration(
+                color: Colors.redAccent,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
         ],
       );
     });
@@ -181,43 +195,51 @@ class ShootingPath extends StatelessWidget {
           details.localPosition.dx / MediaQuery.of(context).size.width,
           details.localPosition.dy / MediaQuery.of(context).size.height,
         );
-        controller.aimAt(target);
+        controller.aimAt(target); // Cập nhật hướng bắn
       },
       onPanEnd: (_) {
-        controller.shootBubble();
+        controller.shootBubble(); // Bắn bóng
       },
-      child: CustomPaint(
-        size: Size.infinite,
-        painter: ShootingPathPainter(controller),
-      ),
+      child: Obx(() {
+        // Lấy dữ liệu từ controller và chuyển cho CustomPainter
+        final shooterPos = controller.shooterPosition.value;
+        final targetPos = controller.targetPosition.value;
+
+        return CustomPaint(
+          size: Size.infinite,
+          painter: ShootingPathPainter(
+            shooterPos: shooterPos,
+            targetPos: targetPos,
+          ),
+        );
+      }),
     );
   }
 }
 
 class ShootingPathPainter extends CustomPainter {
-  final BubbleShooterController controller;
+  final Offset shooterPos;
+  final Offset targetPos;
 
-  ShootingPathPainter(this.controller);
+  ShootingPathPainter({required this.shooterPos, required this.targetPos});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final shooterPos = controller.shooterPosition.value * size.height;
-    final angle = controller.activeBubble.value.angle;
-    final path = Path();
+    final shooter = Offset(
+      shooterPos.dx * size.width,
+      shooterPos.dy * size.height,
+    );
+    final target = Offset(
+      targetPos.dx * size.width,
+      targetPos.dy * size.height,
+    );
 
-    path.moveTo(shooterPos.dx, shooterPos.dy);
-    for (int i = 0; i < 500; i++) {
-      final nextX = shooterPos.dx + cos(angle) * i * 5;
-      final nextY = shooterPos.dy - sin(angle) * i * 5;
-      if (nextX <= 0 ||
-          nextX >= size.width ||
-          nextY <= 0 ||
-          nextY >= size.height) break;
-      path.lineTo(nextX, nextY);
-    }
+    final path = Path();
+    path.moveTo(shooter.dx, shooter.dy);
+    path.lineTo(target.dx, target.dy);
 
     final paint = Paint()
-      ..color = Colors.white
+      ..color = Colors.redAccent.withOpacity(0.7)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 

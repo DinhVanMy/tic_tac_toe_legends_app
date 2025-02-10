@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 
-class ExampleCard extends StatelessWidget {
+class CardTinderWidget extends StatelessWidget {
   final UserModel user;
   final List<Color> colors;
   final int index;
 
-  const ExampleCard(
+  const CardTinderWidget(
       {super.key,
       required this.user,
       required this.colors,
@@ -50,37 +49,37 @@ class ExampleCard extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  user.name!,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  user.email!,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  user.lastActive != null
-                      ? TimeFunctions.displayTimeDefault(user.lastActive!)
-                      : "",
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.all(16),
+          //   child: Column(
+          //     crossAxisAlignment: CrossAxisAlignment.start,
+          //     children: [
+          //       Text(
+          //         user.name!,
+          //         style: const TextStyle(
+          //           color: Colors.black,
+          //           fontWeight: FontWeight.bold,
+          //           fontSize: 20,
+          //         ),
+          //       ),
+          //       const SizedBox(height: 5),
+          //       Text(
+          //         user.email!,
+          //         style: const TextStyle(
+          //           color: Colors.grey,
+          //           fontSize: 15,
+          //         ),
+          //       ),
+          //       const SizedBox(height: 5),
+          //       Text(
+          //         user.lastActive != null
+          //             ? TimeFunctions.displayTimeDefault(user.lastActive!)
+          //             : "",
+          //         style: const TextStyle(color: Colors.grey),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );

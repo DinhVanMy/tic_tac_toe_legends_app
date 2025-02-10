@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
@@ -8,9 +8,10 @@ import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/chat_with_friend_page.dart';
-import 'package:tictactoe_gameapp/Pages/Society/About/Widgets/post_section_widget.dart';
 import 'package:tictactoe_gameapp/Pages/Society/About/user_about_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_list_card.dart';
+import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
 
 class UserAboutPage extends StatelessWidget {
   final String intdexString;
@@ -30,11 +31,11 @@ class UserAboutPage extends StatelessWidget {
     UserModel currentUser = profileController.user!;
     final ThemeData theme = Theme.of(context);
     final ScrollController scrollController = ScrollController();
-    final UserAboutController userAboutController =
-        Get.put(UserAboutController(userId: unknownableUser.id!));
+    final UserAboutController userAboutController = Get.put(
+        UserAboutController(userId: unknownableUser.id!),
+        tag: unknownableUser.id! + intdexString);
     final FirestoreController firestoreController =
         Get.find<FirestoreController>();
-
     final List<String> options = ["Favoritest", "Newest", "Oldest"];
     var selectedOption = 'Newest'.obs;
 
@@ -86,16 +87,11 @@ class UserAboutPage extends StatelessWidget {
                       left: 20,
                       child: Hero(
                         tag: "user_avatar_$intdexString",
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 5),
-                          ),
-                          child: CircleAvatar(
-                            backgroundImage: CachedNetworkImageProvider(
-                                unknownableUser.image!),
-                            radius: 100,
-                          ),
+                        child: AvatarUserWidget(
+                          radius: 100,
+                          imagePath: unknownableUser.image!,
+                          gradientColors: const [Colors.white, Colors.white],
+                          borderThickness: 5.0,
                         ),
                       ),
                     ),
@@ -214,6 +210,9 @@ class UserAboutPage extends StatelessWidget {
                                     );
                             }),
                           ),
+                          const SizedBox(
+                            width: 10,
+                          ),
                           Expanded(
                             child: ElevatedButton(
                                 onPressed: () {
@@ -242,6 +241,9 @@ class UserAboutPage extends StatelessWidget {
                                     Flexible(child: Text("Message")),
                                   ],
                                 )),
+                          ),
+                          const SizedBox(
+                            width: 10,
                           ),
                           Expanded(
                             child: ElevatedButton(
@@ -347,12 +349,9 @@ class UserAboutPage extends StatelessWidget {
                                     children: [
                                       Stack(
                                         children: [
-                                          CircleAvatar(
-                                            backgroundImage:
-                                                CachedNetworkImageProvider(
-                                                    friend.image!),
-                                            radius: 35,
-                                          ),
+                                          AvatarUserWidget(
+                                              radius: 35,
+                                              imagePath: friend.image!),
                                           Positioned(
                                             bottom: 0,
                                             right: 0,
@@ -440,11 +439,15 @@ class UserAboutPage extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 var post = posts[index];
                                 var postUser = post.postUser!;
-                                return PostSectionWidget(
+                                final PostController postController =
+                                    Get.put(PostController());
+                                return PostListCard(
                                   theme: theme,
                                   post: post,
                                   postUser: postUser,
                                   currentUser: currentUser,
+                                  postController: postController,
+                                  isHero: false,
                                 );
                               });
                         }

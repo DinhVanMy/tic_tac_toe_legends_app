@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
 import 'package:tictactoe_gameapp/Components/primary_with_icon_button.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
@@ -26,7 +26,6 @@ import 'package:tictactoe_gameapp/Components/daily_gift/daily_gift_page.dart';
 import 'package:tictactoe_gameapp/Components/daily_mission/missions_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Widgets/looping_carousel_widget.dart';
 import 'package:tictactoe_gameapp/Test/game_history/game_history_page.dart';
-import 'package:tictactoe_gameapp/Test/tinder_cards/tinder_cards_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -100,35 +99,17 @@ class HomePage extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(50),
-                              border: Border.all(color: Colors.blue, width: 3),
-                              boxShadow: const [
-                                BoxShadow(
-                                  spreadRadius: 2.0,
-                                  color: Colors.lightBlueAccent,
-                                  blurRadius: 15.0,
-                                  offset: Offset(3, 3),
-                                ),
-                                BoxShadow(
-                                  spreadRadius: 2.0,
-                                  color: Colors.lightBlueAccent,
-                                  blurRadius: 15.0,
-                                  offset: Offset(-3, -3),
-                                ),
-                              ]),
-                          child: CircleAvatar(
-                            radius: 30,
-                            child: user.image != null && user.image!.isNotEmpty
-                                ? CircleAvatar(
-                                    backgroundImage:
-                                        CachedNetworkImageProvider(user.image!),
-                                    maxRadius: 55,
-                                  )
-                                : const Icon(Icons.person_2_outlined),
-                          ),
-                        ),
+                        user.image != null && user.image!.isNotEmpty
+                            ? AvatarUserWidget(
+                                radius: 30,
+                                imagePath: user.image!,
+                                gradientColors: const [
+                                  Colors.white,
+                                  Colors.blueAccent
+                                ],
+                                
+                              )
+                            : const Icon(Icons.person_2_outlined),
                         const SizedBox(width: 10),
                         Column(
                           children: [

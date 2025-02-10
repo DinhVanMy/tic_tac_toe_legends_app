@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
@@ -27,7 +28,7 @@ class FriendsHomePage extends StatelessWidget {
       if (firestoreController.filterfriendsList.isEmpty) {
         return const Column(
           children: [
-             SizedBox(
+            SizedBox(
               height: 100,
             ),
             Text(
@@ -78,11 +79,8 @@ class FriendsHomePage extends StatelessWidget {
                     Hero(
                       tag: 'friendAvatar-${friend.id}',
                       transitionOnUserGestures: true,
-                      child: CircleAvatar(
-                        backgroundImage:
-                            CachedNetworkImageProvider(friend.image!),
-                        radius: 35,
-                      ),
+                      child: AvatarUserWidget(
+                          radius: 35, imagePath: friend.image!),
                     ),
                     const SizedBox(width: 10),
                     Expanded(

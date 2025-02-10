@@ -84,7 +84,11 @@ class BubbleShooterController extends GetxController {
     return shuffled.take(numOfHeroes).toList();
   }
 
+  var targetPosition = const Offset(0.5, 0.5).obs; // Vị trí mục tiêu được chọn
+
   void aimAt(Offset target) {
+    targetPosition.value = target;
+
     final dx = target.dx - shooterPosition.value.dx;
     final dy = shooterPosition.value.dy - target.dy;
     final angle = atan2(dy, dx);
@@ -94,29 +98,54 @@ class BubbleShooterController extends GetxController {
         bubble.angle = angle;
       }
     });
+
+    update(); // Cập nhật giao diện đường bay
   }
 
   void shootBubble() {
     final bubble = activeBubble.value;
 
-    // Bóng được thêm vào danh sách tạm thời để xử lý hiệu ứng bắn
+    // Đặt vị trí khởi đầu
+    bubble.position =
+        Offset(shooterPosition.value.dx, shooterPosition.value.dy);
     bubbles.add(bubble);
 
-    // Cập nhật vị trí cuối cùng và thêm vào lưới
-    final collisionCell = grid.value.checkCollision(bubble);
-    if (collisionCell != null) {
-      grid.update((g) {
-        g?.addBubble(bubble);
-      });
-      bubbles.remove(bubble);
-    }
+    final dx = targetPosition.value.dx - shooterPosition.value.dx;
+    final dy = shooterPosition.value.dy - targetPosition.value.dy;
+    final angle = atan2(dy, dx);
 
-    // Reset bóng hiện tại
+    bubble.angle = angle;
+
+    // Cập nhật vị trí bóng và kiểm tra va chạm
+    Timer.periodic(const Duration(milliseconds: 16), (timer) {
+      bubble.updatePosition(0.016);
+
+      final collisionCell = grid.value.checkCollision(bubble);
+      if (collisionCell != null) {
+        grid.update((g) {
+          g?.addBubble(bubble);
+        });
+        bubbles.remove(bubble);
+        checkForMatches(bubble);
+
+        timer.cancel();
+      }
+
+      if (bubble.position.dy <= 0) {
+        bubbles.remove(bubble);
+        timer.cancel();
+      }
+
+      update();
+    });
+
+    // Tạo bóng mới cho lần bắn tiếp theo
     activeBubble.value = Bubble.random(selectedChamp);
   }
 
   void updateBubbles(double dt) {
     final toRemove = <Bubble>[];
+
     for (final bubble in bubbles) {
       bubble.updatePosition(dt);
 
@@ -128,38 +157,42 @@ class BubbleShooterController extends GetxController {
         toRemove.add(bubble);
         checkForMatches(bubble);
       }
+
+      // Xóa bóng nếu nó ra khỏi màn hình
+      if (bubble.position.dy <= 0) {
+        toRemove.add(bubble);
+      }
     }
 
     bubbles.removeWhere((bubble) => toRemove.contains(bubble));
 
-    // Cập nhật danh sách bóng để làm mới giao diện
+    // Cập nhật danh sách bóng trong giao diện
     bubbles.assignAll(grid.value.getAllBubbles());
   }
 
   void checkForMatches(Bubble bubble) {
     final matches = grid.value.findMatches(bubble);
-    if (matches.length >= 3) {
-      // Tăng điểm dựa trên số bóng bị xóa
+    if (matches.isNotEmpty) {
       score.value += matches.length * 10;
 
-      // Thông báo combo
-      if (matches.length > 3) {
-        if (matches.length <= 5) {
-          comboMessage.value = 'Great!';
-        } else if (matches.length <= 8) {
-          comboMessage.value = 'Awesome!';
-        } else {
-          comboMessage.value = 'Incredible!';
-        }
-        Future.delayed(const Duration(seconds: 2), () {
-          comboMessage.value = ''; // Xóa thông báo sau 2 giây
-        });
-      }
+      comboMessage.value = _getComboMessage(matches.length);
+      Future.delayed(const Duration(seconds: 2), () {
+        comboMessage.value = '';
+      });
 
       grid.update((g) => g?.removeBubbles(matches));
+
+      // Kiểm tra và xóa bóng không kết nối
       final detachedBubbles = grid.value.findDetachedBubbles();
       grid.update((g) => g?.removeBubbles(detachedBubbles));
     }
+  }
+
+  String _getComboMessage(int length) {
+    if (length > 3 && length <= 5) return 'Great!';
+    if (length > 5 && length <= 8) return 'Awesome!';
+    if (length > 8) return 'Incredible!';
+    return '';
   }
 
   @override

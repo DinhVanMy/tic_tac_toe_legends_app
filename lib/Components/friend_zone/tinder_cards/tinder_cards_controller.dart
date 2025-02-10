@@ -5,13 +5,13 @@ import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Models/Functions/gradient_generator_functions.dart';
 
-class ExampleController extends GetxController {
+class TinderCardController extends GetxController {
   final CardSwiperController cardController = CardSwiperController();
   final ThemeController themeController = Get.find();
   late final List<List<Color>> newGradients;
 
   final int colorsLength;
-  ExampleController({required this.colorsLength});
+  TinderCardController({required this.colorsLength});
 
   @override
   void onInit() {

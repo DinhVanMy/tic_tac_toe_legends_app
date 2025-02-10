@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:giphy_picker/giphy_picker.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/gifphy/preview_gif_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
@@ -126,11 +126,7 @@ class CreatePostPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    backgroundImage:
-                        CachedNetworkImageProvider(userModel.image!),
-                    radius: 35,
-                  ),
+                 AvatarUserWidget(radius: 35, imagePath: userModel.image!),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(

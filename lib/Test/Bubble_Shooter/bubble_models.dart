@@ -2,13 +2,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+
 class Bubble {
   Offset position;
   double angle;
   final String heroAsset; // URL của hero
   static const double speed = 300.0;
 
-  Bubble({required this.position, required this.angle, required this.heroAsset});
+  Bubble(
+      {required this.position, required this.angle, required this.heroAsset});
 
   @override
   bool operator ==(Object other) {
@@ -40,7 +42,6 @@ class Bubble {
   }
 }
 
-
 // Bubble grid model
 class BubbleGrid {
   final List<List<Bubble?>> grid;
@@ -50,20 +51,19 @@ class BubbleGrid {
 
   // Khởi tạo lưới với các bóng ngẫu nhiên
   void initializeGrid(List<String> listChamp) {
-  final random = Random();
-  for (int i = 0; i < grid.length; i++) {
-    for (int j = 0; j < grid[i].length; j++) {
-      if (random.nextBool()) {
-        grid[i][j] = Bubble(
-          position: Offset(j.toDouble(), i.toDouble()),
-          angle: 0,
-          heroAsset: listChamp[random.nextInt(listChamp.length)],
-        );
+    final random = Random();
+    for (int i = 0; i < grid.length; i++) {
+      for (int j = 0; j < grid[i].length; j++) {
+        if (random.nextBool()) {
+          grid[i][j] = Bubble(
+            position: Offset(j.toDouble(), i.toDouble()),
+            angle: 0,
+            heroAsset: listChamp[random.nextInt(listChamp.length)],
+          );
+        }
       }
     }
   }
-}
-
 
 // Tìm các bóng cùng màu liên kết với bóng đầu vào
   List<Bubble> findMatches(Bubble bubble) {
@@ -87,7 +87,8 @@ class BubbleGrid {
       }
     }
 
-    return matches;
+    // Chỉ trả về danh sách nếu số bóng đủ điều kiện
+    return matches.length >= 3 ? matches : [];
   }
 
   // Tìm các bóng không kết nối với hàng trên cùng
@@ -163,7 +164,24 @@ class BubbleGrid {
 
   void addBubble(Bubble bubble) {
     final cell = getClosestCell(bubble.position);
-    grid[cell.dy.toInt()][cell.dx.toInt()] = bubble;
+
+    // Xác định chỉ số tọa độ lưới
+    int x = cell.dx.toInt().clamp(0, grid[0].length - 1);
+    int y = cell.dy.toInt().clamp(0, grid.length - 1);
+
+    // Tìm ô gần nhất không có bóng theo hướng từ dưới lên
+    while (y < grid.length && grid[y][x] != null) {
+      y++;
+    }
+
+    if (y < grid.length) {
+      // Thêm bóng vào ô trống
+      grid[y][x] = Bubble(
+        position: Offset(x.toDouble(), y.toDouble()),
+        angle: 0,
+        heroAsset: bubble.heroAsset,
+      );
+    }
   }
 
   dynamic checkCollision(Bubble bubble) {

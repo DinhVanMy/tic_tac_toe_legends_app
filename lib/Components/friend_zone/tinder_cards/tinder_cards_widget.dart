@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
-import 'package:tictactoe_gameapp/Test/tinder_cards/example_model_card.dart';
-import 'package:tictactoe_gameapp/Test/tinder_cards/tinder_cards_controller.dart';
+import 'package:tictactoe_gameapp/Components/friend_zone/tinder_cards/example_model_card.dart';
+import 'package:tictactoe_gameapp/Components/friend_zone/tinder_cards/tinder_cards_controller.dart';
 
-class Example extends StatelessWidget {
+class MapFriendTinderWidget extends StatelessWidget {
   final List<UserModel> users;
   final int initialIndex;
-  const Example({
+  const MapFriendTinderWidget({
     super.key,
     required this.users,
     required this.initialIndex,
@@ -16,8 +16,8 @@ class Example extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ExampleController controller =
-        Get.put(ExampleController(colorsLength: users.length));
+    final TinderCardController controller =
+        Get.put(TinderCardController(colorsLength: users.length));
 
     return Column(
       children: [
@@ -33,7 +33,7 @@ class Example extends StatelessWidget {
             padding: const EdgeInsets.all(0.0),
             cardBuilder: (context, index, horizontalThresholdPercentage,
                     verticalThresholdPercentage) =>
-                ExampleCard(
+                CardTinderWidget(
               user: users[index],
               colors: controller.newGradients[index],
               index: initialIndex,
@@ -48,7 +48,7 @@ class Example extends StatelessWidget {
     );
   }
 
-  Widget _interactCardFAB(ExampleController controller) {
+  Widget _interactCardFAB(TinderCardController controller) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [

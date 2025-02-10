@@ -15,7 +15,8 @@ import 'package:tictactoe_gameapp/Enums/popup_position.dart';
 
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Components/rippleanimation/ripple_animation_widget.dart';
-import 'package:tictactoe_gameapp/Test/tinder_cards/tinder_cards_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_controller.dart';
+import 'package:tictactoe_gameapp/Components/friend_zone/tinder_cards/tinder_cards_widget.dart';
 
 class FriendZoneMapPage extends StatelessWidget {
   final FirestoreController firestoreController;
@@ -476,7 +477,7 @@ class FriendZoneMapPage extends StatelessWidget {
                                     await Get.dialog(
                                       Dialog(
                                         backgroundColor: Colors.transparent,
-                                        child: Example(
+                                        child: MapFriendTinderWidget(
                                           users: nearUsers,
                                           initialIndex: index,
                                         ),

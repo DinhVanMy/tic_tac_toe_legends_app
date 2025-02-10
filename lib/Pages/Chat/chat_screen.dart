@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/dot_matching_animation_controller.dart';
@@ -125,14 +126,9 @@ class ChatBotPage extends StatelessWidget {
                 ],
               ),
             ),
-            CircleAvatar(
-              child: user.image != null && user.image!.isNotEmpty
-                  ? CircleAvatar(
-                      backgroundImage: CachedNetworkImageProvider(user.image!),
-                      maxRadius: 55,
-                    )
-                  : const Icon(Icons.person_2_outlined),
-            )
+            user.image != null && user.image!.isNotEmpty
+                ? AvatarUserWidget(radius: 55, imagePath: user.image!)
+                : const Icon(Icons.person_2_outlined)
           ],
         ),
       ),

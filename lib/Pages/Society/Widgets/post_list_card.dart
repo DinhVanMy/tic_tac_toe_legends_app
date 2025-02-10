@@ -1,7 +1,7 @@
 import 'package:bottom_sheet/bottom_sheet.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
 import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
@@ -25,6 +25,7 @@ class PostListCard extends StatelessWidget {
   final UserModel currentUser;
   final ThemeData theme;
   final PostController postController;
+  final bool isHero;
   const PostListCard({
     super.key,
     required this.post,
@@ -32,6 +33,7 @@ class PostListCard extends StatelessWidget {
     required this.theme,
     required this.postController,
     required this.currentUser,
+    this.isHero = true,
   });
 
   @override
@@ -39,6 +41,7 @@ class PostListCard extends StatelessWidget {
     // var currentIndex = 0.obs;
     return Container(
       padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(10),
@@ -46,22 +49,23 @@ class PostListCard extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: () {
-              Get.to(UserAboutPage(
-                unknownableUser: postUser,
-                intdexString: post.postId!,
-              ));
-            },
+            onTap: !isHero
+                ? null
+                : () {
+                    Get.to(UserAboutPage(
+                      unknownableUser: postUser,
+                      intdexString: post.postId!,
+                    ));
+                  },
             child: Row(
               children: [
-                Hero(
-                  tag: "user_avatar_${post.postId}",
-                  child: CircleAvatar(
-                    backgroundImage:
-                        CachedNetworkImageProvider(postUser.image!),
-                    radius: 20,
-                  ),
-                ),
+                isHero
+                    ? Hero(
+                        tag: "user_avatar_${post.postId}",
+                        child: AvatarUserWidget(
+                            radius: 20, imagePath: postUser.image!),
+                      )
+                    : AvatarUserWidget(radius: 20, imagePath: postUser.image!),
                 const SizedBox(
                   width: 10,
                 ),

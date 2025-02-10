@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
@@ -101,18 +102,13 @@ class FriendsPage extends StatelessWidget {
                       width: 100,
                       child: Column(
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.blueAccent,
-                                  width: 3,
-                                ),
-                                borderRadius: BorderRadius.circular(50)),
-                            child: CircleAvatar(
-                              backgroundImage:
-                                  CachedNetworkImageProvider(user.image!),
-                              radius: 40,
-                            ),
+                          AvatarUserWidget(
+                            radius: 40,
+                            imagePath: user.image!,
+                            gradientColors: const [
+                              Colors.blueAccent,
+                              Colors.greenAccent
+                            ],
                           ),
                           const Text(
                             "Your Story",
@@ -146,12 +142,9 @@ class FriendsPage extends StatelessWidget {
                                     children: [
                                       Stack(
                                         children: [
-                                          CircleAvatar(
-                                            backgroundImage:
-                                                CachedNetworkImageProvider(
-                                                    friend.image!),
-                                            radius: 35,
-                                          ),
+                                          AvatarUserWidget(
+                                              radius: 35,
+                                              imagePath: friend.image!),
                                           Positioned(
                                             bottom: 0,
                                             right: 0,
@@ -206,7 +199,7 @@ class FriendsPage extends StatelessWidget {
                       theme: theme,
                       listenLatestMessagesController:
                           listenLatestMessagesController,
-                          notifyInMainController: notifyInMainController,
+                      notifyInMainController: notifyInMainController,
                     ),
                     const FriendsGroupPage(),
                     FriendsNotificationsPage(

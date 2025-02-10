@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
-import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
@@ -241,6 +240,11 @@ class WorldBlogPage extends StatelessWidget {
                                               AvatarUserWidget(
                                                 radius: 20,
                                                 imagePath: streamer.image!,
+                                                borderThickness: 2,
+                                                gradientColors: const [
+                                                  Colors.white,
+                                                  Colors.blueAccent
+                                                ],
                                               ),
                                               const SizedBox(
                                                 width: 5,

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
@@ -89,11 +90,8 @@ class PostLikeTab extends StatelessWidget {
                         Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            CircleAvatar(
-                              backgroundImage:
-                                  CachedNetworkImageProvider(likeUser.image!),
-                              radius: 25,
-                            ),
+                            AvatarUserWidget(
+                                radius: 25, imagePath: likeUser.image!),
                             Positioned(
                               bottom: -10,
                               right: -10,

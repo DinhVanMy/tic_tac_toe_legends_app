@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
 import 'package:tictactoe_gameapp/Configs/paint_draws/bubble_chat_painter.dart';
 import 'package:tictactoe_gameapp/Data/chat_friend_controller.dart';
@@ -150,10 +151,7 @@ class ChatFriendItem extends StatelessWidget {
             isMe ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
           if (!isMe && showAvatar)
-            CircleAvatar(
-              backgroundImage: CachedNetworkImageProvider(userFriend.image!),
-              radius: 25,
-            ),
+            AvatarUserWidget(radius: 25, imagePath: userFriend.image!),
           if (!isMe && !showAvatar) const SizedBox(width: 50),
           Flexible(
             child: ChatBubble(

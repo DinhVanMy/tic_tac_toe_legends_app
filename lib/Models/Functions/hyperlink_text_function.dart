@@ -2,6 +2,8 @@ import 'package:any_link_preview/any_link_preview.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/placeholder_custom_widget.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/fetch_firestore_data_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
@@ -70,12 +72,20 @@ class HyperlinkTextFunction {
                   fontSize: 15,
                 ),
                 bodyStyle: const TextStyle(color: Colors.white54, fontSize: 13),
-                errorWidget: Container(
-                  color: Colors.grey[300],
-                  child: const Text('Oops!'),
+                placeholderWidget: const PlaceholderImageCustomWidget(),
+                errorWidget: const ColoredBox(
+                  color: Colors.red,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Oops!',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
                 ),
-                errorImage:
-                    "https://i.ytimg.com/vi/z8wrRRR7_qU/maxresdefault.jpg",
                 errorBody: 'Show my custom error body',
                 errorTitle: 'Next one is youtube link, error title',
               ),
