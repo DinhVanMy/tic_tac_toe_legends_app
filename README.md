@@ -3,7 +3,7 @@
 A new Flutter project.
 https://github.com/DinhVanMy/tic_tac_toe_legends_app/issues/1#issue-2845405867
 ## Getting Started
-
+https://github.com/user-attachments/assets/ad21d0ac-a654-4ad2-a63a-b8c4c1ba6bac
 This project is a starting point for a Flutter application.
 
 A few resources to get you started if this is your first Flutter project:
