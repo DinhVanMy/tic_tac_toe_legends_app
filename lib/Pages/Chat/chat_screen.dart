@@ -1,8 +1,6 @@
 // chat_screen.dart
 import 'dart:io';
-import 'dart:ui';
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -127,7 +125,7 @@ class ChatBotPage extends StatelessWidget {
               ),
             ),
             user.image != null && user.image!.isNotEmpty
-                ? AvatarUserWidget(radius: 55, imagePath: user.image!)
+                ? AvatarUserWidget(radius: 25, imagePath: user.image!)
                 : const Icon(Icons.person_2_outlined)
           ],
         ),

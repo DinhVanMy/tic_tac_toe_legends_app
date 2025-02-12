@@ -75,7 +75,7 @@ class AgoraCallController extends GetxController {
 
   Future<void> _initAgoraRtcEngine() async {
     agoraEngine = createAgoraRtcEngine();
-    await agoraEngine.initialize(const RtcEngineContext(appId: apiAgoraAppId));
+    await agoraEngine.initialize( RtcEngineContext(appId: apiAgoraAppId));
     await agoraEngine.enableAudio();
     await agoraEngine.enableVideo();
     await agoraEngine.setChannelProfile(ChannelProfileType

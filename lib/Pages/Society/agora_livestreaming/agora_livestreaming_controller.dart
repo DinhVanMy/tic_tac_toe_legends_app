@@ -65,7 +65,7 @@ class AgoraLivestreamController extends GetxController {
   Future<void> _initializeAgora() async {
     agoraEngine = createAgoraRtcEngine();
     await agoraEngine.initialize(
-      const RtcEngineContext(appId: apiAgoraAppId),
+       RtcEngineContext(appId: apiAgoraAppId),
     );
     await agoraEngine.setChannelProfile(
       ChannelProfileType.channelProfileLiveBroadcasting,

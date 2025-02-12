@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:tictactoe_gameapp/Configs/constants.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -49,17 +50,17 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDMx5Sm2GDoR7p75W9JAhplTgsHUPZ5Quc',
-    appId: '1:71459166896:android:5b59226030e77e2019b975',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: apiFirebaseKey,
+    appId: apiFirebaseId,
     messagingSenderId: '71459166896',
     projectId: 'tictactoe-flutter-672ff',
     storageBucket: 'tictactoe-flutter-672ff.appspot.com',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB7KApMjFAGYRo6A4rbo6e9DG5Wi8O1Qks',
-    appId: '1:71459166896:ios:f875779ae976dc2719b975',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: apiFirebaseKey,
+    appId: apiFirebaseId,
     messagingSenderId: '71459166896',
     projectId: 'tictactoe-flutter-672ff',
     storageBucket: 'tictactoe-flutter-672ff.appspot.com',

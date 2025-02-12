@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/champion_model.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/sodoku_gamelobby_page.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/sodoku_gameplay_page.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_gameplay_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_lobby_page.dart';
 import 'package:tictactoe_gameapp/Test/Bubble_Shooter/bubble_shooter_gameplay_page.dart';
 import 'package:tictactoe_gameapp/Test/Minesweeper_Game/minesweeper_game_page.dart';
 import 'package:tictactoe_gameapp/Test/NumberMerge_Game/number_merge_gameplay_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gamelobby_page.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_page.dart';
 
 const String url1 = "https://github.com/DinhVanMy?tab=repositories";
 const String url2 = "https://poki.com/";
-const String apiGemini = "AIzaSyBhZLp795GpY6xGzOd1wnH_7zYVJahHSk4";
-const String apiAgoraAppId = "8e6122e4c440452ea9820c570212c24b";
-const String apiAgoraAppCertificate = "42729d5877ea49658fda7815e8e9abfa";
-const String apiGifphy = "3MUVQ2qkbp0XB4oo2CHcs6wKJfHziqkh";
+//api keys
+String apiFirebaseKey = '${dotenv.env['API_FIREBASE_KEY']}';
+String apiFirebaseId = '${dotenv.env['API_FIREBASE_ID']}';
+String apiGemini = "${dotenv.env['API_GEMINI']}";
+String apiAgoraAppId = "${dotenv.env['API_AGORA_ID']}";
+String apiAgoraAppCertificate = "${dotenv.env['API_AGORA_CER']}";
+String apiGifphy = "${dotenv.env['API_GIFPHY']}";
 
 const duration750 = Duration(milliseconds: 750);
 //----------------------------------------------------------------

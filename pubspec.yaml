@@ -32,6 +32,7 @@ dependencies:
   flutter_animate: ^4.5.2
   flutter_card_swiper: ^7.0.2
   flutter_chat_bubble: ^2.0.2
+  flutter_dotenv: ^5.2.1
   flutter_inappwebview: ^6.0.0
   flutter_map: ^7.0.2
   flutter_polls: ^0.1.6
@@ -80,6 +81,7 @@ flutter:
     - assets/borders/
     - assets/emotes/
     - assets/jajas/
+    - .env
 
   fonts:
     - family: Poppins

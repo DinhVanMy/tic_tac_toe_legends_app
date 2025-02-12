@@ -26,7 +26,7 @@ class AgoraPreviewController extends GetxController {
   // Initialize Agora RTC Engine
   Future<void> initializeAgoraEngine() async {
     agoraEngine = createAgoraRtcEngine();
-    await agoraEngine.initialize(const RtcEngineContext(appId: apiAgoraAppId));
+    await agoraEngine.initialize( RtcEngineContext(appId: apiAgoraAppId));
   }
 
   // Check camera and microphone permissions
