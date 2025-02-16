@@ -321,7 +321,6 @@ const List<String> listChampName = [
   "zed",
   "zoe",
 ];
-
 const List<String> listChamNameA = [
   "aatrox",
   "ahri",

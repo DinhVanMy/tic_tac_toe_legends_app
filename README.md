@@ -4,7 +4,9 @@ A Flutter application that combines gaming and social networking.
 ## 📝 Introduction
 TicTacToe Game App is a Flutter-based application that integrates both **gaming and social networking** features, offering an engaging experience for users.
 
-🎥 **Demo Video:** [Watch here](https://github.com/DinhVanMy/tic_tac_toe_legends_app/issues/1#issue-2845405867)
+🎥 **Demo Video:** [Watch demo here](https://github.com/DinhVanMy/tic_tac_toe_legends_app/issues/1#issue-2845405867)
+
+📥 **Download & Installation:** [Download app here](https://www.mediafire.com/file/uxcm7tc6lkaa9p9/Gaming_social_app.apk/file)
 
 ## 📝 About
 

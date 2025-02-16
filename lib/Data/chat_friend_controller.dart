@@ -279,7 +279,7 @@ class ChatFriendController extends GetxController {
   //auto delete message after time out
   Future<void> deleteOldMessages() async {
     final Timestamp sevenDaysAgo = Timestamp.fromDate(
-      DateTime.now().subtract(const Duration(days: 30)),
+      DateTime.now().subtract(const Duration(days: 365)),
     );
 
     try {
