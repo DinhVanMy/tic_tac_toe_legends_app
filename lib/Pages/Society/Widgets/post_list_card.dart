@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
@@ -348,7 +349,8 @@ class PostListCard extends StatelessWidget {
                                 child: InkWell(
                                   highlightColor: Colors.redAccent,
                                   onTap: () async {
-                                    postController.likePost(post, currentUser);
+                                    await postController.likePost(
+                                        post, currentUser);
                                   },
                                   child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -381,7 +383,7 @@ class PostListCard extends StatelessWidget {
                                 child: InkWell(
                                   highlightColor: Colors.redAccent,
                                   onTap: () async {
-                                    postController.unlikePost(
+                                    await postController.unlikePost(
                                         post.postId!, currentUser.id!);
                                   },
                                   child: const Row(

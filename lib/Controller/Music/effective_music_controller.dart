@@ -1,4 +1,3 @@
-import 'package:audio_session/audio_session.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
@@ -13,18 +12,12 @@ class EffectiveMusicController extends GetxController {
     super.onInit();
     _player = AudioPlayer();
     _player.setLoopMode(LoopMode.off);
-    setupAudioSession();
   }
 
   @override
   void onClose() {
     _player.dispose();
     super.onClose();
-  }
-
-  Future<void> setupAudioSession() async {
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration.music());
   }
 
   // Hàm chung để phát âm thanh

@@ -10,7 +10,7 @@ class GeneralNotificationsModel {
   String? type;
   Timestamp? timestamp;
   bool? isReaded;
-
+  bool? isVideoCall;
   String? roomId;
   String? postId;
   String? commentId;
@@ -25,6 +25,7 @@ class GeneralNotificationsModel {
     this.type,
     this.timestamp,
     this.isReaded,
+    this.isVideoCall,
     this.roomId,
     this.postId,
     this.commentId,
@@ -58,7 +59,9 @@ class GeneralNotificationsModel {
     if (json["isReaded"] is bool) {
       isReaded = json["isReaded"];
     }
-
+    if (json["isVideoCall"] is bool) {
+      isVideoCall = json["isVideoCall"];
+    }
     if (json["roomId"] is String) {
       roomId = json["roomId"];
     }
@@ -83,7 +86,7 @@ class GeneralNotificationsModel {
     data["type"] = type;
     data["timestamp"] = timestamp;
     data["isReaded"] = isReaded;
-
+    data["isVideoCall"] = isVideoCall;
     data["roomId"] = roomId;
     data["postId"] = postId;
     data["commentId"] = commentId;

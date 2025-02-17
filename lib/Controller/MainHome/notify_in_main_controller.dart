@@ -228,6 +228,7 @@ class NotifyInMainController extends GetxController {
     required String receiverId,
     required UserModel senderUser,
     required String channelId,
+    required bool isVideoCall,
   }) async {
     try {
       var senderModel = UserModel(
@@ -241,6 +242,7 @@ class NotifyInMainController extends GetxController {
         senderModel: senderModel,
         receiverId: receiverId,
         roomId: channelId,
+        isVideoCall: isVideoCall,
         type: 'call',
         timestamp: Timestamp.now(),
       );
@@ -370,10 +372,11 @@ class NotifyInMainController extends GetxController {
                       userCurrent: profileController.user!,
                       channelId: call.roomId!,
                       initialMicState: true,
-                      initialVideoState: true,
+                      initialVideoState: call.isVideoCall ?? false,
                     ));
               } else {}
             },
+            isvideocall: call.isVideoCall ?? false,
           ),
         ),
       ),

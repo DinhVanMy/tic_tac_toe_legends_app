@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/main_home_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
-import 'package:tictactoe_gameapp/Controller/check_network_controller.dart';
-import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/bottom_nav_bar.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Bottom/button_nav_bar_curve.dart';
 
 class MainHomePage extends StatelessWidget {
@@ -12,8 +10,9 @@ class MainHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final MainHomeController controller = Get.put(MainHomeController());
-    final BackgroundMusicController musicController = Get.find();
-//todo check network
+    final BackgroundMusicController effectiveMusicController = Get.find();
+    
+    //todo check network
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   Get.put(CheckNetworkController(), permanent: true);
     // });
@@ -69,7 +68,8 @@ class MainHomePage extends StatelessWidget {
       }),
       bottomNavigationBar: CurvedBottomNavBar(
         currentIndex: controller.currentIndex.value,
-        onTabChanged: (value) {
+        onTabChanged: (value) async {
+          await effectiveMusicController.buttonSoundEffect();
           controller.currentIndex.value = value;
         },
       ),

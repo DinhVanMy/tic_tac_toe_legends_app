@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/theme/theme_dark.dart';
 import 'package:tictactoe_gameapp/Configs/theme/theme_light.dart';
 import 'package:tictactoe_gameapp/Configs/translation/translation.dart';
+import 'package:tictactoe_gameapp/Controller/Music/effective_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
@@ -19,17 +20,25 @@ import 'firebase_options.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _setUpExternalLoad();
+  await _setUpGeneralSystem();
+  runApp(const MyApp());
+}
+
+Future<void> _setUpExternalLoad() async {
   await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await GetStorage.init();
+}
+
+Future<void> _setUpGeneralSystem() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -42,7 +51,7 @@ class MyApp extends StatelessWidget {
         Get.put(ThemeController(), permanent: true);
         Get.put(AuthController(), permanent: true);
         Get.put(BackgroundMusicController(), permanent: true);
-        // Get.put(CheckNetworkController(),permanent: true);
+        // Get.put(EffectiveMusicController(), permanent: false);
       }),
       // initialRoute: '/splace',
       getPages: pages, navigatorKey: navigatorKey,

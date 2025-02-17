@@ -134,6 +134,7 @@ class ChatWithFriendPage extends StatelessWidget {
                     receiverId: userFriend.id!,
                     senderUser: userCurrent,
                     channelId: channelId,
+                    isVideoCall: false,
                   );
                   Get.to(
                     () => AgoraCallPage(
@@ -166,6 +167,12 @@ class ChatWithFriendPage extends StatelessWidget {
                   var userCurrent = profileController.user!;
                   var uuid = const Uuid();
                   final String channelId = uuid.v4().substring(0, 12);
+                  await notifyInMainController.sendCallInvite(
+                    receiverId: userFriend.id!,
+                    senderUser: userCurrent,
+                    channelId: channelId,
+                    isVideoCall: true,
+                  );
                   Get.to(
                     () => AgoraCallPage(
                       userFriend: userFriend,

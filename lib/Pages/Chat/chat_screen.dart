@@ -9,6 +9,7 @@ import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/dot_matching_animation_controller.dart';
+import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/text_to_speech_controller.dart';
 import 'package:tictactoe_gameapp/Data/gemini_api_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
@@ -512,6 +513,10 @@ class ChatBotPage extends StatelessWidget {
                                     size: 30,
                                   ),
                             onPressed: () async {
+                              final BackgroundMusicController
+                                  effectiveMusicController = Get.find();
+                              await effectiveMusicController
+                                  .digitalSoundEffect();
                               final text = textController.text;
                               if (text.isNotEmpty) {
                                 if (imagePath.isNotEmpty) {
