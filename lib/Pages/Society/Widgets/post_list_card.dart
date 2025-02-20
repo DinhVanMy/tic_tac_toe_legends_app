@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
-import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
@@ -190,14 +190,21 @@ class PostListCard extends StatelessWidget {
                     ),
                   ),
                 )
-              : Align(
-                  alignment: Alignment.topLeft,
-                  child: ExpandableContent(
-                      content: post.content!,
-                      style: theme.textTheme.titleLarge!.copyWith(
-                        fontSize: 18,
-                        overflow: TextOverflow.ellipsis,
-                      )),
+              : Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: ExpandableContent(
+                          content: post.content!,
+                          style: theme.textTheme.titleLarge!.copyWith(
+                            fontSize: 18,
+                            overflow: TextOverflow.ellipsis,
+                          )),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ],
                 ),
           const SizedBox(
             height: 10,
@@ -511,8 +518,14 @@ class PostListCard extends StatelessWidget {
                             ShareSheetCustom(
                           scrollController: controller,
                           currentUser: currentUser,
-                          postController: postController,
-                          post: post,
+                          onPressed: () async {
+                            await postController
+                                .incrementSharedCount(post, currentUser)
+                                .then((_) {
+                              Get.back();
+                              successMessage("Post shared successfully!");
+                            });
+                          },
                         ),
                         context: context,
                         initHeight: 0.8,

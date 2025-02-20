@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/Functions/compress_image_function.dart';
 import 'package:tictactoe_gameapp/Models/chat_friend_settings_model.dart';
 import 'package:tictactoe_gameapp/Models/message_friend_model.dart';
 import 'package:uuid/uuid.dart';
@@ -220,7 +221,7 @@ class ChatFriendController extends GetxController {
     String? base64String = base64Encode(imageBytes);
 
     // Kiểm tra kích thước của chuỗi Base64
-    int base64Size = calculateBase64Size(base64String);
+    int base64Size = CompressImageFunction.calculateBase64Size(base64String);
     if (base64Size > 999999) {
       errorMessage("Please pick a image which is lighter than 1 mega byte");
     }
@@ -346,16 +347,6 @@ class ChatFriendController extends GetxController {
     return currentUserId.hashCode <= friendId.hashCode
         ? '$currentUserId-$friendId'
         : '$friendId-$currentUserId';
-  }
-
-  int calculateBase64Size(String base64String) {
-    int padding = base64String.endsWith('==')
-        ? 2
-        : base64String.endsWith('=')
-            ? 1
-            : 0;
-    int size = (base64String.length * 3 / 4).floor() - padding;
-    return size; // Kích thước tính bằng byte
   }
 
   Timer? _scrollStopTimer;

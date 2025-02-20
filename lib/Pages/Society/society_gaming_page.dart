@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Widgets/create_post_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/friend_blog_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_notification_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/live_stream_list_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
+import 'package:tictactoe_gameapp/Test/Reels/create_reel_page.dart';
+import 'package:tictactoe_gameapp/Test/Reels/reel_page.dart';
 
 class SocietyGamingPage extends StatelessWidget {
   const SocietyGamingPage({super.key});
@@ -108,23 +109,22 @@ class SocietyGamingPage extends StatelessWidget {
                             ],
                           ),
                           IconButton(
-                            onPressed: () => Get.to(
-                              CreatePostPage(
-                                userModel: user,
-                                postController: postController,
-                              ),
-                              transition: Transition.upToDown,
-                            ),
+                            onPressed: () {
+                              Get.to(ReelPage(user: user));
+                            },
                             icon: const Icon(
-                              Icons.add_circle_rounded,
+                              Icons.video_collection_rounded,
                               size: 35,
                               color: Colors.deepPurpleAccent,
                             ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () => Get.to(
+                              CreateReelPage(user: user),
+                              transition: Transition.upToDown,
+                            ),
                             icon: const Icon(
-                              Icons.search_rounded,
+                              Icons.add_circle_rounded,
                               size: 35,
                               color: Colors.deepPurpleAccent,
                             ),

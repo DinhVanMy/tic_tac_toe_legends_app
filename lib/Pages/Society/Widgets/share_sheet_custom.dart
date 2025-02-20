@@ -1,25 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
-import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
-import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
 
 class ShareSheetCustom extends StatelessWidget {
   final ScrollController scrollController;
   final UserModel currentUser;
-  final PostController postController;
-  final PostModel post;
+  final VoidCallback onPressed;
   const ShareSheetCustom(
       {super.key,
       required this.scrollController,
       required this.currentUser,
-      required this.postController,
-      required this.post});
+      required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -237,14 +231,7 @@ class ShareSheetCustom extends StatelessWidget {
                     ),
                   )),
                   ElevatedButton(
-                      onPressed: () async {
-                        await postController
-                            .incrementSharedCount(post, currentUser)
-                            .then((_) {
-                          Get.back();
-                          successMessage("Post shared successfully!");
-                        });
-                      },
+                      onPressed: onPressed,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         foregroundColor: Colors.white,
@@ -347,14 +334,7 @@ class ShareSheetCustom extends StatelessWidget {
                           InkWell(
                             borderRadius: BorderRadius.circular(100),
                             splashColor: Colors.lightBlueAccent,
-                            onTap: () async {
-                              final result = await Share.share("Oh Hi!");
-                              if (result.status == ShareResultStatus.success) {
-                                successMessage("Done!");
-                              }
-                              await postController
-                                  .incrementSharedCount(post, currentUser);
-                            },
+                            onTap: onPressed,
                             child: Ink(
                               padding: const EdgeInsets.all(20),
                               decoration: const BoxDecoration(

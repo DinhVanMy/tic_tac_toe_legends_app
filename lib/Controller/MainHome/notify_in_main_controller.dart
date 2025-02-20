@@ -376,7 +376,7 @@ class NotifyInMainController extends GetxController {
                     ));
               } else {}
             },
-            isvideocall: call.isVideoCall ?? false,
+            isVideoCall: call.isVideoCall ?? false,
           ),
         ),
       ),

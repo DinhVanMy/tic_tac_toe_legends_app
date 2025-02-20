@@ -19,7 +19,7 @@ class CheckNetworkController extends GetxController {
   }
 
   Future<void> _checkConnection() async {
-    bool result = await InternetConnectionChecker().hasConnection;
+    bool result = await InternetConnectionChecker.instance.hasConnection;
     isConnected.value = result;
     if (!result) {
       showNoConnectionDialog(onPressed: () {
@@ -33,7 +33,7 @@ class CheckNetworkController extends GetxController {
 
   void _listenForConnectionChanges() {
     _streamSubscription =
-        InternetConnectionChecker().onStatusChange.listen((status) {
+        InternetConnectionChecker.instance.onStatusChange.listen((status) {
       isConnected.value = status == InternetConnectionStatus.connected;
       if (!isConnected.value) {
         showNoConnectionDialog(onPressed: () {

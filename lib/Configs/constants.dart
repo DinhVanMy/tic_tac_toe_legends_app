@@ -12,6 +12,8 @@ import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_
 
 const String url1 = "https://github.com/DinhVanMy?tab=repositories";
 const String url2 = "https://poki.com/";
+const String videoPlaceholder =
+    "https://www.iconpacks.net/icons/1/free-video-icon-833-thumb.png";
 //api keys
 String apiFirebaseKey = '${dotenv.env['API_FIREBASE_KEY']}';
 String apiFirebaseId = '${dotenv.env['API_FIREBASE_ID']}';
@@ -19,6 +21,11 @@ String apiGemini = "${dotenv.env['API_GEMINI']}";
 String apiAgoraAppId = "${dotenv.env['API_AGORA_ID']}";
 String apiAgoraAppCertificate = "${dotenv.env['API_AGORA_CER']}";
 String apiGifphy = "${dotenv.env['API_GIFPHY']}";
+String pexelsApiKey = "${dotenv.env['YOUR_PEXELS_API_KEY']}";
+String pixabayApiKey = "${dotenv.env['YOUR_PIXABAY_API_KEY']}";
+String dailymotionApiKey = "${dotenv.env['YOUR_DAILYMOTION_API_KEY']}";
+String vimeoApiKey = "${dotenv.env['YOUR_VIMEO_API_KEY']}";
+String apiVideoApiKey = "${dotenv.env['YOUR_APIVIDEO_API_KEY']}";
 
 const duration750 = Duration(milliseconds: 750);
 //----------------------------------------------------------------

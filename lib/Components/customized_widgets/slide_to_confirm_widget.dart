@@ -40,11 +40,13 @@ class CallSliderController extends GetxController {
 class CallSlider extends StatelessWidget {
   final VoidCallback onAccept;
   final VoidCallback onDecline;
+  final bool isVideoCall;
 
   const CallSlider({
     super.key,
     required this.onAccept,
     required this.onDecline,
+    required this.isVideoCall,
   });
 
   @override
@@ -129,15 +131,25 @@ class CallSlider extends StatelessWidget {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.phone,
-                        color: controller.dragPosition.value != 0
-                            ? controller.dragPosition.value > 0
-                                ? Colors.green
-                                : Colors.red
-                            : Colors.black,
-                        size: 36,
-                      ),
+                      child: isVideoCall
+                          ? Icon(
+                              Icons.video_call_rounded,
+                              color: controller.dragPosition.value != 0
+                                  ? controller.dragPosition.value > 0
+                                      ? Colors.blue
+                                      : Colors.red
+                                  : Colors.black,
+                              size: 36,
+                            )
+                          : Icon(
+                              Icons.phone,
+                              color: controller.dragPosition.value != 0
+                                  ? controller.dragPosition.value > 0
+                                      ? Colors.green
+                                      : Colors.red
+                                  : Colors.black,
+                              size: 36,
+                            ),
                     ),
                   ),
                 ),

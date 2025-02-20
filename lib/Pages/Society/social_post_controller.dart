@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polls/flutter_polls.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/Functions/compress_image_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/notification_add_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
@@ -180,7 +179,7 @@ class PostController extends GetxController {
     var uuid = const Uuid();
     String postId = uuid.v4();
 
-    List<String> base64ImageList = await _processImages(imageFiles);
+    List<String> base64ImageList = await CompressImageFunction.processImages(imageFiles);
 
     if (base64ImageList.isEmpty && imageFiles != null) {
       return;
@@ -240,7 +239,7 @@ class PostController extends GetxController {
       updatedFields['privacy'] = privacy;
     }
 
-    List<String> base64ImageList = await _processImages(imageFiles);
+    List<String> base64ImageList = await CompressImageFunction.processImages(imageFiles);
 
     if (base64ImageList.isEmpty && imageFiles != null) {
       return;
@@ -341,49 +340,7 @@ class PostController extends GetxController {
     }
   }
 
-  Future<List<String>> _processImages(List<XFile>? imageFiles) async {
-    List<String> base64ImageList = [];
-    int totalBase64Size = 0;
 
-    if (imageFiles == null || imageFiles.isEmpty) {
-      return base64ImageList;
-    }
-
-    try {
-      for (XFile imageFile in imageFiles) {
-        List<int> imageBytes = await imageFile.readAsBytes();
-        String base64String = base64Encode(imageBytes);
-
-        // Tính kích thước Base64 của ảnh hiện tại
-        int base64Size = calculateBase64Size(base64String);
-        totalBase64Size += base64Size;
-
-        // Kiểm tra nếu tổng kích thước ảnh vượt quá 1MB
-        if (totalBase64Size > 999999) {
-          errorMessage(
-              "Total size of selected images exceeds 1 MB. Please select smaller images.");
-          return []; // Trả về danh sách rỗng nếu kích thước vượt quá 1MB
-        }
-
-        base64ImageList.add(base64String);
-      }
-    } catch (e) {
-      errorMessage("Error reading images: ${e.toString()}");
-      return []; // Trả về danh sách rỗng nếu gặp lỗi
-    }
-
-    return base64ImageList;
-  }
-
-  int calculateBase64Size(String base64String) {
-    int padding = base64String.endsWith('==')
-        ? 2
-        : base64String.endsWith('=')
-            ? 1
-            : 0;
-    int size = (base64String.length * 3 / 4).floor() - padding;
-    return size; // Kích thước tính bằng byte
-  }
 
   // Hàm xoá post
   Future<void> deletePost(

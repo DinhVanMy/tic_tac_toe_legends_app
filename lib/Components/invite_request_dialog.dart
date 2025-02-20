@@ -199,13 +199,13 @@ class CallInviteRequestDialog extends StatelessWidget {
   final UserModel friend;
   final Function() onPressedAccept;
   final Function() onPressedRefuse;
-  final bool isvideocall;
+  final bool isVideoCall;
   const CallInviteRequestDialog(
       {super.key,
       required this.friend,
       required this.onPressedAccept,
       required this.onPressedRefuse,
-      required this.isvideocall});
+      required this.isVideoCall});
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +307,7 @@ class CallInviteRequestDialog extends StatelessWidget {
                       Column(
                         children: [
                           Text(
-                            isvideocall
+                            isVideoCall
                                 ? 'You have a video call'
                                 : 'You have a voice call',
                             style: const TextStyle(
@@ -317,7 +317,7 @@ class CallInviteRequestDialog extends StatelessWidget {
                             ),
                           ),
                           Icon(
-                            isvideocall ? Icons.video_call : Icons.call_end,
+                            isVideoCall ? Icons.video_call : Icons.call_end,
                             size: 50,
                             color: Colors.greenAccent,
                           )
@@ -333,6 +333,7 @@ class CallInviteRequestDialog extends StatelessWidget {
           CallSlider(
             onAccept: onPressedAccept,
             onDecline: onPressedRefuse,
+            isVideoCall: isVideoCall,
           ),
           const Spacer(),
         ],
