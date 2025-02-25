@@ -23,12 +23,14 @@ dependencies:
   cyber_punk_tool_kit_ui: ^0.1.2
   dotted_border: ^2.1.0
   emoji_picker_flutter: null
+  firebase_app_check: null
   firebase_auth: ^4.18.0
   firebase_core: ^2.27.2
   firebase_storage: ^11.6.11
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
+  flutter_cache_manager: ^3.4.1
   flutter_card_swiper: ^7.0.2
   flutter_chat_bubble: ^2.0.2
   flutter_dotenv: ^5.2.1
@@ -57,7 +59,7 @@ dependencies:
   speech_to_text: null
   uuid: ^4.4.0
   video_player: ^2.9.2
-  whitecodel_reels: ^0.0.6
+  visibility_detector: ^0.4.0+2
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_lints: ^3.0.0
@@ -83,6 +85,7 @@ flutter:
     - assets/borders/
     - assets/emotes/
     - assets/jajas/
+    - assets/videos/blank.mp4
     - .env
 
   fonts:

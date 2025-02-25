@@ -24,8 +24,6 @@ String apiGifphy = "${dotenv.env['API_GIFPHY']}";
 String pexelsApiKey = "${dotenv.env['YOUR_PEXELS_API_KEY']}";
 String pixabayApiKey = "${dotenv.env['YOUR_PIXABAY_API_KEY']}";
 String dailymotionApiKey = "${dotenv.env['YOUR_DAILYMOTION_API_KEY']}";
-String vimeoApiKey = "${dotenv.env['YOUR_VIMEO_API_KEY']}";
-String apiVideoApiKey = "${dotenv.env['YOUR_APIVIDEO_API_KEY']}";
 
 const duration750 = Duration(milliseconds: 750);
 //----------------------------------------------------------------

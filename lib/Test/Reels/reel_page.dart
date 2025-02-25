@@ -5,14 +5,15 @@ import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
+import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/share_sheet_custom.dart';
 import 'package:tictactoe_gameapp/Test/Reels/create_reel_page.dart';
+import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_page.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_model.dart';
 import 'package:video_player/video_player.dart';
-import 'package:whitecodel_reels/whitecodel_reels.dart';
 
 class ReelPage extends StatelessWidget {
   final UserModel user;
@@ -41,25 +42,12 @@ class ReelPage extends StatelessWidget {
           var reels = reelController.reelsList.toList();
           return Stack(
             children: [
-              WhiteCodelReels(
-                key: UniqueKey(),
-                context: context,
-                loader: Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        GifsPath.loadingGif2,
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
+              WhiteCodelReelsPage(
                 isCaching: true,
+                reelController: reelController,
                 videoList: reels.map((e) => e.videoUrl!).toList(),
                 builder: (context, index, child, videoPlayerController,
-                    pageController) {
+                    pageController, videoProgressController) {
                   if (index < 0 || index >= reels.length) {
                     return const Center(
                       child: Text(
@@ -68,15 +56,12 @@ class ReelPage extends StatelessWidget {
                       ),
                     );
                   }
+                  //todo:
+                  // if (index == reels.length - 1) {
+                  //   reelController.fetchMoreReels();
+                  // }
                   var reel = reels[index];
-                  StreamController<double> videoProgressController =
-                      StreamController<double>();
-                  videoPlayerController.addListener(() {
-                    double videoProgress =
-                        videoPlayerController.value.position.inMilliseconds /
-                            videoPlayerController.value.duration.inMilliseconds;
-                    videoProgressController.add(videoProgress);
-                  });
+
                   return Stack(
                     children: [
                       Container(
@@ -91,13 +76,18 @@ class ReelPage extends StatelessWidget {
                                   : await reelController.likeReel(
                                       reel.reelId!, user.id!);
                             },
+                            onLongPress: () {
+                              successMessage("Saved reel successfully!");
+                            },
                             child: child),
                       ),
                       Positioned(
                         bottom: 5,
                         left: 0,
-                        right: 0,
+                        right: 50,
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _buildVideoInfo(theme, reel),
                             _buildProcessingLine(context,
@@ -106,8 +96,8 @@ class ReelPage extends StatelessWidget {
                         ),
                       ),
                       Positioned(
-                        bottom: 70,
-                        right: 10,
+                        bottom: 10,
+                        right: 0,
                         child: _buildActionButtons(
                             context, reel, index, reelController),
                       ),
@@ -132,7 +122,7 @@ class ReelPage extends StatelessWidget {
                     CreateReelPage(user: user),
                     transition: Transition.upToDown,
                   ),
-                  icon: const Icon(Icons.camera_enhance_rounded,
+                  icon: const Icon(Icons.camera_enhance_outlined,
                       color: Colors.white, size: 30),
                 ),
               ),
@@ -144,87 +134,41 @@ class ReelPage extends StatelessWidget {
   }
 
   Widget _buildVideoInfo(ThemeData theme, ReelModel reel) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.black.withOpacity(0.0),
-            Colors.black.withOpacity(0.2),
-            Colors.black.withOpacity(0.5),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 10.0,
+        right: 8.0,
+        bottom: 5.0,
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment.topLeft,
-            child: ExpandableContent(
-                content: reel.description ?? "",
-                style: theme.textTheme.titleMedium!.copyWith(
-                  fontSize: 16,
-                  overflow: TextOverflow.ellipsis,
-                  color: Colors.white,
-                )),
+          Text(
+            "#${reel.privacy}",
+            style: theme.textTheme.bodyLarge!.copyWith(color: Colors.blueGrey),
           ),
           const SizedBox(
             height: 5,
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AvatarUserWidget(
-                radius: 25,
-                imagePath: user.image!,
-                borderThickness: 2,
-                gradientColors: const [
-                  Colors.lightBlueAccent,
-                  Colors.lightGreenAccent
-                ],
-              ),
-              const SizedBox(
-                width: 5,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    user.name!,
-                    style: theme.textTheme.bodyMedium!.copyWith(
-                      color: Colors.blueAccent,
-                    ),
-                  ),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {},
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 3, horizontal: 7),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white, width: 2),
-                        color: Colors.transparent,
-                      ),
-                      child: Text(
-                        "Follow",
-                        style: theme.textTheme.bodySmall!
-                            .copyWith(color: Colors.white),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ],
+          ExpandableContent(
+              content: reel.description ?? "",
+              maxLines: 2,
+              style: theme.textTheme.headlineSmall!.copyWith(
+                overflow: TextOverflow.ellipsis,
+                color: Colors.white,
+              )),
+          const SizedBox(
+            height: 5,
           ),
-          // Text(
-          //   reel.description ?? "",
-          //   maxLines: 2,
-          //   overflow: TextOverflow.ellipsis,
-          //   style: const TextStyle(color: Colors.white, fontSize: 16),
-          // ),
+          Text(
+            TimeFunctions.timeAgo(
+                now: DateTime.now(), createdAt: reel.createdAt!),
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 15,
+            ),
+          ),
         ],
       ),
     );
@@ -234,22 +178,40 @@ class ReelPage extends StatelessWidget {
       ReelController reelController) {
     return Column(
       children: [
-        _buildActionButton(
-          Icons.thumb_up_alt,
-          Icons.thumb_up_alt_outlined,
-          reelController.isLikedReel(user.id!, reel.reelId!).value,
-          () async {
-            reelController.isLikedReel(user.id!, reel.reelId!).value
-                ? await reelController.unlikeReel(reel.reelId!, user.id!)
-                : await reelController.likeReel(reel.reelId!, user.id!);
-          },
-          reel.likedList == null ? "0" : reel.likedList!.length.toString(),
+        AvatarUserWidget(
+          radius: 30,
+          imagePath: reel.reelUser!.image!,
+          borderThickness: 2,
+          gradientColors: const [
+            Colors.lightBlueAccent,
+            Colors.lightGreenAccent
+          ],
+        ),
+        GestureDetector(
+            onTap: () async {},
+            child: const Text("Follow",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold))),
+        Obx(
+          () => _buildActionButton(
+            Icons.thumb_up_alt,
+            Icons.thumb_up_alt_outlined,
+            reelController.isLikedReel(user.id!, reel.reelId!).value,
+            () async {
+              reelController.isLikedReel(user.id!, reel.reelId!).value
+                  ? await reelController.unlikeReel(reel.reelId!, user.id!)
+                  : await reelController.likeReel(reel.reelId!, user.id!);
+            },
+            reel.likedList == null ? "0" : reel.likedList!.length.toString(),
+          ),
         ),
         const SizedBox(height: 10),
-        _buildActionButton(Icons.comment, Icons.comment, false, () {},
+        _buildActionButton(Icons.comment, Icons.messenger_outline, false, () {},
             reel.commentCount.toString()),
         const SizedBox(height: 10),
-        _buildActionButton(Icons.share, Icons.share, false, () async {
+        _buildActionButton(Icons.share, Icons.share_outlined, false, () async {
           await GeneralBottomsheetShowFunction.showScrollableGeneralBottomsheet(
             widgetBuilder: (context, controller) => ShareSheetCustom(
               scrollController: controller,
@@ -268,7 +230,9 @@ class ReelPage extends StatelessWidget {
         }, "Share"),
         const SizedBox(height: 10),
         _buildActionButton(
-            Icons.bookmark, Icons.bookmark_border, false, () {}, "Save"),
+            Icons.star_rounded, Icons.star_outline_rounded, false, () {
+          successMessage("Saved reel successfully!");
+        }, "Save"),
       ],
     );
   }
@@ -279,7 +243,11 @@ class ReelPage extends StatelessWidget {
       children: [
         IconButton(
           onPressed: onPressed,
-          icon: Icon(isActive ? iconActive : iconInactive, color: Colors.white),
+          icon: Icon(
+            isActive ? iconActive : iconInactive,
+            color: Colors.white,
+            size: 30,
+          ),
         ),
         Text(label,
             style: const TextStyle(
@@ -295,7 +263,6 @@ class ReelPage extends StatelessWidget {
     StreamController<double> videoProgressController,
     VideoPlayerController videoPlayerController,
   ) {
-    
     return StreamBuilder(
       stream: videoProgressController.stream,
       builder: (context, snapshot) {

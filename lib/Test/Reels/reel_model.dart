@@ -77,4 +77,18 @@ class ReelModel {
     data["isNotified"] = isNotified;
     return data;
   }
+
+  // Phương thức cập nhật các trường cần thiết từ JSON mới
+  void updateFromJson(Map<String, dynamic> json) {
+    if (json.containsKey('likedList') && json['likedList'] is List) {
+      likedList = List<String>.from(json['likedList']);
+    }
+    if (json.containsKey('commentCount')) {
+      commentCount = json['commentCount'] as int? ?? commentCount;
+    }
+    if (json.containsKey('shareCount')) {
+      shareCount = json['shareCount'] as int? ?? shareCount;
+    }
+    // Nếu có các trường khác cần cập nhật, bạn có thể thêm ở đây
+  }
 }

@@ -7,10 +7,11 @@ import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
-import 'package:tictactoe_gameapp/Test/Reels/api/fetch_url_link_api_controller.dart';
+import 'package:tictactoe_gameapp/Test/Reels/api/fetch_url_link_api_page.dart';
+import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_page.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
 import 'package:video_player/video_player.dart';
-import 'package:whitecodel_reels/whitecodel_reels.dart';
+
 import 'package:http/http.dart' as http;
 
 class CreateReelPage extends StatelessWidget {
@@ -50,9 +51,7 @@ class CreateReelPage extends StatelessWidget {
         ),
         actions: [
           Obx(
-            () => isVideoValid.value &&
-                    description.value.isNotEmpty &&
-                    imagePath.value.isNotEmpty
+            () => isVideoValid.value && description.value.isNotEmpty
                 ? InkWell(
                     onTap: () async {
                       await Get.showOverlay(
@@ -61,7 +60,7 @@ class CreateReelPage extends StatelessWidget {
                             videoUrl: videoUrl.value,
                             user: user,
                             description: description.value,
-                            thumbnailUrl: imagePath.value,
+                            thumbnailUrl: image,
                           );
                         },
                         loadingWidget: Center(
@@ -173,10 +172,10 @@ class CreateReelPage extends StatelessWidget {
                       height: 300,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(15),
-                        child: WhiteCodelReels(
-                          context: context,
-                          videoList: [videoUrl.value],
-                          loader: const CircularProgressIndicator(),
+                        child: WhiteCodelReelsPage(
+                          // context: context,
+                          singleVideoUrl: videoUrl.value,
+                          
                           isCaching: false,
                         ),
                       ),

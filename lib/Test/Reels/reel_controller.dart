@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tictactoe_gameapp/Models/Functions/compress_image_function.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_model.dart';
 import 'package:uuid/uuid.dart';
 import '../../Models/user_model.dart';
@@ -11,24 +12,23 @@ import '../../Configs/messages.dart';
 class ReelController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late StreamSubscription subscriptionListenReels;
-  late final ScrollController scrollController;
   final ImagePicker picker = ImagePicker();
   DocumentSnapshot? lastDocument;
 
   var reelsList = <ReelModel>[].obs;
   RxBool isLiked = false.obs;
   bool isFetching = false;
-  int pageSize = 5;
+  int pageSize = 3;
 
   @override
   void onInit() {
     super.onInit();
-    scrollController = ScrollController();
     fetchInitialReels();
     listenToReelChanges();
   }
 
   Future<void> fetchInitialReels() async {
+    reelsList.clear();
     if (isFetching) return;
     isFetching = true;
     try {
@@ -106,18 +106,19 @@ class ReelController extends GetxController {
     required String videoUrl,
     required UserModel user,
     required String description,
-    required String thumbnailUrl,
+    XFile? thumbnailUrl,
     List<String>? taggedUserIds,
   }) async {
     var uuid = const Uuid();
     String reelId = uuid.v4();
+    final String? thumbnailUrl64 = await _getUrlVideo(thumbnailUrl);
 
     ReelModel newReel = ReelModel(
       reelId: reelId,
       reelUser: user,
       videoUrl: videoUrl,
       description: description,
-      thumbnailUrl: thumbnailUrl,
+      thumbnailUrl: thumbnailUrl64,
       taggedUserIds: taggedUserIds,
       createdAt: DateTime.now(),
       likedList: [],
@@ -128,17 +129,42 @@ class ReelController extends GetxController {
     );
 
     try {
-      await _firestore.collection('reels').doc(reelId).set(newReel.toJson());
+      await _firestore
+          .collection('reels')
+          .doc(reelId)
+          .set(newReel.toJson())
+          .catchError((e) => errorMessage(e));
       successMessage("Reel created with ID: $reelId");
     } catch (e) {
       errorMessage("Failed to create reel: ${e.toString()}");
     }
   }
 
+  Future<String?> _getUrlVideo(XFile? thumbnailUrl) async {
+    if (thumbnailUrl != null) {
+      List<int> imageBytes = await thumbnailUrl.readAsBytes();
+      String? base64String = base64Encode(imageBytes);
+
+      // Kiểm tra kích thước của chuỗi Base64
+      int base64Size = CompressImageFunction.calculateBase64Size(base64String);
+      if (base64Size > 999999) {
+        errorMessage("Please pick a image which is lighter than 1 mega byte");
+        return null;
+      }
+      return base64String;
+    } else {
+      return null;
+    }
+  }
+
   Future<void> deleteReel(
       {required String reelId, required UserModel user}) async {
     try {
-      await _firestore.collection('reels').doc(reelId).delete();
+      await _firestore
+          .collection('reels')
+          .doc(reelId)
+          .delete()
+          .catchError((e) => errorMessage(e));
       successMessage("Reel deleted");
     } catch (e) {
       errorMessage("Error deleting reel: $e");
@@ -149,14 +175,14 @@ class ReelController extends GetxController {
     DocumentReference reelRef = _firestore.collection('reels').doc(reelId);
     await reelRef.update({
       'likedList': FieldValue.arrayUnion([userId])
-    });
+    }).catchError((e) => errorMessage(e));
   }
 
   Future<void> unlikeReel(String reelId, String userId) async {
     DocumentReference reelRef = _firestore.collection('reels').doc(reelId);
     await reelRef.update({
       'likedList': FieldValue.arrayRemove([userId])
-    });
+    }).catchError((e) => errorMessage(e));
   }
 
   RxBool isLikedReel(String userId, String reelId) {
@@ -211,7 +237,6 @@ class ReelController extends GetxController {
   @override
   void onClose() {
     subscriptionListenReels.cancel();
-    scrollController.dispose();
     super.onClose();
   }
 }

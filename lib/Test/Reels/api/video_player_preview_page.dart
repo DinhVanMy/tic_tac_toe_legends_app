@@ -22,7 +22,7 @@ class VideoPlayerPreviewController extends GetxController {
           update();
         }).catchError((error) {
           isError.value = true;
-          errorMessage("Error initializing video: $error");
+          print("Error initializing video: $error");
         });
     } catch (e) {
       isError.value = true;
