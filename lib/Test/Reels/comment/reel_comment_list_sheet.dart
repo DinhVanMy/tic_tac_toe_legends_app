@@ -10,11 +10,11 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
-
 import 'package:tictactoe_gameapp/Pages/Society/Comment/post_reply_comment_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
 import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
 import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_controller.dart';
+import 'package:tictactoe_gameapp/Test/Reels/comment/reel_reply_comment_controller.dart';
 import 'package:tictactoe_gameapp/Test/Reels/comment/reel_reply_comment_list_sheet.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_model.dart';
 
@@ -460,10 +460,10 @@ class ReelCommentListSheet extends StatelessWidget {
                               ? IconButton(
                                   onPressed: () async {
                                     focusNode.unfocus();
-                                    Get.delete<PostReplyCommentController>();
-                                    PostReplyCommentController
+                                    Get.delete<ReelReplyCommentController>();
+                                    ReelReplyCommentController
                                         subCommentController =
-                                        Get.put(PostReplyCommentController(
+                                        Get.put(ReelReplyCommentController(
                                       reel.reelId!, // Sử dụng reelId
                                       commentId.value,
                                     ));

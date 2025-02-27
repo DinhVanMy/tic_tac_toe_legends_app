@@ -107,7 +107,6 @@ class HomePage extends StatelessWidget {
                                   Colors.white,
                                   Colors.blueAccent
                                 ],
-                                
                               )
                             : const Icon(Icons.person_2_outlined),
                         const SizedBox(width: 10),

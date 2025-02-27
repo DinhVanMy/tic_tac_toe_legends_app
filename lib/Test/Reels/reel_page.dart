@@ -17,7 +17,7 @@ import 'package:tictactoe_gameapp/Pages/Society/Widgets/share_sheet_custom.dart'
 import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_controller.dart';
 import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_list_sheet.dart';
 import 'package:tictactoe_gameapp/Test/Reels/create_reel_page.dart';
-import 'package:tictactoe_gameapp/Test/Reels/test_animation.dart';
+import 'package:tictactoe_gameapp/Test/Reels/like_animation_widget.dart';
 import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_page.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_model.dart';
@@ -209,48 +209,66 @@ class ReelPage extends StatelessWidget {
                     color: Colors.white,
                     fontSize: 16,
                     fontWeight: FontWeight.bold))),
-        Obx(
-          () => _buildActionButton(
-              Icons.star_rounded,
-              Icons.star_outline_rounded,
-              reelController.isLikedReel(user.id!, reel.reelId!).value,
-              () async {
-                reelController.showLikeAnimation.value = true;
-                reelController.isLikedReel(user.id!, reel.reelId!).value
-                    ? await reelController.unlikeReel(reel.reelId!, user.id!)
-                    : await reelController.likeReel(reel.reelId!, user.id!);
-              },
-              reel.likedList == null ? "0" : reel.likedList!.length.toString(),
-              size: 35,
-              onPressedText: () async {
-                if (reel.likedList != null) {
-                  final FetchFirestoreDataFunctions
-                      fetchFirestoreDataFunctions =
-                      FetchFirestoreDataFunctions();
-                  var likeUsers = await fetchFirestoreDataFunctions
-                      .fetchPostLikeUsers(reel.likedList!);
-                  await showFlexibleBottomSheet(
-                    minHeight: 0,
-                    initHeight: 0.8,
-                    maxHeight: 1,
-                    context: context,
-                    builder: (context, scrollController, bottomSheet) {
-                      return LikeUserListSheet(
-                        likeUsers: likeUsers,
-                        scrollController: scrollController,
-                      );
-                    },
-                    duration: const Duration(milliseconds: 500),
-                    bottomSheetColor: Colors.white,
-                    bottomSheetBorderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                    isSafeArea: true,
-                  );
-                }
-              }),
-        ),
+        Obx(() {
+          bool isLiked =
+              reelController.isLikedReel(user.id!, reel.reelId!).value;
+          return GestureDetector(
+            onLongPress: () async {
+              if (reel.likedList != null) {
+                final FetchFirestoreDataFunctions fetchFirestoreDataFunctions =
+                    FetchFirestoreDataFunctions();
+                var likeUsers = await fetchFirestoreDataFunctions
+                    .fetchPostLikeUsers(reel.likedList!);
+                await showFlexibleBottomSheet(
+                  minHeight: 0,
+                  initHeight: 0.8,
+                  maxHeight: 1,
+                  context: context,
+                  builder: (context, scrollController, bottomSheet) {
+                    return LikeUserListSheet(
+                      likeUsers: likeUsers,
+                      scrollController: scrollController,
+                    );
+                  },
+                  duration: const Duration(milliseconds: 500),
+                  bottomSheetColor: Colors.white,
+                  bottomSheetBorderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                  isSafeArea: true,
+                );
+              }
+            },
+            child: Column(
+              children: [
+                IconButton(
+                  onPressed: () async {
+                    reelController.showLikeAnimation.value = true;
+                    reelController.isLikedReel(user.id!, reel.reelId!).value
+                        ? await reelController.unlikeReel(
+                            reel.reelId!, user.id!)
+                        : await reelController.likeReel(reel.reelId!, user.id!);
+                  },
+                  icon: Icon(
+                    isLiked ? Icons.star_rounded : Icons.star_outline_rounded,
+                    color: isLiked ? Colors.pinkAccent : Colors.white,
+                    size: 35,
+                  ),
+                ),
+                Text(
+                  reel.likedList == null
+                      ? "0"
+                      : reel.likedList!.length.toString(),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          );
+        }),
         const SizedBox(height: 10),
         _buildActionButton(Icons.comment, Icons.messenger_outline, false,
             () async {
@@ -308,28 +326,29 @@ class ReelPage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData iconActive, IconData iconInactive,
-      bool isActive, VoidCallback onPressed, String label,
-      {double size = 25, VoidCallback? onPressedText}) {
-    return GestureDetector(
-      onLongPress: onPressedText,
-      child: Column(
-        children: [
-          IconButton(
-            onPressed: onPressed,
-            icon: Icon(
-              isActive ? iconActive : iconInactive,
-              color: Colors.white,
-              size: size,
-            ),
+  Widget _buildActionButton(
+    IconData iconActive,
+    IconData iconInactive,
+    bool isActive,
+    VoidCallback onPressed,
+    String label,
+  ) {
+    return Column(
+      children: [
+        IconButton(
+          onPressed: onPressed,
+          icon: Icon(
+            isActive ? iconActive : iconInactive,
+            color: Colors.white,
+            size: 25,
           ),
-          Text(label,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold)),
-        ],
-      ),
+        ),
+        Text(label,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.bold),),
+      ],
     );
   }
 

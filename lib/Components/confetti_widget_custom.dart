@@ -42,3 +42,35 @@ class ConfettiWidgetCustom extends StatelessWidget {
     );
   }
 }
+
+
+class ConfettiLikeWidgetCustom extends StatelessWidget {
+  final int quantity;
+  const ConfettiLikeWidgetCustom({super.key, this.quantity = 20}); // Giảm số lượng hạt xuống 20
+
+  @override
+  Widget build(BuildContext context) {
+    final ConfettiToController confettiToController = Get.put(ConfettiToController());
+    return ConfettiWidget(
+      confettiController: confettiToController.confettiController,
+      blastDirectionality: BlastDirectionality.explosive, // Nổ từ trung tâm ra mọi hướng
+      shouldLoop: false, // Chỉ chạy một lần
+      colors: const [
+        Colors.red,
+        Colors.blue,
+        Colors.green,
+        Colors.yellow,
+        Colors.purple,
+        Colors.orange,
+        Colors.pink,
+      ],
+      createParticlePath: (size) => DrawPath.drawStarOfficial(size), // Hạt hình ngôi sao
+      numberOfParticles: quantity, // Số lượng hạt tối ưu
+      emissionFrequency: 0.01, // Tần suất nổ thấp để tránh dày đặc
+      gravity: 0.3, // Lực hấp dẫn nhẹ để hạt rơi chậm tự nhiên
+      minBlastForce: 5, // Lực nổ nhỏ nhất
+      maxBlastForce: 15, // Lực nổ lớn nhất, giảm để nhẹ nhàng hơn
+      particleDrag: 0.1, // Lực cản lớn hơn để hạt rơi nhanh và biến mất sớm
+    );
+  }
+}

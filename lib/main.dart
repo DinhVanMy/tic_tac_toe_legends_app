@@ -9,7 +9,6 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/theme/theme_dark.dart';
 import 'package:tictactoe_gameapp/Configs/theme/theme_light.dart';
 import 'package:tictactoe_gameapp/Configs/translation/translation.dart';
-import 'package:tictactoe_gameapp/Controller/Music/effective_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';

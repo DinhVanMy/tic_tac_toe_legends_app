@@ -91,7 +91,7 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
       body: Obx(
         () => PageView.builder(
           controller: controller.pageController,
-          itemCount: controller.pageCount.value,
+          itemCount: controller.videoPlayerControllerList.length, //controller.pageCount.value, //!invalid length
           scrollDirection: Axis.vertical,
           onPageChanged: (index) async {
             // Kiểm tra index hợp lệ
