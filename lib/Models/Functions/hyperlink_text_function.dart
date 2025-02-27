@@ -3,7 +3,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/placeholder_custom_widget.dart';
-import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/fetch_firestore_data_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
@@ -133,7 +132,7 @@ class HyperlinkTextFunction {
 
   // Điều hướng đến trang hồ sơ của người dùng
   static Future<void> openUserProfile(String username) async {
-    FetchFirestoreDataFunctions fetchFirestoreDataFunctions =
+    final FetchFirestoreDataFunctions fetchFirestoreDataFunctions =
         FetchFirestoreDataFunctions();
     final UserModel? tagUser =
         await fetchFirestoreDataFunctions.fetchUserByName(username);

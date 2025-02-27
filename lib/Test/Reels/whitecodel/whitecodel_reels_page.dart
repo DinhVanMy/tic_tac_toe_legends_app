@@ -131,9 +131,10 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
       key: Key('reel_tile_$index'),
       onVisibilityChanged: (visibilityInfo) async {
         if (!_isMounted) return;
-        // if (index < 0 || index >= controller.videoPlayerControllerList.length) {
-        //   return;
-        // }
+        if (index < 0 || index >= controller.videoPlayerControllerList.length)
+          // ignore: curly_braces_in_flow_control_structures
+          return;
+
         await Future.delayed(const Duration(milliseconds: 100));
         if (visibilityInfo.visibleFraction < 0.5) {
           if (controller.videoPlayerControllerList[index].value.isInitialized) {

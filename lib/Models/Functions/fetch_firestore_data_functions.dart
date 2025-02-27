@@ -24,4 +24,30 @@ class FetchFirestoreDataFunctions{
     }
     return null; // Trả về null nếu không tìm thấy hoặc xảy ra lỗi
   }
+   Future<List<UserModel>> fetchPostLikeUsers(List<String> likeUserIds) async {
+    try {
+      // Tạo danh sách các futures để tải dữ liệu của từng user ID
+      List<Future<DocumentSnapshot>> userSnapshotsFutures = likeUserIds
+          .map(
+            (userId) => _firestore.collection('users').doc(userId).get(),
+          )
+          .toList();
+
+      // Chờ tất cả futures hoàn thành
+      List<DocumentSnapshot> userSnapshots =
+          await Future.wait(userSnapshotsFutures);
+
+      // Lọc ra các user đã tồn tại và chuyển thành UserModel
+      List<UserModel> likeUsers = userSnapshots
+          .where((snapshot) => snapshot.exists)
+          .map((snapshot) =>
+              UserModel.fromJson(snapshot.data() as Map<String, dynamic>))
+          .toList();
+
+      return likeUsers;
+    } catch (e) {
+      errorMessage("Error fetching post like users: $e");
+      return [];
+    }
+  }
 }

@@ -5,7 +5,8 @@ import 'package:video_player/video_player.dart';
 
 /// Abstract class định nghĩa phương thức lấy controller cho video.
 abstract class VideoControllerService {
-  Future<VideoPlayerController> getControllerForVideo(String url, bool isCaching);
+  Future<VideoPlayerController> getControllerForVideo(
+      String url, bool isCaching);
 }
 
 /// Triển khai VideoControllerService sử dụng caching.
@@ -15,7 +16,8 @@ class CachedVideoControllerService extends VideoControllerService {
   CachedVideoControllerService(this._cacheManager);
 
   @override
-  Future<VideoPlayerController> getControllerForVideo(String url, bool isCaching) async {
+  Future<VideoPlayerController> getControllerForVideo(
+      String url, bool isCaching) async {
     if (isCaching) {
       try {
         // Thử lấy file từ cache
@@ -30,7 +32,8 @@ class CachedVideoControllerService extends VideoControllerService {
         log('Error downloading video from url $url: $e');
         // Nếu xảy ra lỗi (ví dụ: 403), trả về controller từ asset fallback.
         try {
-          final fallbackController = VideoPlayerController.asset('assets/videos/blank.mp4');
+          final fallbackController =
+              VideoPlayerController.asset('assets/videos/blank.mp4');
           await fallbackController.initialize();
           return fallbackController;
         } catch (assetError) {
@@ -46,7 +49,8 @@ class CachedVideoControllerService extends VideoControllerService {
         log('Error creating network controller for url $url: $e');
         // Nếu có lỗi tạo controller từ network, dùng fallback asset.
         try {
-          final fallbackController = VideoPlayerController.asset('assets/videos/blank.mp4');
+          final fallbackController =
+              VideoPlayerController.asset('assets/videos/blank.mp4');
           await fallbackController.initialize();
           return fallbackController;
         } catch (assetError) {
@@ -56,4 +60,19 @@ class CachedVideoControllerService extends VideoControllerService {
       }
     }
   }
+}
+
+class CustomCacheManager {
+  static const key = 'customCacheKey';
+  static CacheManager instance = CacheManager(
+    Config(
+      key,
+      stalePeriod: const Duration(hours: 1),
+      maxNrOfCacheObjects: 20,
+      repo: JsonCacheInfoRepository(databaseName: key),
+      fileSystem: IOFileSystem(key),
+      fileService: HttpFileService(),
+    ),
+  );
+  static CacheManager defaultInstance = DefaultCacheManager();
 }

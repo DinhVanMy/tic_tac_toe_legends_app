@@ -83,6 +83,25 @@ class NotificationAddFunctions {
     );
   }
 
+  Future<void> createReelCommentNotification({
+    required String senderId,
+    required UserModel senderModel,
+    required String receiverId,
+    required String reelId,
+    required String commentId,
+    required String comment,
+  }) async {
+    await _createNotification(
+      senderId: senderId,
+      senderModel: senderModel,
+      receiverId: receiverId,
+      message: "${senderModel.name} commented on your reel '$comment'",
+      type: "comment",
+      postId: reelId,
+      commentId: commentId,
+    );
+  }
+
   // Hàm tạo thông báo follow
   Future<void> createFollowNotification({
     required String senderId,

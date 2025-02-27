@@ -5,14 +5,16 @@ import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.
 import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
+import 'package:tictactoe_gameapp/Models/Functions/fetch_firestore_data_functions.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_controller.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Widgets/comment_list_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Comment/post_comment_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_comment_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/like_user_list_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/share_sheet_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
@@ -255,7 +257,10 @@ class PostListCard extends StatelessWidget {
                     child: InkWell(
                       onTap: () async {
                         if (post.likedList != null) {
-                          var likeUsers = await postController
+                          final FetchFirestoreDataFunctions
+                              fetchFirestoreDataFunctions =
+                              FetchFirestoreDataFunctions();
+                          var likeUsers = await fetchFirestoreDataFunctions
                               .fetchPostLikeUsers(post.likedList!);
                           await showFlexibleBottomSheet(
                             minHeight: 0,
@@ -459,14 +464,14 @@ class PostListCard extends StatelessWidget {
                   child: InkWell(
                     highlightColor: Colors.purpleAccent,
                     onTap: () async {
-                      Get.delete<CommentController>();
+                      Get.delete<PostCommentController>();
                       await showFlexibleBottomSheet(
                         minHeight: 0,
                         initHeight: 0.9,
                         maxHeight: 1,
                         context: context,
                         builder: (context, scrollController, bottomSheet) {
-                          return CommentListSheet(
+                          return PostCommentListSheet(
                             scrollController: scrollController,
                             currentUser: currentUser,
                             post: post,
@@ -569,6 +574,7 @@ class PostListCard extends StatelessWidget {
   ) {
     return PostEditSheet(
       scrollController: scrollController,
+      postType: PostType.post,
     );
   }
 }

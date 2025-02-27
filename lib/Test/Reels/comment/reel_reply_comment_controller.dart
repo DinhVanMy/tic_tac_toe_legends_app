@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
@@ -7,7 +6,7 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_model.dart';
 import 'package:uuid/uuid.dart';
 
-class SubCommentController extends GetxController {
+class ReelReplyCommentController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   late StreamSubscription subscriptionListenComment;
 
@@ -16,15 +15,15 @@ class SubCommentController extends GetxController {
   DocumentSnapshot? lastDocument; // Để theo dõi pagination
   bool isFetching = false;
 
-  final String postId; // ID của bài viết
+  final String reelId; // ID của reel
   final String commentId; // ID của comment chính
-  SubCommentController(this.postId, this.commentId);
+  ReelReplyCommentController(this.reelId, this.commentId);
 
   @override
   void onInit() {
     super.onInit();
-    fetchSubComments(); // Lắng nghe sub-comments ngay từ khi init
-    listenToSubComments();
+    fetchSubComments(); // Lấy danh sách sub-comments ngay từ khi init
+    listenToSubComments(); // Lắng nghe thay đổi thời gian thực
   }
 
   // Lấy danh sách sub-comments theo pagination
@@ -34,36 +33,30 @@ class SubCommentController extends GetxController {
 
     try {
       Query query = _firestore
-          .collection('posts')
-          .doc(postId)
+          .collection('reels')
+          .doc(reelId)
           .collection('comments')
           .doc(commentId)
           .collection('subComments')
           .orderBy('createdAt', descending: true)
           .limit(commentsPerPage);
 
-      // Nếu đang pagination, bắt đầu từ document cuối cùng đã lấy
       if (isPagination && lastDocument != null) {
         query = query.startAfterDocument(lastDocument!);
       }
 
       QuerySnapshot snapshot = await query.get();
 
-      // Cập nhật document cuối để tiếp tục pagination
       if (snapshot.docs.isNotEmpty) {
         lastDocument = snapshot.docs.last;
       }
 
-      // Nếu không phải là pagination, clear danh sách trước khi thêm mới
       if (!isPagination) {
         subCommentsList.clear();
       }
 
-      // Thêm vào danh sách subCommentsList
       subCommentsList.addAll(
-        snapshot.docs.map((doc) {
-          return CommentModel.fromJson(doc.data() as Map<String, dynamic>);
-        }).toList(),
+        snapshot.docs.map((doc) => CommentModel.fromJson(doc.data() as Map<String, dynamic>)).toList(),
       );
     } catch (e) {
       throw Exception("Error fetching sub-comments: $e");
@@ -75,8 +68,8 @@ class SubCommentController extends GetxController {
   // Lắng nghe sub-comments theo thời gian thực
   void listenToSubComments() {
     subscriptionListenComment = _firestore
-        .collection('posts')
-        .doc(postId)
+        .collection('reels')
+        .doc(reelId)
         .collection('comments')
         .doc(commentId)
         .collection('subComments')
@@ -85,19 +78,13 @@ class SubCommentController extends GetxController {
         .listen((snapshot) {
       for (var change in snapshot.docChanges) {
         if (change.type == DocumentChangeType.added) {
-          // Thêm bình luận mới vào đầu danh sách
-          subCommentsList.insert(0,
-              CommentModel.fromJson(change.doc.data() as Map<String, dynamic>));
+          subCommentsList.insert(0, CommentModel.fromJson(change.doc.data() as Map<String, dynamic>));
         } else if (change.type == DocumentChangeType.modified) {
-          // Cập nhật bình luận nếu có thay đổi
-          int index = subCommentsList
-              .indexWhere((comment) => comment.id == change.doc.id);
+          int index = subCommentsList.indexWhere((comment) => comment.id == change.doc.id);
           if (index != -1) {
-            subCommentsList[index] = CommentModel.fromJson(
-                change.doc.data() as Map<String, dynamic>);
+            subCommentsList[index] = CommentModel.fromJson(change.doc.data() as Map<String, dynamic>);
           }
         } else if (change.type == DocumentChangeType.removed) {
-          // Xóa bình luận nếu bị xóa khỏi Firestore
           subCommentsList.removeWhere((comment) => comment.id == change.doc.id);
         }
       }
@@ -105,41 +92,42 @@ class SubCommentController extends GetxController {
   }
 
   // Thêm sub-comment
-  Future<void> addSubComment(
-      {required String content,
-      String? gifUrl,
-      List<String>? taggedUserIds,
-      required UserModel currentUser}) async {
+  Future<void> addSubComment({
+    required String content,
+    String? gifUrl,
+    List<String>? taggedUserIds,
+    required UserModel currentUser,
+  }) async {
     try {
       var uuid = const Uuid();
       String subCommentId = uuid.v4();
       CommentModel newSubComment = CommentModel(
-        id: commentId,
-        postId: commentId,
+        id: subCommentId, // Sử dụng ID mới cho sub-comment
+        postId: reelId, // Gán reelId vào postId để tái sử dụng CommentModel
         gif: gifUrl,
         content: content,
         commentUser: currentUser,
         createdAt: DateTime.now(),
         taggedUserIds: taggedUserIds,
       );
+
       DocumentReference subCommentRef = _firestore
-          .collection('posts')
-          .doc(postId)
+          .collection('reels')
+          .doc(reelId)
           .collection('comments')
           .doc(commentId)
           .collection('subComments')
           .doc(subCommentId);
 
-      await subCommentRef
-          .set(newSubComment.toJson())
-          .catchError((e) => errorMessage(e));
+      await subCommentRef.set(newSubComment.toJson()).catchError((e) => errorMessage(e));
 
-      await _firestore.collection('posts').doc(postId).update({
+      await _firestore.collection('reels').doc(reelId).update({
         'commentCount': FieldValue.increment(1),
       }).catchError((e) => errorMessage(e));
+
       await _firestore
-          .collection('posts')
-          .doc(postId)
+          .collection('reels')
+          .doc(reelId)
           .collection('comments')
           .doc(commentId)
           .update({
@@ -150,80 +138,77 @@ class SubCommentController extends GetxController {
     }
   }
 
+  // Like sub-comment
   Future<void> likeSubComment(String subCommentId, String userId) async {
     DocumentReference commentRef = _firestore
-        .collection('posts')
-        .doc(postId)
+        .collection('reels')
+        .doc(reelId)
         .collection('comments')
         .doc(commentId)
         .collection('subComments')
         .doc(subCommentId);
 
     await commentRef.update({
-      'likedList': FieldValue.arrayUnion([userId]) // Thêm userId vào likedList
+      'likedList': FieldValue.arrayUnion([userId]),
     }).catchError((e) => errorMessage(e));
   }
 
-  // Hàm xóa userId khỏi likedList khi unlike
+  // Unlike sub-comment
   Future<void> unlikeSubComment(String subCommentId, String userId) async {
     DocumentReference commentRef = _firestore
-        .collection('posts')
-        .doc(postId)
+        .collection('reels')
+        .doc(reelId)
         .collection('comments')
         .doc(commentId)
         .collection('subComments')
         .doc(subCommentId);
 
     await commentRef.update({
-      'likedList': FieldValue.arrayRemove([userId]) // Xóa userId khỏi likedList
+      'likedList': FieldValue.arrayRemove([userId]),
     }).catchError((e) => errorMessage(e));
   }
 
+  // Kiểm tra trạng thái like của sub-comment
   RxBool isLikedSubComment(String userId, String subCommentId) {
-    // Tìm bài viết theo postId
-    final comment = subCommentsList
-        .firstWhereOrNull((subComment) => subComment.id == subCommentId);
-
-    // Nếu không tìm thấy post hoặc likedList là null, trả về false
+    final comment = subCommentsList.firstWhereOrNull((subComment) => subComment.id == subCommentId);
     if (comment == null || comment.likedList == null) {
       return false.obs;
     }
-
-    // Kiểm tra xem userId có nằm trong likedList của post không
     final isLiked = comment.likedList!.contains(userId);
-
-    return isLiked.obs; // Trả về RxBool phản ánh trạng thái "liked"
+    return isLiked.obs;
   }
 
-  // Hàm xóa bình luận
-  Future<void> deleteComment(String subCommentId) async {
+  // Xóa sub-comment
+  Future<void> deleteSubComment(String subCommentId) async {
     try {
       await _firestore
-          .collection('posts')
-          .doc(postId)
+          .collection('reels')
+          .doc(reelId)
           .collection('comments')
           .doc(commentId)
           .collection('subComments')
           .doc(subCommentId)
           .delete()
           .catchError((e) => errorMessage(e));
-      await _firestore.collection('posts').doc(postId).update({
+
+      await _firestore.collection('reels').doc(reelId).update({
         'commentCount': FieldValue.increment(-1),
       }).catchError((e) => errorMessage(e));
+
       await _firestore
-          .collection('posts')
-          .doc(postId)
+          .collection('reels')
+          .doc(reelId)
           .collection('comments')
           .doc(commentId)
           .update({
         'countReplies': FieldValue.increment(-1),
       }).catchError((e) => errorMessage(e));
     } catch (e) {
-      errorMessage("Error deleting comment: $e");
+      errorMessage("Error deleting sub-comment: $e");
     }
   }
 
-  // Hàm để tải thêm sub-comments cho pagination
+  // Tải thêm sub-comments (pagination)
   Future<void> loadMoreSubComments() async {
     await fetchSubComments(isPagination: true);
   }

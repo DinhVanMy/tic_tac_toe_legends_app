@@ -20,6 +20,10 @@ class ReelController extends GetxController {
   bool isFetching = false;
   int pageSize = 3;
 
+  //animation like
+  RxBool showLikeAnimation = false.obs;
+  // RxBool isLiked = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -158,14 +162,18 @@ class ReelController extends GetxController {
   }
 
   Future<void> deleteReel(
-      {required String reelId, required UserModel user}) async {
+      {required ReelModel reel, required UserModel user}) async {
     try {
-      await _firestore
-          .collection('reels')
-          .doc(reelId)
-          .delete()
-          .catchError((e) => errorMessage(e));
-      successMessage("Reel deleted");
+      if (reel.reelUser!.id == user.id) {
+        await _firestore
+            .collection('reels')
+            .doc(reel.reelId)
+            .delete()
+            .catchError((e) => errorMessage(e));
+        successMessage("Reel deleted");
+      } else {
+        errorMessage("You don't have permission to delete this post.");
+      }
     } catch (e) {
       errorMessage("Error deleting reel: $e");
     }

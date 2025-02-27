@@ -1,5 +1,3 @@
-import 'package:bottom_sheet/bottom_sheet.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
@@ -11,31 +9,35 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_controller.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Comment/sub_comment_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Comment/post_comment_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Comment/post_reply_comment_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Widgets/reply_comment_list_sheet.dart';
-import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
 import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
 
-class CommentListSheet extends StatelessWidget {
+class PostReplyCommentListSheet extends StatelessWidget {
+  final PostCommentController commentController;
   final ScrollController scrollController;
   final UserModel currentUser;
-  final PostModel post;
-  const CommentListSheet(
+  final String postId;
+  final CommentModel commentModel;
+  const PostReplyCommentListSheet(
       {super.key,
       required this.scrollController,
       required this.currentUser,
-      required this.post});
+      required this.postId,
+      required this.commentModel,
+      required this.commentController});
 
   @override
   Widget build(BuildContext context) {
-    final CommentController commentController =
-        Get.put(CommentController(post.postId!));
+    final PostReplyCommentController subCommentController =
+        Get.put(PostReplyCommentController(postId, commentModel.id!));
+    final UserModel commentUser = commentModel.commentUser!;
     final TextEditingController textController = TextEditingController();
     final FocusNode focusNode = FocusNode();
     RxString commentContent = "".obs;
-    RxString commentId = "".obs;
+    RxString replyCommentId = "".obs;
     RxBool isEmojiPickerVisible = false.obs;
     var selectedGif = Rx<GiphyGif?>(null);
     return Column(
@@ -65,69 +67,150 @@ class CommentListSheet extends StatelessWidget {
                     ),
                   ),
                   const Text(
-                    "Comments",
+                    "Replies",
                     overflow: TextOverflow.clip,
                     style: TextStyle(fontSize: 20),
                   ),
-                  Obx(() => DropdownButton<String>(
-                        value: commentController.selectedOption.value,
-                        icon: const Icon(Icons.radio_button_checked_rounded),
-                        iconSize: 24,
-                        iconEnabledColor: Colors.blue,
-                        elevation: 16,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                        style:
-                            const TextStyle(color: Colors.black, fontSize: 16),
-                        underline: const SizedBox(),
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            commentController.updateSelectedOption(newValue);
-                          }
-                        },
-                        items: commentController.options
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      )),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AvatarUserWidget(
+                            radius: 30, imagePath: commentUser.image!),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                commentUser.name!,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.purpleAccent,
+                                ),
+                              ),
+                              ExpandableContent(
+                                content: commentModel.content!,
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 19,
+                                ),
+                                maxLines: 5,
+                              ),
+                              Text(
+                                TimeFunctions.timeAgo(
+                                    now: DateTime.now(),
+                                    createdAt: commentModel.createdAt!),
+                                style: const TextStyle(
+                                  color: Colors.blueGrey,
+                                  fontSize: 13,
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            commentModel.likedList != null
+                                ? Obx(() {
+                                    RxBool isLiked =
+                                        commentController.isLikedComment(
+                                            currentUser.id!, commentModel.id!);
+                                    return !isLiked.value
+                                        ? IconButton(
+                                            icon: const Icon(
+                                              Icons.favorite_border,
+                                              size: 30,
+                                              color: Colors.black,
+                                            ),
+                                            onPressed: () async {
+                                              commentController.likeComment(
+                                                  commentModel.id!,
+                                                  currentUser.id!);
+                                            },
+                                          )
+                                        : IconButton(
+                                            icon: const Icon(
+                                              Icons.favorite,
+                                              size: 30,
+                                              color: Colors.red,
+                                            ),
+                                            onPressed: () async {
+                                              commentController.unlikeComment(
+                                                  commentModel.id!,
+                                                  currentUser.id!);
+                                            },
+                                          );
+                                  })
+                                : IconButton(
+                                    icon: const Icon(
+                                      Icons.favorite_border,
+                                      size: 30,
+                                      color: Colors.black,
+                                    ),
+                                    onPressed: () async {
+                                      commentController.likeComment(
+                                          commentModel.id!, currentUser.id!);
+                                    },
+                                  ),
+                            commentModel.likedList == null ||
+                                    commentModel.likedList!.isEmpty
+                                ? const Text(
+                                    "0",
+                                    style: TextStyle(
+                                      color: Colors.blueGrey,
+                                      fontSize: 17,
+                                    ),
+                                  )
+                                : Text(
+                                    "${commentModel.likedList!.length}",
+                                    style: const TextStyle(
+                                      color: Colors.blueGrey,
+                                      fontSize: 17,
+                                    ),
+                                  ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
             IconButton(
-              onPressed: () {
-                commentController.fetchInitialComments();
-              },
+              onPressed: () {},
               icon: const Icon(
-                Icons.refresh_outlined,
+                Icons.info_outline,
                 size: 35,
-                color: Colors.blue,
               ),
             ),
           ],
         ),
         Expanded(
           child: Obx(() {
-            if (commentController.commentsList.isEmpty) {
+            if (subCommentController.subCommentsList.isEmpty) {
               return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("No comments yet", style: TextStyle(fontSize: 25)),
+                    Text("No replies yet", style: TextStyle(fontSize: 25)),
                     Text("Start the conversation...",
                         style: TextStyle(fontSize: 15, color: Colors.grey)),
                   ],
                 ),
               );
             } else {
-              var comments = commentController.commentsList.toList();
+              var comments = subCommentController.subCommentsList.toList();
               return NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {
                   if (scrollInfo.metrics.pixels >=
                       scrollInfo.metrics.maxScrollExtent - 200) {
-                    commentController.fetchMoreFilteredComments();
+                    subCommentController.loadMoreSubComments();
                   }
                   return true;
                 },
@@ -161,7 +244,7 @@ class CommentListSheet extends StatelessWidget {
                                             style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.purpleAccent,
+                                              color: Colors.blueAccent,
                                             ),
                                           ),
                                           const SizedBox(
@@ -188,12 +271,11 @@ class CommentListSheet extends StatelessWidget {
                                       ),
                                       comment.gif != null
                                           ? DisplayGifWidget(
-                                              gifUrl: comment.gif!,
-                                            )
+                                              gifUrl: comment.gif!)
                                           : const SizedBox(),
                                       GestureDetector(
                                         onTap: () {
-                                          commentId.value = comment.id!;
+                                          replyCommentId.value = comment.id!;
                                           textController.text =
                                               "@${commentUser.name!} ";
                                           textController.selection =
@@ -217,50 +299,14 @@ class CommentListSheet extends StatelessWidget {
                                 ),
                                 Column(
                                   children: [
-                                    comment.likedList != null
-                                        ? Obx(() {
-                                            RxBool isLiked = commentController
-                                                .isLikedComment(currentUser.id!,
-                                                    comment.id!);
-                                            return !isLiked.value
-                                                ? IconButton(
-                                                    icon: const Icon(
-                                                      Icons.favorite_border,
-                                                      size: 25,
-                                                      color: Colors.black,
-                                                    ),
-                                                    onPressed: () async {
-                                                      commentController
-                                                          .likeComment(
-                                                              comment.id!,
-                                                              currentUser.id!);
-                                                    },
-                                                  )
-                                                : IconButton(
-                                                    icon: const Icon(
-                                                      Icons.favorite,
-                                                      size: 25,
-                                                      color: Colors.red,
-                                                    ),
-                                                    onPressed: () async {
-                                                      commentController
-                                                          .unlikeComment(
-                                                              comment.id!,
-                                                              currentUser.id!);
-                                                    },
-                                                  );
-                                          })
-                                        : IconButton(
-                                            icon: const Icon(
-                                              Icons.favorite_border,
-                                              size: 25,
-                                              color: Colors.black,
-                                            ),
-                                            onPressed: () async {
-                                              commentController.likeComment(
-                                                  comment.id!, currentUser.id!);
-                                            },
-                                          ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.favorite_border,
+                                        size: 25,
+                                        color: Colors.black,
+                                      ),
+                                      onPressed: () {},
+                                    ),
                                     comment.likedList == null ||
                                             comment.likedList!.isEmpty
                                         ? const Text(
@@ -281,65 +327,6 @@ class CommentListSheet extends StatelessWidget {
                                 )
                               ],
                             ),
-                            comment.countReplies == null ||
-                                    comment.countReplies == 0
-                                ? const SizedBox()
-                                : Row(
-                                    children: [
-                                      const SizedBox(
-                                        width: 40,
-                                      ),
-                                      Container(
-                                        height: 2,
-                                        width: 50,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.blueGrey,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20)),
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () async {
-                                          Get.delete<SubCommentController>();
-                                          await showFlexibleBottomSheet(
-                                            minHeight: 0,
-                                            initHeight: 0.8,
-                                            maxHeight: 1,
-                                            context: context,
-                                            builder: (context, scrollController,
-                                                bottomSheet) {
-                                              return ReplyCommentListSheet(
-                                                scrollController:
-                                                    scrollController,
-                                                currentUser: currentUser,
-                                                postId: post.postId!,
-                                                commentModel: comment,
-                                                commentController:
-                                                    commentController,
-                                              );
-                                            },
-                                            duration: const Duration(
-                                                milliseconds: 500),
-                                            bottomSheetColor: Colors.white,
-                                            bottomSheetBorderRadius:
-                                                const BorderRadius.only(
-                                              topLeft: Radius.circular(20),
-                                              topRight: Radius.circular(20),
-                                            ),
-                                            isSafeArea: true,
-                                          );
-                                        },
-                                        child: Text(
-                                          "View ${comment.countReplies} more replies",
-                                          style: const TextStyle(
-                                            fontStyle: FontStyle.italic,
-                                            fontSize: 14,
-                                            color: Colors.blueGrey,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
                           ],
                         ),
                       )
@@ -355,7 +342,7 @@ class CommentListSheet extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
-              Obx(() => commentId.value.isNotEmpty
+              Obx(() => replyCommentId.value.isNotEmpty
                   ? Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 10),
@@ -377,7 +364,7 @@ class CommentListSheet extends StatelessWidget {
                           ),
                           GestureDetector(
                               onTap: () {
-                                commentId.value = "";
+                                replyCommentId.value = "";
                                 textController.clear();
                               },
                               child: const Text(
@@ -391,9 +378,7 @@ class CommentListSheet extends StatelessWidget {
                       ),
                     )
                   : const SizedBox()),
-              PreviewGifWidget(
-                selectedGif: selectedGif,
-              ),
+              PreviewGifWidget(selectedGif: selectedGif),
               CustomEmojiPicker(
                 onEmojiSelected: (emoji) {
                   textController.text += emoji;
@@ -440,7 +425,8 @@ class CommentListSheet extends StatelessWidget {
                     decoration: InputDecoration(
                       fillColor: Colors.grey.shade400,
                       hintStyle: const TextStyle(color: Colors.black54),
-                      hintText: "Write a comment...",
+                      hintText:
+                          "Reply a comment of @${commentModel.commentUser!.name!}",
                       prefixIcon: IconButton(
                         icon: const Icon(
                           Icons.gif_box_outlined,
@@ -489,57 +475,27 @@ class CommentListSheet extends StatelessWidget {
                                 ))),
                     ),
                   )),
-                  Obx(() => commentContent.value.isEmpty ||
-                          commentContent.value == ""
-                      ? const SizedBox()
-                      : Obx(
-                          () => commentId.value.isNotEmpty
-                              ? IconButton(
-                                  onPressed: () async {
-                                    focusNode.unfocus();
-                                    Get.delete<SubCommentController>();
-                                    SubCommentController subCommentController =
-                                        Get.put(SubCommentController(
-                                      post.postId!,
-                                      commentId.value,
-                                    ));
-                                    await subCommentController.addSubComment(
-                                        content: commentContent.value,
-                                        gifUrl: selectedGif
-                                            .value?.images.original!.url!,
-                                        currentUser: currentUser);
-                                    textController.clear();
-                                    commentContent.value = "";
-                                    selectedGif.value = null;
-                                    commentId.value = "";
-                                  },
-                                  icon: const Icon(
-                                    Icons.reply_all_rounded,
-                                    size: 35,
-                                    color: Colors.blue,
-                                  ),
-                                )
-                              : IconButton(
-                                  onPressed: () async {
-                                    focusNode.unfocus();
-                                    await commentController.addComment(
-                                      content: commentContent.value,
-                                      currentUser: currentUser,
-                                      receiverId: post.postUser!.id!,
-                                      gifUrl: selectedGif
-                                          .value?.images.original!.url!,
-                                    );
-                                    textController.clear();
-                                    selectedGif.value = null;
-                                    commentContent.value = "";
-                                  },
-                                  icon: const Icon(
-                                    Icons.send_rounded,
-                                    size: 35,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                        )),
+                  Obx(
+                    () => commentContent.value.isEmpty ||
+                            commentContent.value == ""
+                        ? const SizedBox()
+                        : IconButton(
+                            onPressed: () async {
+                              focusNode.unfocus();
+                              await subCommentController.addSubComment(
+                                  content: commentContent.value,
+                                  currentUser: currentUser);
+                              textController.clear();
+                              commentContent.value = "";
+                            },
+                            icon: const Icon(
+                              Icons.arrow_outward_rounded,
+                              size: 35,
+                              color: Colors.blue,
+                              weight: 10.0,
+                            ),
+                          ),
+                  ),
                 ],
               ),
             ],

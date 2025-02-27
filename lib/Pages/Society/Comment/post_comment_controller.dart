@@ -7,7 +7,7 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_model.dart';
 import 'package:uuid/uuid.dart';
 
-class CommentController extends GetxController {
+class PostCommentController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   late StreamSubscription subscriptionListenComment;
@@ -21,7 +21,7 @@ class CommentController extends GetxController {
   int pageSize = 2;
 
   final String postId; // ID của bài viết mà controller này quản lý comments
-  CommentController(this.postId);
+  PostCommentController(this.postId);
 
   @override
   void onInit() {
@@ -208,7 +208,6 @@ class CommentController extends GetxController {
         receiverId: receiverId,
         postId: postId,
         commentId: commentId,
-        
         comment: content,
       );
     } catch (e) {

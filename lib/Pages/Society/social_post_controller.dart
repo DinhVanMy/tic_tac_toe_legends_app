@@ -179,7 +179,8 @@ class PostController extends GetxController {
     var uuid = const Uuid();
     String postId = uuid.v4();
 
-    List<String> base64ImageList = await CompressImageFunction.processImages(imageFiles);
+    List<String> base64ImageList =
+        await CompressImageFunction.processImages(imageFiles);
 
     if (base64ImageList.isEmpty && imageFiles != null) {
       return;
@@ -239,7 +240,8 @@ class PostController extends GetxController {
       updatedFields['privacy'] = privacy;
     }
 
-    List<String> base64ImageList = await CompressImageFunction.processImages(imageFiles);
+    List<String> base64ImageList =
+        await CompressImageFunction.processImages(imageFiles);
 
     if (base64ImageList.isEmpty && imageFiles != null) {
       return;
@@ -340,8 +342,6 @@ class PostController extends GetxController {
     }
   }
 
-
-
   // Hàm xoá post
   Future<void> deletePost(
       {required PostModel post, required UserModel user}) async {
@@ -420,33 +420,6 @@ class PostController extends GetxController {
         receiverId: postModel.postUser!.id!,
         postId: postModel.postId!,
       );
-    }
-  }
-
-  Future<List<UserModel>> fetchPostLikeUsers(List<String> likeUserIds) async {
-    try {
-      // Tạo danh sách các futures để tải dữ liệu của từng user ID
-      List<Future<DocumentSnapshot>> userSnapshotsFutures = likeUserIds
-          .map(
-            (userId) => _firestore.collection('users').doc(userId).get(),
-          )
-          .toList();
-
-      // Chờ tất cả futures hoàn thành
-      List<DocumentSnapshot> userSnapshots =
-          await Future.wait(userSnapshotsFutures);
-
-      // Lọc ra các user đã tồn tại và chuyển thành UserModel
-      List<UserModel> likeUsers = userSnapshots
-          .where((snapshot) => snapshot.exists)
-          .map((snapshot) =>
-              UserModel.fromJson(snapshot.data() as Map<String, dynamic>))
-          .toList();
-
-      return likeUsers;
-    } catch (e) {
-      errorMessage("Error fetching post like users: $e");
-      return [];
     }
   }
 

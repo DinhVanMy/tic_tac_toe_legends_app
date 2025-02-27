@@ -1,15 +1,23 @@
 import 'dart:async';
+import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/Functions/fetch_firestore_data_functions.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/like_user_list_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/share_sheet_custom.dart';
+import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_controller.dart';
+import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_list_sheet.dart';
 import 'package:tictactoe_gameapp/Test/Reels/create_reel_page.dart';
+import 'package:tictactoe_gameapp/Test/Reels/test_animation.dart';
 import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_page.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
 import 'package:tictactoe_gameapp/Test/Reels/reel_model.dart';
@@ -56,18 +64,14 @@ class ReelPage extends StatelessWidget {
                       ),
                     );
                   }
-                  //todo:
-                  // if (index == reels.length - 1) {
-                  //   reelController.fetchMoreReels();
-                  // }
                   var reel = reels[index];
-
                   return Stack(
                     children: [
                       Container(
                         color: Colors.transparent,
                         child: GestureDetector(
                             onDoubleTap: () async {
+                              reelController.showLikeAnimation.value = true;
                               reelController
                                       .isLikedReel(user.id!, reel.reelId!)
                                       .value
@@ -76,9 +80,10 @@ class ReelPage extends StatelessWidget {
                                   : await reelController.likeReel(
                                       reel.reelId!, user.id!);
                             },
-                            onLongPress: () {
-                              successMessage("Saved reel successfully!");
-                            },
+                            onLongPress: () => _showEditSheet(
+                                context,
+                                () async => await reelController.deleteReel(
+                                    reel: reel, user: user)),
                             child: child),
                       ),
                       Positioned(
@@ -101,6 +106,15 @@ class ReelPage extends StatelessWidget {
                         child: _buildActionButtons(
                             context, reel, index, reelController),
                       ),
+                      if (reelController.showLikeAnimation.value)
+                        LikeAnimationWidget(
+                          isLiked: reelController
+                              .isLikedReel(user.id!, reel.reelId!)
+                              .value,
+                          onAnimationComplete: () {
+                            reelController.showLikeAnimation.value = false;
+                          },
+                        ),
                     ],
                   );
                 },
@@ -157,6 +171,7 @@ class ReelPage extends StatelessWidget {
               style: theme.textTheme.headlineSmall!.copyWith(
                 overflow: TextOverflow.ellipsis,
                 color: Colors.white,
+                fontSize: 17,
               )),
           const SizedBox(
             height: 5,
@@ -196,20 +211,71 @@ class ReelPage extends StatelessWidget {
                     fontWeight: FontWeight.bold))),
         Obx(
           () => _buildActionButton(
-            Icons.thumb_up_alt,
-            Icons.thumb_up_alt_outlined,
-            reelController.isLikedReel(user.id!, reel.reelId!).value,
-            () async {
-              reelController.isLikedReel(user.id!, reel.reelId!).value
-                  ? await reelController.unlikeReel(reel.reelId!, user.id!)
-                  : await reelController.likeReel(reel.reelId!, user.id!);
-            },
-            reel.likedList == null ? "0" : reel.likedList!.length.toString(),
-          ),
+              Icons.star_rounded,
+              Icons.star_outline_rounded,
+              reelController.isLikedReel(user.id!, reel.reelId!).value,
+              () async {
+                reelController.showLikeAnimation.value = true;
+                reelController.isLikedReel(user.id!, reel.reelId!).value
+                    ? await reelController.unlikeReel(reel.reelId!, user.id!)
+                    : await reelController.likeReel(reel.reelId!, user.id!);
+              },
+              reel.likedList == null ? "0" : reel.likedList!.length.toString(),
+              size: 35,
+              onPressedText: () async {
+                if (reel.likedList != null) {
+                  final FetchFirestoreDataFunctions
+                      fetchFirestoreDataFunctions =
+                      FetchFirestoreDataFunctions();
+                  var likeUsers = await fetchFirestoreDataFunctions
+                      .fetchPostLikeUsers(reel.likedList!);
+                  await showFlexibleBottomSheet(
+                    minHeight: 0,
+                    initHeight: 0.8,
+                    maxHeight: 1,
+                    context: context,
+                    builder: (context, scrollController, bottomSheet) {
+                      return LikeUserListSheet(
+                        likeUsers: likeUsers,
+                        scrollController: scrollController,
+                      );
+                    },
+                    duration: const Duration(milliseconds: 500),
+                    bottomSheetColor: Colors.white,
+                    bottomSheetBorderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    isSafeArea: true,
+                  );
+                }
+              }),
         ),
         const SizedBox(height: 10),
-        _buildActionButton(Icons.comment, Icons.messenger_outline, false, () {},
-            reel.commentCount.toString()),
+        _buildActionButton(Icons.comment, Icons.messenger_outline, false,
+            () async {
+          Get.delete<ReelCommentController>();
+          await showFlexibleBottomSheet(
+            minHeight: 0,
+            initHeight: 0.9,
+            maxHeight: 1,
+            context: context,
+            builder: (context, scrollController, bottomSheet) {
+              return ReelCommentListSheet(
+                scrollController: scrollController,
+                currentUser: user,
+                reel: reel,
+              );
+            },
+            duration: const Duration(milliseconds: 500),
+            bottomSheetColor: Colors.white,
+            bottomSheetBorderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            isSafeArea: true,
+          );
+        }, reel.commentCount.toString()),
         const SizedBox(height: 10),
         _buildActionButton(Icons.share, Icons.share_outlined, false, () async {
           await GeneralBottomsheetShowFunction.showScrollableGeneralBottomsheet(
@@ -230,31 +296,40 @@ class ReelPage extends StatelessWidget {
         }, "Share"),
         const SizedBox(height: 10),
         _buildActionButton(
-            Icons.star_rounded, Icons.star_outline_rounded, false, () {
-          successMessage("Saved reel successfully!");
-        }, "Save"),
+            Icons.more_horiz,
+            Icons.more_horiz_outlined,
+            false,
+            () => _showEditSheet(
+                context,
+                () async =>
+                    await reelController.deleteReel(reel: reel, user: user)),
+            "More"),
       ],
     );
   }
 
   Widget _buildActionButton(IconData iconActive, IconData iconInactive,
-      bool isActive, VoidCallback onPressed, String label) {
-    return Column(
-      children: [
-        IconButton(
-          onPressed: onPressed,
-          icon: Icon(
-            isActive ? iconActive : iconInactive,
-            color: Colors.white,
-            size: 30,
+      bool isActive, VoidCallback onPressed, String label,
+      {double size = 25, VoidCallback? onPressedText}) {
+    return GestureDetector(
+      onLongPress: onPressedText,
+      child: Column(
+        children: [
+          IconButton(
+            onPressed: onPressed,
+            icon: Icon(
+              isActive ? iconActive : iconInactive,
+              color: Colors.white,
+              size: size,
+            ),
           ),
-        ),
-        Text(label,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold)),
-      ],
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold)),
+        ],
+      ),
     );
   }
 
@@ -303,6 +378,39 @@ class ReelPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showEditSheet(BuildContext context, VoidCallback onTapDelete) {
+    showFlexibleBottomSheet(
+      minHeight: 0,
+      initHeight: 0.5,
+      maxHeight: 1,
+      context: context,
+      builder: (context, scrollController, bottomSheetOffset) {
+        return PostEditSheet(
+          scrollController: scrollController,
+          onDeletePost: onTapDelete,
+          postType: PostType.reel,
+          onSavePost: () =>
+              successMessage("This reel has been saved to your feed!"),
+        );
+      },
+      duration: const Duration(milliseconds: 500),
+      bottomSheetColor: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+      bottomSheetBorderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+      ),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      anchors: [0, 1],
+      isSafeArea: true,
     );
   }
 }
