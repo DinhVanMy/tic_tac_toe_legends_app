@@ -5,8 +5,8 @@ import 'package:tictactoe_gameapp/Pages/Society/Widgets/friend_blog_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_notification_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/live_stream_list_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
-import 'package:tictactoe_gameapp/Test/Reels/create_reel_page.dart';
-import 'package:tictactoe_gameapp/Test/Reels/reel_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/create_reel_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_page.dart';
 
 class SocietyGamingPage extends StatelessWidget {
   const SocietyGamingPage({super.key});

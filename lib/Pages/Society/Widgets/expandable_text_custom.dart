@@ -1,61 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Models/Functions/hyperlink_text_function.dart';
-
-class ExpandableText extends StatelessWidget {
-  final String text;
-  final ThemeData theme;
-  const ExpandableText({super.key, required this.text, required this.theme});
-
-  @override
-  Widget build(BuildContext context) {
-    RxBool isExpanded = false.obs;
-    final fontSize = _calculateFontSize();
-    return Obx(() {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () {},
-            child: Text(
-              text,
-              style: theme.textTheme.titleLarge!.copyWith(fontSize: fontSize),
-              maxLines: isExpanded.value ? 1000 : 5,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          TextButton(
-            style: TextButton.styleFrom(
-              overlayColor: Colors.blueGrey,
-            ),
-            onPressed: () => isExpanded.value = !isExpanded.value,
-            child: Text(
-              isExpanded.value ? 'Show less' : 'Show more',
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 18,
-              ),
-            ),
-          ),
-        ],
-      );
-    });
-  }
-
-  double _calculateFontSize() {
-    if (text.length < 50) {
-      return 25.0; // Văn bản ngắn, chữ lớn hơn
-    } else if (text.length < 500) {
-      return 20.0; // Văn bản trung bình, chữ vừa
-    } else if (text.length < 2000) {
-      return 17.0; // Văn bản trung bình, chữ vừa
-    } else {
-      return 16.0;
-    }
-  }
-}
 
 class ExpandableContent extends StatelessWidget {
   final String content;
@@ -92,6 +41,10 @@ class ExpandableContent extends StatelessWidget {
               onTap: () {
                 isExpanded.value = !isExpanded.value;
               },
+              onLongPress: () async =>
+                  await Clipboard.setData(ClipboardData(text: content)).then(
+                (value) => successMessage('Copied to Clipboard'),
+              ),
               child: Text.rich(
                 TextSpan(children: [
                   HyperlinkTextFunction.parseContent(
@@ -127,6 +80,10 @@ class ExpandableContent extends StatelessWidget {
               onTap: () {
                 isExpanded.value = !isExpanded.value;
               },
+              onLongPress: () async =>
+                  await Clipboard.setData(ClipboardData(text: content)).then(
+                (value) => successMessage('Copied to Clipboard'),
+              ),
               child: Text.rich(
                 TextSpan(
                   children: [
@@ -192,4 +149,16 @@ class ExpandableContent extends StatelessWidget {
 
     return truncatedText.trim();
   }
+
+  //   double _calculateFontSize() {
+  //   if (text.length < 50) {
+  //     return 25.0; // Văn bản ngắn, chữ lớn hơn
+  //   } else if (text.length < 500) {
+  //     return 20.0; // Văn bản trung bình, chữ vừa
+  //   } else if (text.length < 2000) {
+  //     return 17.0; // Văn bản trung bình, chữ vừa
+  //   } else {
+  //     return 16.0;
+  //   }
+  // }
 }

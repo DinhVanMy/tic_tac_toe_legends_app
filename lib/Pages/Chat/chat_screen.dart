@@ -297,7 +297,7 @@ class ChatBotPage extends StatelessWidget {
                                         onPressed: chatController.scrollDown,
                                         icon: const Icon(
                                           Icons.arrow_downward,
-                                          size: 35,
+                                          size: 25,
                                           color: Colors.white,
                                         ),
                                       )

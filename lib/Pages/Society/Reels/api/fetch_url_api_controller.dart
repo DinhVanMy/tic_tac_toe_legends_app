@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:tictactoe_gameapp/Configs/constants.dart';
-import 'package:tictactoe_gameapp/Test/Reels/api/video_api_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/api/video_api_model.dart';
 
 // Các hằng số cấu hình thời gian random (ở đây dùng 10s để dễ test)
 const Duration randomizationThreshold = Duration(hours: 1);

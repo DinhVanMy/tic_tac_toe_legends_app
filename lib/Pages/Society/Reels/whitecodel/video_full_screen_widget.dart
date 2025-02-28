@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/whitecodel/whitecodel_reels_controller.dart';
 import 'package:video_player/video_player.dart';
 
 /// VideoFullScreenPage nhận controller từ cha để tránh lỗi Get.find()

@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Models/Functions/compress_image_function.dart';
-import 'package:tictactoe_gameapp/Test/Reels/reel_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_model.dart';
 import 'package:uuid/uuid.dart';
-import '../../Models/user_model.dart';
-import '../../Configs/messages.dart';
+import '../../../Models/user_model.dart';
+import '../../../Configs/messages.dart';
 
 class ReelController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

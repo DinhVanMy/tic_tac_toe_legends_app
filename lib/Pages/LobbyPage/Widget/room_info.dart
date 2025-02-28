@@ -58,6 +58,7 @@ class RoomInfo extends StatelessWidget {
                     const SizedBox(width: 10),
                     InkWell(
                       onTap: () async {
+                        
                         final result = await Share.share(
                             "${auth.getCurrentUserEmail()} invited you play roomCode: $roomCode");
                         if (result.status == ShareResultStatus.success) {

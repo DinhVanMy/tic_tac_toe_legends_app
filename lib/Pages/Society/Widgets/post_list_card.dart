@@ -1,5 +1,6 @@
 import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
@@ -122,7 +123,19 @@ class PostListCard extends StatelessWidget {
                       initHeight: 0.8,
                       maxHeight: 1,
                       context: context,
-                      builder: _buildPostEditSheet,
+                      builder: (context, scrollController, bottomSheetOffset) {
+                        return PostEditSheet(
+                          scrollController: scrollController,
+                          onDeletePost: () async => postController.deletePost(
+                              post: post, user: currentUser),
+                          onSavePost: () async => await Clipboard.setData(
+                            ClipboardData(text: post.content ?? ""),
+                          ).then(
+                            (value) => successMessage('Copied to Clipboard'),
+                          ),
+                          postType: PostType.post,
+                        );
+                      },
                       duration: const Duration(milliseconds: 500),
                       bottomSheetColor:
                           theme.colorScheme.primary.withOpacity(0.4),
@@ -564,17 +577,6 @@ class PostListCard extends StatelessWidget {
           )
         ],
       ),
-    );
-  }
-
-  Widget _buildPostEditSheet(
-    BuildContext context,
-    ScrollController scrollController,
-    double bottomSheetOffset,
-  ) {
-    return PostEditSheet(
-      scrollController: scrollController,
-      postType: PostType.post,
     );
   }
 }

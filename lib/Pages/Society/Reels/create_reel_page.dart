@@ -7,9 +7,9 @@ import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
-import 'package:tictactoe_gameapp/Test/Reels/api/fetch_url_link_api_page.dart';
-import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_page.dart';
-import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/api/fetch_url_link_api_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/whitecodel/whitecodel_reels_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_controller.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:http/http.dart' as http;

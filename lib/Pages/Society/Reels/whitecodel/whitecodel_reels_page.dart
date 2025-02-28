@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
-import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
-import 'package:tictactoe_gameapp/Test/Reels/whitecodel/video_full_screen_widget.dart';
-import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/whitecodel/video_full_screen_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/whitecodel/whitecodel_reels_controller.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -134,7 +134,6 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
         if (index < 0 || index >= controller.videoPlayerControllerList.length)
           // ignore: curly_braces_in_flow_control_structures
           return;
-
         await Future.delayed(const Duration(milliseconds: 100));
         if (visibilityInfo.visibleFraction < 0.5) {
           if (controller.videoPlayerControllerList[index].value.isInitialized) {

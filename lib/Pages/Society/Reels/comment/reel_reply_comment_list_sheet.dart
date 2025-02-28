@@ -12,8 +12,8 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/comment_post_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
 import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
-import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_controller.dart';
-import 'package:tictactoe_gameapp/Test/Reels/comment/reel_reply_comment_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/comment/reel_comment_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/comment/reel_reply_comment_controller.dart';
 
 class ReelReplyCommentListSheet extends StatelessWidget {
   final ReelCommentController commentController; // Controller cho comment cha

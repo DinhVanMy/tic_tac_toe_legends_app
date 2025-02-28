@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_controller.dart';
 import 'package:video_player/video_player.dart';
 import 'video_controller_service.dart';
 

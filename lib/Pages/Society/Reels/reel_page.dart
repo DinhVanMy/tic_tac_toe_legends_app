@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bottom_sheet/bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
@@ -14,13 +15,13 @@ import 'package:tictactoe_gameapp/Pages/Society/Widgets/like_user_list_sheet.dar
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/share_sheet_custom.dart';
-import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_controller.dart';
-import 'package:tictactoe_gameapp/Test/Reels/comment/reel_comment_list_sheet.dart';
-import 'package:tictactoe_gameapp/Test/Reels/create_reel_page.dart';
-import 'package:tictactoe_gameapp/Test/Reels/like_animation_widget.dart';
-import 'package:tictactoe_gameapp/Test/Reels/whitecodel/whitecodel_reels_page.dart';
-import 'package:tictactoe_gameapp/Test/Reels/reel_controller.dart';
-import 'package:tictactoe_gameapp/Test/Reels/reel_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/comment/reel_comment_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/comment/reel_comment_list_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/create_reel_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/like_animation_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/whitecodel/whitecodel_reels_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_model.dart';
 import 'package:video_player/video_player.dart';
 
 class ReelPage extends StatelessWidget {
@@ -81,9 +82,18 @@ class ReelPage extends StatelessWidget {
                                       reel.reelId!, user.id!);
                             },
                             onLongPress: () => _showEditSheet(
-                                context,
-                                () async => await reelController.deleteReel(
-                                    reel: reel, user: user)),
+                                  context,
+                                  () async => await reelController.deleteReel(
+                                      reel: reel, user: user),
+                                  () async => await Clipboard.setData(
+                                          ClipboardData(
+                                              text:
+                                                  reel.videoUrl ?? "https://"))
+                                      .then(
+                                    (value) =>
+                                        successMessage('Copied to Clipboard'),
+                                  ),
+                                ),
                             child: child),
                       ),
                       Positioned(
@@ -318,9 +328,15 @@ class ReelPage extends StatelessWidget {
             Icons.more_horiz_outlined,
             false,
             () => _showEditSheet(
-                context,
-                () async =>
-                    await reelController.deleteReel(reel: reel, user: user)),
+                  context,
+                  () async =>
+                      await reelController.deleteReel(reel: reel, user: user),
+                  () async => await Clipboard.setData(ClipboardData(
+                          text: reel.videoUrl ?? "https://www.youtube.com/"))
+                      .then(
+                    (value) => successMessage('Copied to Clipboard'),
+                  ),
+                ),
             "More"),
       ],
     );
@@ -343,11 +359,11 @@ class ReelPage extends StatelessWidget {
             size: 25,
           ),
         ),
-        Text(label,
-            style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.bold),),
+        Text(
+          label,
+          style: const TextStyle(
+              color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -400,7 +416,8 @@ class ReelPage extends StatelessWidget {
     );
   }
 
-  void _showEditSheet(BuildContext context, VoidCallback onTapDelete) {
+  void _showEditSheet(
+      BuildContext context, VoidCallback onTapDelete, VoidCallback onTapSave) {
     showFlexibleBottomSheet(
       minHeight: 0,
       initHeight: 0.5,
@@ -410,9 +427,8 @@ class ReelPage extends StatelessWidget {
         return PostEditSheet(
           scrollController: scrollController,
           onDeletePost: onTapDelete,
+          onSavePost: onTapSave,
           postType: PostType.reel,
-          onSavePost: () =>
-              successMessage("This reel has been saved to your feed!"),
         );
       },
       duration: const Duration(milliseconds: 500),

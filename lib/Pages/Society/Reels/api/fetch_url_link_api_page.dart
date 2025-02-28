@@ -2,8 +2,8 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
-import 'package:tictactoe_gameapp/Test/Reels/api/fetch_url_api_controller.dart';
-import 'package:tictactoe_gameapp/Test/Reels/api/video_player_preview_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/api/fetch_url_api_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/api/video_player_preview_page.dart';
 
 class VideoSelectionScreen extends StatelessWidget {
   const VideoSelectionScreen({super.key});
