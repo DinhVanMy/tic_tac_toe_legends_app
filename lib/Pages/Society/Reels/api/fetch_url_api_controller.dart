@@ -7,15 +7,14 @@ import 'package:http/http.dart' as http;
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/api/video_api_model.dart';
 
-// Các hằng số cấu hình thời gian random (ở đây dùng 10s để dễ test)
-const Duration randomizationThreshold = Duration(hours: 1);
+/// Ngưỡng làm mới dữ liệu mỗi ngày
+const Duration randomizationThreshold = Duration(days: 1);
 const String lastRandomizationKey = 'last_randomization_time';
 
 class FetchUrlApiController extends GetxController {
   var videoList = <VideoApiModel>[].obs;
   var isLoading = false.obs;
-  int page = 1;
-  // Biến lưu query tìm kiếm từ người dùng
+  int page = 1; // Sử dụng cho chế độ pagination khi không refresh toàn bộ
   var searchQuery = ''.obs;
 
   final GetStorage storage = GetStorage();
@@ -27,7 +26,7 @@ class FetchUrlApiController extends GetxController {
     _checkAndRefreshData();
   }
 
-  /// Kiểm tra xem đã đủ ngưỡng random chưa (ở đây 10s)
+  /// Kiểm tra xem đã đủ thời gian làm mới (1 ngày) chưa.
   bool get _shouldRandomize {
     int? lastRandomMillis = storage.read(lastRandomizationKey);
     if (lastRandomMillis == null) return true;
@@ -35,7 +34,7 @@ class FetchUrlApiController extends GetxController {
     return DateTime.now().difference(lastRandom) >= randomizationThreshold;
   }
 
-  /// Khi đủ thời gian, clear data và fetch dữ liệu mới với random, cập nhật timestamp.
+  /// Làm mới dữ liệu khi đủ thời gian
   Future<void> refreshData() async {
     if (_shouldRandomize) {
       clearData();
@@ -47,35 +46,50 @@ class FetchUrlApiController extends GetxController {
     }
   }
 
-  /// Kiểm tra tự động khi khởi chạy
+  /// Kiểm tra khi khởi tạo: nếu chưa có dữ liệu hoặc đã đủ thời gian refresh, fetch mới.
   Future<void> _checkAndRefreshData() async {
-    if (videoList.isEmpty || _shouldRandomize) {
+    if (_shouldRandomize) {
       clearData();
       await fetchVideos();
       storage.write(
           lastRandomizationKey, DateTime.now().millisecondsSinceEpoch);
-    } else {
+    } else if (videoList.isEmpty) {
       await fetchVideos();
     }
   }
 
-  /// Xóa dữ liệu cũ và reset page
+  /// Xóa dữ liệu cũ và reset biến page
   void clearData() {
     videoList.clear();
     page = 1;
   }
 
+  /// Fetch dữ liệu từ Pexels và Pixabay cùng lúc.
+  /// Mỗi lần fetch, gọi 5 trang (pagesToFetch = 5).
   Future<void> fetchVideos() async {
     if (isLoading.value) return;
     isLoading.value = true;
     try {
-      var results = await Future.wait([
-        fetchPexelsVideos(page),
-        fetchPixabayVideos(page),
-        fetchDailymotionVideos(page),
-      ]);
-      videoList.addAll(results.expand((list) => list));
-      page++;
+      const int pagesToFetch = 5; // Số trang fetch mỗi lần gọi
+      List<Future<List<VideoApiModel>>> pexelsFutures = List.generate(
+          pagesToFetch,
+          (i) => _shouldRandomize
+              ? fetchPexelsVideos(_randomPage())
+              : fetchPexelsVideos(page + i));
+      List<Future<List<VideoApiModel>>> pixabayFutures = List.generate(
+          pagesToFetch,
+          (i) => _shouldRandomize
+              ? fetchPixabayVideos(_randomPage())
+              : fetchPixabayVideos(page + i));
+
+      var results = await Future.wait([...pexelsFutures, ...pixabayFutures]);
+      var newVideos = results.expand((list) => list).toList();
+      newVideos.shuffle(random); // Trộn danh sách để đảm bảo ngẫu nhiên
+      videoList.addAll(newVideos);
+      // Nếu không làm mới toàn bộ, tăng page; nếu làm mới, ta không cần dựa vào page
+      if (!_shouldRandomize) {
+        page += pagesToFetch;
+      }
     } catch (e) {
       print("Error fetching videos: $e");
     } finally {
@@ -83,17 +97,19 @@ class FetchUrlApiController extends GetxController {
     }
   }
 
+  /// Hàm sinh số trang ngẫu nhiên dựa trên giới hạn của API (ví dụ: 1 đến 50)
+  int _randomPage() {
+    return random.nextInt(50) + 1;
+  }
+
+  /// Fetch video từ Pexels theo trang
   Future<List<VideoApiModel>> fetchPexelsVideos(int page) async {
-    bool randomize = _shouldRandomize;
-    int pageToUse = randomize ? random.nextInt(50) + 1 : page;
-    String randomParam = randomize ? "&_r=${random.nextInt(100000)}" : "";
-    final url = Uri.parse(
-        "https://api.pexels.com/videos/popular?page=$pageToUse$randomParam");
+    final url = Uri.parse("https://api.pexels.com/videos/popular?page=$page");
     final response =
         await http.get(url, headers: {'Authorization': pexelsApiKey});
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      var list = List<VideoApiModel>.from(
+      return List<VideoApiModel>.from(
         (data['videos'] as List).map((video) => VideoApiModel(
               title: video['user']['name'] ?? 'Pexels Video',
               description: video['url'] ?? '',
@@ -101,22 +117,18 @@ class FetchUrlApiController extends GetxController {
               url: video['video_files'][0]['link'] ?? '',
             )),
       );
-      list.shuffle(random);
-      return list;
     }
     return [];
   }
 
+  /// Fetch video từ Pixabay theo trang
   Future<List<VideoApiModel>> fetchPixabayVideos(int page) async {
-    bool randomize = _shouldRandomize;
-    int pageToUse = randomize ? random.nextInt(50) + 1 : page;
-    String randomParam = randomize ? "&_r=${random.nextInt(100000)}" : "";
     final url = Uri.parse(
-        "https://pixabay.com/api/videos/?key=$pixabayApiKey&page=$pageToUse$randomParam");
+        "https://pixabay.com/api/videos/?key=$pixabayApiKey&page=$page");
     final response = await http.get(url);
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      var list = List<VideoApiModel>.from(
+      return List<VideoApiModel>.from(
         (data['hits'] as List).map((video) => VideoApiModel(
               title: video['tags'] ?? 'Pixabay Video',
               description: "Pixabay Video",
@@ -126,75 +138,16 @@ class FetchUrlApiController extends GetxController {
               url: video['videos']['medium']['url'] ?? '',
             )),
       );
-      list.shuffle(random);
-      return list;
     }
     return [];
   }
 
-  Future<List<VideoApiModel>> fetchDailymotionVideos(int page) async {
-    bool randomize = _shouldRandomize;
-    int pageToUse = randomize ? random.nextInt(50) + 1 : page;
-    String randomParam = randomize ? "&_r=${random.nextInt(100000)}" : "";
-    final url = Uri.parse(
-        "https://api.dailymotion.com/videos?fields=id,title,thumbnail_240_url&limit=10&page=$pageToUse$randomParam");
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      List videosList = data['list'];
-      List<Future<VideoApiModel?>> futures =
-          videosList.map<Future<VideoApiModel?>>((video) async {
-        String videoId = video['id'];
-        String title = video['title'] ?? 'Dailymotion Video';
-        String thumbnail = video['thumbnail_240_url'] ?? '';
-        final metaUrl = Uri.parse(
-            "https://www.dailymotion.com/player/metadata/video/$videoId?embedder=");
-        final metaResponse = await http.get(metaUrl);
-        if (metaResponse.statusCode == 200) {
-          final metaData = json.decode(metaResponse.body);
-          if (metaData['qualities'] != null && metaData['qualities'] is Map) {
-            Map qualities = metaData['qualities'];
-            String directUrl = '';
-            if (qualities.containsKey("auto")) {
-              List autoQuality = qualities["auto"];
-              if (autoQuality.isNotEmpty && autoQuality[0]['url'] != null) {
-                directUrl = autoQuality[0]['url'];
-              }
-            } else {
-              for (var key in qualities.keys) {
-                List qualityList = qualities[key];
-                if (qualityList.isNotEmpty && qualityList[0]['url'] != null) {
-                  directUrl = qualityList[0]['url'];
-                  break;
-                }
-              }
-            }
-            if (directUrl.isNotEmpty) {
-              return VideoApiModel(
-                title: title,
-                description: "Dailymotion Video",
-                thumbnail: thumbnail,
-                url: directUrl,
-              );
-            }
-          }
-        }
-        return null;
-      }).toList();
-      final results = await Future.wait(futures);
-      var list = results.whereType<VideoApiModel>().toList();
-      list.shuffle(random);
-      return list;
-    }
-    return [];
-  }
-
-  /// Cập nhật search query
+  /// Cập nhật query tìm kiếm
   void updateSearchQuery(String query) {
     searchQuery.value = query;
   }
 
-  /// Danh sách video đã được lọc theo search query
+  /// Lọc danh sách video theo query nhập từ người dùng
   List<VideoApiModel> get filteredVideoList {
     if (searchQuery.value.trim().isEmpty) return videoList;
     return videoList.where((video) {
@@ -203,7 +156,7 @@ class FetchUrlApiController extends GetxController {
     }).toList();
   }
 
-  /// Hàm so khớp các từ theo thứ tự
+  /// Hàm so khớp từ khóa theo thứ tự (ordered matching)
   bool _matchOrdered(String text, String query) {
     final words = query
         .toLowerCase()
