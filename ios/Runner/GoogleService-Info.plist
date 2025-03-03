@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>71459166896-d9t8p8oml9k92jfhhbbvg38j0slclvps.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.71459166896-d9t8p8oml9k92jfhhbbvg38j0slclvps</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>71459166896-43o7t5t67fk001f9uof1b382ut0cd9k2.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB7KApMjFAGYRo6A4rbo6e9DG5Wi8O1Qks</string>
+	<key>GCM_SENDER_ID</key>
+	<string>71459166896</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.tictactoeGameapp</string>
+	<key>PROJECT_ID</key>
+	<string>tictactoe-flutter-672ff</string>
+	<key>STORAGE_BUCKET</key>
+	<string>tictactoe-flutter-672ff.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:71459166896:ios:f875779ae976dc2719b975</string>
+</dict>
+</plist>
