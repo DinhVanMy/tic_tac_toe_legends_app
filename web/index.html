@@ -1,22 +1,11 @@
-<!DOCTYPE html><html><head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="$FLUTTER_BASE_HREF">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="A new Flutter project for playing tic tac toe game.">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,94 +18,47 @@
 
   <title>tictactoe_gameapp</title>
   <link rel="manifest" href="manifest.json">
-  
-  
+
+  <!-- Viewport để responsive -->
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-  
-  
-  
-  
-  
-  
-  <style id="splash-screen-style">
-    html {
-      height: 100%
-    }
 
-    body {
+  <!-- CSS cơ bản để đảm bảo giao diện không bị lỗi -->
+  <style>
+    html, body {
+      height: 100%;
       margin: 0;
-      min-height: 100%;
-      background-color: #071b5d;
-          background-size: 100% 100%;
-    }
-
-    .center {
-      margin: 0;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      -ms-transform: translate(-50%, -50%);
-      transform: translate(-50%, -50%);
-    }
-
-    .contain {
-      display:block;
-      width:100%; height:100%;
-      object-fit: contain;
-    }
-
-    .stretch {
-      display:block;
-      width:100%; height:100%;
-    }
-
-    .cover {
-      display:block;
-      width:100%; height:100%;
-      object-fit: cover;
-    }
-
-    .bottom {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      -ms-transform: translate(-50%, 0);
-      transform: translate(-50%, 0);
-    }
-
-    .bottomLeft {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-    }
-
-    .bottomRight {
-      position: absolute;
-      bottom: 0;
-      right: 0;
+      padding: 0;
+      overflow: auto; /* Cho phép cuộn nếu nội dung vượt quá */
+      background-color: transparent; /* Loại bỏ màu nền mặc định */
     }
   </style>
-  <script id="splash-screen-script">
-    function removeSplashFromWeb() {
-      document.getElementById("splash")?.remove();
-      document.getElementById("splash-branding")?.remove();
-      document.body.style.background = "transparent";
-    }
-  </script>
 </head>
 <body>
-  <picture id="splash">
-      <source srcset="splash/img/light-1x.gif 1x, splash/img/light-2x.gif 2x, splash/img/light-3x.gif 3x, splash/img/light-4x.gif 4x" media="(prefers-color-scheme: light)">
-      <source srcset="splash/img/dark-1x.gif 1x, splash/img/dark-2x.gif 2x, splash/img/dark-3x.gif 3x, splash/img/dark-4x.gif 4x" media="(prefers-color-scheme: dark)">
-      <img class="center" aria-hidden="true" src="splash/img/light-1x.gif" alt="">
-  </picture>
-  
-  
-  
-  
-  
-  
-  <script src="flutter_bootstrap.js" async=""></script>
+  <!-- Tải Firebase SDK (phiên bản mới hơn) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js"></script>
 
+  <!-- Cấu hình Firebase -->
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyD1pgWp3AgWRgIRnoqJqRqIr6IE4gyCKCk",
+      authDomain: "tictactoe-flutter-672ff.firebaseapp.com",
+      projectId: "tictactoe-flutter-672ff",
+      storageBucket: "tictactoe-flutter-672ff.appspot.com",
+      messagingSenderId: "71459166896",
+      appId: "1:71459166896:web:eb0e9b513a1de73e19b975"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
 
-</body></html>
+  <!-- Đảm bảo window.nativeCommunication đã được định nghĩa -->
+  <script>
+    window.nativeCommunication = window.nativeCommunication || {};
+  </script>
+
+  <!-- Tải Flutter engine -->
+  <script src="flutter.js" defer></script>
+</body>
+</html>

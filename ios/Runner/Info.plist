@@ -46,30 +46,30 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
-		<!-- Quyền Microphone -->
+		<!-- Microphone Permission -->
 		<key>NSMicrophoneUsageDescription</key>
-		<string>Ứng dụng cần quyền truy cập microphone để thực hiện cuộc gọi video/âm thanh và nhận dạng giọng nói.</string>
-		<!-- Quyền Camera -->
+		<string>The app requires access to the microphone for video/audio calls and speech recognition.</string>
+		<!-- Camera Permission -->
 		<key>NSCameraUsageDescription</key>
-		<string>Ứng dụng cần quyền truy cập camera để chụp ảnh và thực hiện cuộc gọi video.</string>
-		<!-- Quyền Thư viện ảnh -->
+		<string>The app requires access to the camera for taking photos and video calls.</string>
+		<!-- Photo Library Permission -->
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Ứng dụng cần quyền truy cập thư viện ảnh để chọn ảnh.</string>
-		<!-- Quyền Vị trí -->
+		<string>The app requires access to the photo library to select photos.</string>
+		<!-- Location Permissions -->
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Ứng dụng cần quyền truy cập vị trí khi đang sử dụng để cung cấp các tính năng liên quan đến vị trí.</string>
+		<string>The app requires access to your location while in use to provide location-based features.</string>
 		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-		<string>Ứng dụng cần quyền truy cập vị trí luôn luôn và khi đang sử dụng để cung cấp các tính năng liên quan đến vị trí.</string>
-		<!-- Quyền Nhận dạng giọng nói -->
+		<string>The app requires access to your location always and while in use to provide location-based features.</string>
+		<!-- Speech Recognition Permission -->
 		<key>NSSpeechRecognitionUsageDescription</key>
-		<string>Ứng dụng cần quyền nhận dạng giọng nói để chuyển đổi giọng nói thành văn bản.</string>
-		<!-- Quyền Thông báo -->
+		<string>The app requires speech recognition to convert speech to text.</string>
+		<!-- Background Modes for Notifications -->
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>fetch</string>
 			<string>remote-notification</string>
 		</array>
-		<!-- Cấu hình Google Sign-In -->
+		<!-- Google Sign-In Configuration -->
 		<key>CFBundleURLTypes</key>
 		<array>
 			<dict>
@@ -77,11 +77,11 @@
 				<string>Editor</string>
 				<key>CFBundleURLSchemes</key>
 				<array>
-					<string>com.googleusercontent.apps.YOUR-CLIENT-ID</string>
+					<string>71459166896-d9t8p8oml9k92jfhhbbvg38j0slclvps</string>
 				</array>
 			</dict>
 		</array>
-		<!-- Cấu hình mạng (tùy chọn) -->
+		<!-- Network Configuration (Optional) -->
 		<key>NSAppTransportSecurity</key>
 		<dict>
 			<key>NSAllowsArbitraryLoads</key>

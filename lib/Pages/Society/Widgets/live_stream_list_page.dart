@@ -11,6 +11,7 @@ import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/agora_livest
 import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/create_livestream_room_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_doc_service.dart';
+import 'package:tictactoe_gameapp/Test/shimmers/lives_placeholder_widget.dart';
 
 class WorldBlogPage extends StatelessWidget {
   final UserModel user;
@@ -87,17 +88,7 @@ class WorldBlogPage extends StatelessWidget {
             Expanded(
               child: Obx(() {
                 if (liveStreamController.liveStreamsList.isEmpty) {
-                  return Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: const CircularProgressIndicator(
-                        color: Colors.blue,
-                      ),
-                    ),
-                  );
+                  return const LivesPlaceholderWidget();
                 } else {
                   var liveStreams =
                       liveStreamController.liveStreamsList.toList();

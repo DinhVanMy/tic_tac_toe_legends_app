@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:tictactoe_gameapp/Configs/page_route.dart';
 import 'package:get/get.dart';
@@ -22,6 +23,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _setUpExternalLoad();
   await _setUpGeneralSystem();
+  // await _setUpLocalNotifications();
   runApp(const MyApp());
 }
 
@@ -43,6 +45,23 @@ Future<void> _setUpGeneralSystem() async {
     DeviceOrientation.portraitDown,
   ]);
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+}
+
+Future<void> _setUpLocalNotifications() async {
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('app_logo');
+  const DarwinInitializationSettings initializationSettingsDarwin =
+      DarwinInitializationSettings();
+  const LinuxInitializationSettings initializationSettingsLinux =
+      LinuxInitializationSettings(defaultActionName: 'Open notification');
+  const InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+      macOS: initializationSettingsDarwin,
+      linux: initializationSettingsLinux);
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 }
 
 class MyApp extends StatelessWidget {

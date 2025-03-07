@@ -12,7 +12,7 @@ dependencies:
   agora_token_service: ^0.1.2
   animated_text_kit: ^4.2.2
   any_link_preview: ^3.0.2
-  awesome_notifications: null
+  flutter_local_notifications: ^18.0.1
   bottom_sheet: ^4.0.4
   cached_network_image: ^3.3.1
   cloud_firestore: ^4.15.10
@@ -85,7 +85,7 @@ flutter:
     - assets/borders/
     - assets/emotes/
     - assets/jajas/
-    - assets/videos/blank.mp4
+    - assets/videos/
     - .env
 
   fonts:

@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Components/confetti_widget_custom.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
@@ -694,7 +691,8 @@ class PlayWithPlayerController extends GetxController {
             color: Colors.lightBlueAccent.withOpacity(0.4),
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Expanded(
+          child: SizedBox(
+            height: 200,
             child: GridView.builder(
               scrollDirection: Axis.vertical,
               physics: const BouncingScrollPhysics(),

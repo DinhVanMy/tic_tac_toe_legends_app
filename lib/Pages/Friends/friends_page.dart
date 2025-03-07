@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
-import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
+import 'package:tictactoe_gameapp/Controller/notification_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/webview_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
@@ -49,7 +48,17 @@ class FriendsPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(50),
             ),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                final NotificationController notificationController =
+                    Get.put(NotificationController());
+                // notificationController.showNotification(
+                //   'Tiêu đề',
+                //   'Nội dung',
+                //   {'key': 'value'},
+                // );
+                notificationController.showCallNotification(
+                    user.name!, user.image!);
+              },
               icon: const Icon(
                 Icons.edit,
                 size: 25,
@@ -60,157 +69,159 @@ class FriendsPage extends StatelessWidget {
       ),
       body: DefaultTabController(
         length: 3,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                Builder(builder: (context) {
-                  return TextField(
-                    onChanged: (value) {
-                      int indexTab = DefaultTabController.of(context).index;
-                      if (indexTab == 0) {
-                        firestoreController.updateSearchText(value);
-                      } else if (indexTab == 1) {
-                        print("Searching... groups");
-                      } else if (indexTab == 2) {
-                        notifyInMainController.updateSearchText(value);
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Searching',
-                      labelStyle: theme.textTheme.bodyLarge!
-                          .copyWith(color: Colors.blueGrey),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        borderSide: const BorderSide(color: Colors.blueAccent),
+        child: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      Builder(
+                        builder: (context) {
+                          return TextField(
+                            onChanged: (value) {
+                              int indexTab =
+                                  DefaultTabController.of(context).index;
+                              if (indexTab == 0) {
+                                firestoreController.updateSearchText(value);
+                              } else if (indexTab == 1) {
+                                print("Searching... groups");
+                              } else if (indexTab == 2) {
+                                notifyInMainController.updateSearchText(value);
+                              }
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Searching',
+                              labelStyle: theme.textTheme.bodyLarge!
+                                  .copyWith(color: Colors.blueGrey),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide:
+                                    const BorderSide(color: Colors.blueAccent),
+                              ),
+                              prefixIcon: IconButton(
+                                onPressed: () {},
+                                icon: const Icon(Icons.search),
+                              ),
+                              prefixIconColor: Colors.blueGrey,
+                            ),
+                          );
+                        },
                       ),
-                      prefixIcon: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.search),
-                      ),
-                      prefixIconColor: Colors.blueGrey,
-                    ),
-                  );
-                }),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 100,
-                      child: Column(
+                      const SizedBox(height: 10),
+                      Row(
                         children: [
-                          AvatarUserWidget(
-                            radius: 40,
-                            imagePath: user.image!,
-                            gradientColors: const [
-                              Colors.blueAccent,
-                              Colors.greenAccent
-                            ],
-                          ),
-                          const Text(
-                            "Your Story",
-                            style: TextStyle(color: Colors.deepPurple),
-                          )
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    Obx(
-                      () {
-                        if (firestoreController.friendsList.isEmpty) {
-                          return const SizedBox();
-                        }
-                        var friends = firestoreController.friendsList.toList();
-                        return Expanded(
-                          child: SizedBox(
-                            height: 120,
-                            width: double.infinity,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: friends.length,
-                              itemBuilder: (context, index) {
-                                var friend = friends[index];
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      Stack(
-                                        children: [
-                                          AvatarUserWidget(
-                                              radius: 35,
-                                              imagePath: friend.image!),
-                                          Positioned(
-                                            bottom: 0,
-                                            right: 0,
-                                            child: Container(
-                                              width: 20,
-                                              height: 20,
-                                              decoration: BoxDecoration(
-                                                color: Colors.green,
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
-                                                border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 3,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        friend.name!,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                          SizedBox(
+                            width: 100,
+                            child: Column(
+                              children: [
+                                AvatarUserWidget(
+                                  radius: 40,
+                                  imagePath: user.image!,
+                                  gradientColors: const [
+                                    Colors.blueAccent,
+                                    Colors.greenAccent
+                                  ],
+                                ),
+                                const Text(
+                                  "Your Story",
+                                  style: TextStyle(color: Colors.deepPurple),
+                                )
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ],
+                          const SizedBox(width: 15),
+                          Obx(() {
+                            if (firestoreController.friendsList.isEmpty) {
+                              return const SizedBox();
+                            }
+                            var friends =
+                                firestoreController.friendsList.toList();
+                            return Expanded(
+                              child: SizedBox(
+                                height: 120,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: friends.length,
+                                  itemBuilder: (context, index) {
+                                    var friend = friends[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        children: [
+                                          Stack(
+                                            children: [
+                                              AvatarUserWidget(
+                                                radius: 35,
+                                                imagePath: friend.image!,
+                                              ),
+                                              Positioned(
+                                                bottom: 0,
+                                                right: 0,
+                                                child: Container(
+                                                  width: 20,
+                                                  height: 20,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            100),
+                                                    border: Border.all(
+                                                      color: Colors.white,
+                                                      width: 3,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(friend.name!),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
+                      TabBar(
+                        labelColor: Colors.blueAccent,
+                        indicatorColor: Colors.blueAccent,
+                        unselectedLabelColor: Colors.grey,
+                        dividerHeight: 0,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelStyle: theme.textTheme.bodyLarge,
+                        tabs: const [
+                          Tab(text: 'Home'),
+                          Tab(text: 'Groups'),
+                          Tab(text: 'Notes'),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                TabBar(
-                  labelColor: Colors.blueAccent,
-                  indicatorColor: Colors.blueAccent,
-                  unselectedLabelColor: Colors.grey,
-                  dividerHeight: 0,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelStyle: theme.textTheme.bodyLarge,
-                  tabs: const [
-                    Tab(text: 'Home'),
-                    Tab(text: 'Groups'),
-                    Tab(text: 'Notes'),
-                  ],
-                ),
-                SizedBox(
-                  height: 1000,
-                  child: TabBarView(children: [
-                    FriendsHomePage(
-                      firestoreController: firestoreController,
-                      theme: theme,
-                      listenLatestMessagesController:
-                          listenLatestMessagesController,
-                      notifyInMainController: notifyInMainController,
-                    ),
-                    const FriendsGroupPage(),
-                    FriendsNotificationsPage(
-                      theme: theme,
-                      notifyInMainController: notifyInMainController,
-                      firestoreController: firestoreController,
-                    ),
-                  ]),
-                )
-              ],
-            ),
+              ),
+            ];
+          },
+          body: TabBarView(
+            children: [
+              FriendsHomePage(
+                firestoreController: firestoreController,
+                theme: theme,
+                listenLatestMessagesController: listenLatestMessagesController,
+                notifyInMainController: notifyInMainController,
+              ),
+              const FriendsGroupPage(),
+              FriendsNotificationsPage(
+                theme: theme,
+                notifyInMainController: notifyInMainController,
+                firestoreController: firestoreController,
+              ),
+            ],
           ),
         ),
       ),

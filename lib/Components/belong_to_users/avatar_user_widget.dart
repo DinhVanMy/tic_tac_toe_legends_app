@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class AvatarUserWidget extends StatelessWidget {
   final double radius;
@@ -33,22 +34,8 @@ class AvatarUserWidget extends StatelessWidget {
             child: ClipOval(
               child: CachedNetworkImage(
                 imageUrl: imagePath,
-                placeholder: (context, url) => ColoredBox(
-                  color: Colors.blueGrey,
-                  child: Icon(
-                    Icons.person,
-                    size: radius,
-                    color: Colors.grey[500],
-                  ),
-                ),
-                errorWidget: (context, url, error) => ColoredBox(
-                  color: Colors.blueGrey,
-                  child: Icon(
-                    Icons.error,
-                    size: radius,
-                    color: Colors.red,
-                  ),
-                ),
+                placeholder: (context, url) => _buildPlacholderWidget(),
+                errorWidget: (context, url, error) => _buildErrorWidget(),
                 fit: BoxFit.cover,
                 width: radius * 2 - borderThickness * 2,
                 height: radius * 2 - borderThickness * 2,
@@ -58,26 +45,40 @@ class AvatarUserWidget extends StatelessWidget {
         : ClipOval(
             child: CachedNetworkImage(
               imageUrl: imagePath,
-              placeholder: (context, url) => ColoredBox(
-                color: Colors.blueGrey,
-                child: Icon(
-                  Icons.person,
-                  size: radius,
-                  color: Colors.grey[500],
-                ),
-              ),
-              errorWidget: (context, url, error) => ColoredBox(
-                color: Colors.blueGrey,
-                child: Icon(
-                  Icons.error,
-                  size: radius,
-                  color: Colors.red,
-                ),
-              ),
+              placeholder: (context, url) => _buildPlacholderWidget(),
+              errorWidget: (context, url, error) => _buildErrorWidget(),
               fit: BoxFit.cover,
               width: radius * 2,
               height: radius * 2,
             ),
           );
+  }
+
+  Widget _buildPlacholderWidget() {
+    return ColoredBox(
+      color: Colors.blueAccent,
+      child: Icon(
+        Icons.person,
+        size: radius,
+        color: Colors.deepPurple[100],
+      ),
+    ).animate(onPlay: (controller) => controller.repeat(reverse: true)).shimmer(
+          delay: 400.ms,
+          duration: 1800.ms,
+          colors: [Colors.deepPurple[100]!, Colors.deepPurple[50]!],
+          size: 1.8,
+          blendMode: BlendMode.srcATop,
+        );
+  }
+
+  Widget _buildErrorWidget() {
+    return ColoredBox(
+      color: Colors.blueGrey,
+      child: Icon(
+        Icons.error,
+        size: radius,
+        color: Colors.red,
+      ),
+    );
   }
 }

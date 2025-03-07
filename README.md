@@ -48,15 +48,16 @@ Story Feature – Share disappearing content similar to Instagram & Facebook Sto
 ## 🚀 Git Commands
 
 ```sh
-git status                   # Check the repository status
-git add .                    # Stage all changes
-git commit -m "Commit message" # Commit changes with a message
-git push origin <branch-name> # Push changes to the repository
+git status
+git add .
+git commit -m "Commit message"
+git push origin master
 ```
 
 ## 🔥 Firebase Deployment
 
 ```sh
 firebase deploy --only functions
+firebase deploy --only hosting:tictactoe-flutter-672ff
 ```
 

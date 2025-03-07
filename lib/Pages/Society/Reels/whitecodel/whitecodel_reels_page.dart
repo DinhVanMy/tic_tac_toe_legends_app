@@ -44,7 +44,7 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
   late final WhiteCodelReelsController controller;
   bool _isMounted = true;
   final Map<int, StreamController<double>> _progressControllers = {};
-  final Map<int, Function> _progressListeners = {};
+  final Map<int, Function()> _progressListeners = {};
 
   @override
   void initState() {
@@ -53,36 +53,37 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
     final tag = widget.singleVideoUrl != null
         ? 'whitecodel_reels_controller_${widget.singleVideoUrl.hashCode}'
         : 'whitecodel_reels_controller';
-    // Xóa controller cũ nếu có
-    Get.delete<WhiteCodelReelsController>(tag: tag, force: true);
 
-    // Khởi tạo controller mới với tag duy nhất
-    controller = Get.put(
-      WhiteCodelReelsController(
-        reelsVideoList: widget.videoList ??
-            (widget.singleVideoUrl != null ? [widget.singleVideoUrl!] : []),
-        isCaching: widget.isCaching,
-        startIndex: widget.startIndex,
-      ),
-      tag: tag,
-    );
-  }
-
-  @override
-  void dispose() {
-    _isMounted = false;
-    _progressListeners.forEach((index, listener) {
-      if (index < controller.videoPlayerControllerList.length) {
-        controller.videoPlayerControllerList[index].removeListener(listener());
-      }
-    });
-    _progressControllers.forEach((_, controller) => controller.close());
-    final tag = widget.singleVideoUrl != null
-        ? 'whitecodel_reels_controller_${widget.singleVideoUrl.hashCode}'
-        : 'whitecodel_reels_controller';
     Get.delete<WhiteCodelReelsController>(tag: tag, force: true);
-    super.dispose();
+    if (Get.isRegistered<WhiteCodelReelsController>(tag: tag)) {
+      controller = Get.find<WhiteCodelReelsController>(tag: tag);
+    } else {
+      controller = Get.put(
+        WhiteCodelReelsController(
+          reelsVideoList: widget.videoList ??
+              (widget.singleVideoUrl != null ? [widget.singleVideoUrl!] : []),
+          isCaching: widget.isCaching,
+          startIndex: widget.startIndex,
+        ),
+        tag: tag,
+      );
+    }
   }
+@override
+void dispose() {
+  _isMounted = false;
+  _progressListeners.forEach((index, listener) {
+    if (index < controller.videoPlayerControllerList.length) {
+      controller.videoPlayerControllerList[index].removeListener(listener);
+    }
+  });
+  _progressControllers.forEach((_, controller) => controller.close());
+  final tag = widget.singleVideoUrl != null
+      ? 'whitecodel_reels_controller_${widget.singleVideoUrl.hashCode}'
+      : 'whitecodel_reels_controller';
+  Get.delete<WhiteCodelReelsController>(tag: tag, force: true);
+  super.dispose();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +92,8 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
       body: Obx(
         () => PageView.builder(
           controller: controller.pageController,
-          itemCount: controller.videoPlayerControllerList.length, //controller.pageCount.value, //!invalid length
+          itemCount: controller.videoPlayerControllerList
+              .length, //controller.pageCount.value, //!invalid length
           scrollDirection: Axis.vertical,
           onPageChanged: (index) async {
             // Kiểm tra index hợp lệ
@@ -179,42 +181,20 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
               index >= controller.videoPlayerControllerList.length) {
             return const Center(child: Text("Error: Invalid index"));
           }
-          if (controller.loading.value ||
-              !controller
-                  .videoPlayerControllerList[index].value.isInitialized) {
+          final vpController = controller.videoPlayerControllerList[index];
+          if (controller.loading.value || !vpController.value.isInitialized) {
             return widget.loader ??
                 Container(
                   width: double.infinity,
                   height: double.infinity,
                   decoration: const BoxDecoration(
                     image: DecorationImage(
-                      image: AssetImage(
-                        GifsPath.loadingGif2,
-                      ),
+                      image: AssetImage(GifsPath.loadingGif2),
                       fit: BoxFit.cover,
                     ),
                   ),
                 );
           }
-          // Tạo StreamController cho video nếu chưa tồn tại
-          // if (!_progressControllers.containsKey(index)) {
-          //   _progressControllers[index] = StreamController<double>.broadcast();
-          //   controller.videoPlayerControllerList[index].addListener(() {
-          //     if (controller
-          //             .videoPlayerControllerList[index].value.isInitialized &&
-          //         _isMounted) {
-          //       double videoProgress = controller
-          //               .videoPlayerControllerList[index]
-          //               .value
-          //               .position
-          //               .inMilliseconds /
-          //           controller.videoPlayerControllerList[index].value.duration
-          //               .inMilliseconds;
-          //       _progressControllers[index]!.add(videoProgress);
-          //     }
-          //   });
-          // }
-
           if (!_progressControllers.containsKey(index)) {
             _progressControllers[index] = StreamController<double>.broadcast();
             void listener() {
@@ -226,18 +206,17 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
                         .value
                         .position
                         .inMilliseconds /
-                    controller.videoPlayerControllerList[index].value.duration
-                        .inMilliseconds;
+                    vpController.value.duration.inMilliseconds;
                 _progressControllers[index]!.add(videoProgress);
               }
             }
 
             _progressListeners[index] = listener;
-            controller.videoPlayerControllerList[index].addListener(listener);
+            vpController.addListener(listener);
           }
 
           Widget videoWidget = VideoFullScreenWidget(
-            videoPlayerController: controller.videoPlayerControllerList[index],
+            videoPlayerController: vpController,
             controller: controller,
           );
           return widget.builder == null
@@ -246,7 +225,7 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
                   context,
                   index,
                   videoWidget,
-                  controller.videoPlayerControllerList[index],
+                  vpController,
                   controller.pageController,
                   _progressControllers[index]!,
                 );
