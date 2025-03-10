@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Shop/Widgets/champions_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Shop/Widgets/emotes_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Shop/Widgets/maps_page.dart';
@@ -46,15 +47,20 @@ class ShopPage extends StatelessWidget {
               ],
             ),
             DraggableFloatingActionButton(
-              child: const Icon(
-                Icons.shopping_cart_rounded,
-                color: Colors.white,
-                size: 30,
-              ),
-              onPressed: () {
-                printInfo(info: "hi");
-              },
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(100),
+                  child: Image.asset(GifsPath.chloe1)),
             ),
+            // DraggableFloatingActionButton(
+            //   child: const Icon(
+            //     Icons.shopping_cart_rounded,
+            //     color: Colors.white,
+            //     size: 30,
+            //   ),
+            //   onPressed: () {
+            //     printInfo(info: "hi");
+            //   },
+            // ),
           ],
         ),
       ),

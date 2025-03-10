@@ -147,6 +147,24 @@ class ProfileController extends GetxController {
     return image;
   }
 
+  Future<XFile?> pickImageGallery() async {
+    final XFile? images = await picker.pickImage(
+      maxHeight: 240,
+      maxWidth: 320,
+      source: ImageSource.gallery,
+    );
+    return images;
+  }
+
+  Future<XFile?> pickImageCamera() async {
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.camera,
+      maxHeight: 240,
+      maxWidth: 320,
+    );
+    return image;
+  }
+
   Future<bool> isUserNameExists(String name) async {
     try {
       final querySnapshot =

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:cyber_punk_tool_kit_ui/src/containers/cyber_container_two.dart';
-import 'package:tictactoe_gameapp/Configs/theme/colors.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_controller.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_page.dart';
 
@@ -17,10 +16,10 @@ class BreakoutGamelobbyPage extends StatelessWidget {
     RxnString selectedImageIndex = RxnString();
     final List<String> imagePaths = [
       GifsPath.chloe1,
-      GifsPath.chloe2,
+      GifsPath.chatbotGif,
       GifsPath.lightGif,
       GifsPath.cyberpunk,
-      GifsPath.loadingGif4,
+      GifsPath.transitionGif,
     ];
     const TextStyle textStyle = TextStyle(
       color: Colors.black,

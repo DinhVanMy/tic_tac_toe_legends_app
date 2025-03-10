@@ -34,7 +34,7 @@ class ChatFriendController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    deleteOldMessages();
+    // deleteOldMessages();
     listenToMessages();
     setupSearchListener();
     focusNode.addListener(() {
@@ -127,9 +127,7 @@ class ChatFriendController extends GetxController {
 
   void loadMessages() async {
     if (isLoadingMore.value || !hasMoreMessages.value) return;
-
     isLoadingMore.value = true;
-
     try {
       QuerySnapshot snapshot;
 

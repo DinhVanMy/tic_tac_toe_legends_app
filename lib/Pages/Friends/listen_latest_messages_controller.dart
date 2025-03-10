@@ -11,6 +11,7 @@ class ListenLatestMessagesController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   RxList<MessageFriendModel> latestMessages = <MessageFriendModel>[].obs;
+  RxBool isFetching = false.obs;
   late final UserModel currentUser;
   final Map<String, StreamSubscription> _listeners = {};
 
@@ -30,21 +31,25 @@ class ListenLatestMessagesController extends GetxController {
 
   // Hàm lấy tin nhắn gần nhất cho từng bạn bè
   Future<void> fetchLatestMessages() async {
-    List<MessageFriendModel> initialMessages =
-        await getLatestMessagesFromFriends();
-    latestMessages.value =
-        initialMessages; // Cập nhật danh sách tin nhắn ban đầu
-    listenToLatestMessages(initialMessages.map((m) => m.senderId!).toList());
+    isFetching.value = true;
+    try {
+      List<MessageFriendModel> initialMessages =
+          await getLatestMessagesFromFriends();
+      latestMessages.value = initialMessages;
+      listenToLatestMessages(initialMessages.map((m) => m.senderId!).toList());
+    } catch (e) {
+      errorMessage("Error fetching reels: $e");
+    } finally {
+      isFetching.value = false;
+    }
   }
 
   // Hàm lấy tin nhắn mới nhất của bạn bè (không bao gồm listener)
   Future<List<MessageFriendModel>> getLatestMessagesFromFriends() async {
     List<Future<MessageFriendModel?>> futures = [];
-
     if (currentUser.friendsList != null) {
       for (String friendId in currentUser.friendsList!) {
         String chatId = _getChatRoomId(friendId);
-
         futures.add(
           _firestore
               .collection('chats')

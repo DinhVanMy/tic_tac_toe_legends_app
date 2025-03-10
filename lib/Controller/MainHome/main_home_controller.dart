@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Pages/Chat/chat_screen.dart';
-import 'package:tictactoe_gameapp/Pages/Friends/friends_page.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/messenger_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/home_page.dart';
-import 'package:tictactoe_gameapp/Pages/Society/society_gaming_page.dart';
-import 'package:tictactoe_gameapp/Pages/Web/web_view_screen.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_page.dart';
+import 'package:tictactoe_gameapp/Pages/Society/social_media_page.dart';
 
 class MainHomeController extends GetxController {
   RxInt currentIndex = 2.obs;
@@ -13,7 +13,7 @@ class MainHomeController extends GetxController {
     const ChatBotPage(),
     const FriendsPage(),
     const HomePage(),
-    const UltizeScreen(),
-    const SocietyGamingPage(),
+    const ReelPage(),
+    const SocialMediaPage(),
   ];
 }

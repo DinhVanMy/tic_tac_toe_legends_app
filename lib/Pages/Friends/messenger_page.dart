@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
+import 'package:tictactoe_gameapp/Components/shimmers/friendavatar_placeholder_widget.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
 import 'package:tictactoe_gameapp/Controller/notification_controller.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Controller/webview_controller.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
-import 'package:tictactoe_gameapp/Pages/Friends/Widgets/friends_group_page.dart';
-import 'package:tictactoe_gameapp/Pages/Friends/Widgets/friends_home_page.dart';
-import 'package:tictactoe_gameapp/Pages/Friends/Widgets/friends_notifications_page.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/messages_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/Widgets/notes_widget.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/listen_latest_messages_controller.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Drawer/drawer_nav_bar.dart';
 
@@ -58,6 +58,10 @@ class FriendsPage extends StatelessWidget {
                 // );
                 notificationController.showCallNotification(
                     user.name!, user.image!);
+                notificationController.showMessageNotification(
+                    user.name!,
+                    "Uint8List largeIconBytes = await _loadNetworkImage(callerImage);",
+                    user.image!);
               },
               icon: const Icon(
                 Icons.edit,
@@ -68,7 +72,7 @@ class FriendsPage extends StatelessWidget {
         ],
       ),
       body: DefaultTabController(
-        length: 3,
+        length: 2,
         child: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
@@ -86,8 +90,6 @@ class FriendsPage extends StatelessWidget {
                               if (indexTab == 0) {
                                 firestoreController.updateSearchText(value);
                               } else if (indexTab == 1) {
-                                print("Searching... groups");
-                              } else if (indexTab == 2) {
                                 notifyInMainController.updateSearchText(value);
                               }
                             },
@@ -133,7 +135,21 @@ class FriendsPage extends StatelessWidget {
                           ),
                           const SizedBox(width: 15),
                           Obx(() {
-                            if (firestoreController.friendsList.isEmpty) {
+                            if (firestoreController.isLoadingFriends.value) {
+                              return Expanded(
+                                child: SizedBox(
+                                  height: 120,
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: 5, // Số lượng placeholder
+                                    itemBuilder: (context, index) {
+                                      return const FriendavatarPlaceholderWidget();
+                                    },
+                                  ),
+                                ),
+                              );
+                            } else if (firestoreController
+                                .friendsList.isEmpty) {
                               return const SizedBox();
                             }
                             var friends =
@@ -196,9 +212,8 @@ class FriendsPage extends StatelessWidget {
                         indicatorSize: TabBarIndicatorSize.tab,
                         labelStyle: theme.textTheme.bodyLarge,
                         tabs: const [
-                          Tab(text: 'Home'),
-                          Tab(text: 'Groups'),
-                          Tab(text: 'Notes'),
+                          Tab(text: 'Chats'),
+                          Tab(text: 'News'),
                         ],
                       ),
                     ],
@@ -209,14 +224,13 @@ class FriendsPage extends StatelessWidget {
           },
           body: TabBarView(
             children: [
-              FriendsHomePage(
+              MessagesWidget(
                 firestoreController: firestoreController,
                 theme: theme,
                 listenLatestMessagesController: listenLatestMessagesController,
                 notifyInMainController: notifyInMainController,
               ),
-              const FriendsGroupPage(),
-              FriendsNotificationsPage(
+              NotesWidget(
                 theme: theme,
                 notifyInMainController: notifyInMainController,
                 firestoreController: firestoreController,

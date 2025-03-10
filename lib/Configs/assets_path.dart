@@ -7,7 +7,7 @@ class IconsPath {
   static const smsIcon = "${basePath}sms.svg";
   static const wonIcon = "${basePath}won.svg";
   static const xIcon = "${basePath}x.svg";
-  static const applogo = "${basePath}appLogo.svg";
+  static const applogo = "${basePath}appLogo.png";
   static const mic = "${basePath}mic.svg";
   static const camera = "${basePath}camera.svg";
   static const gallery = "${basePath}gallery.svg";
@@ -55,23 +55,19 @@ class GifsPath {
   static const androidGif = "${basePath}android_gif.gif";
   static const chatbotGif = "${basePath}chatbot_gif.gif";
   static const chloe1 = "${basePath}chloe_1.gif";
-  static const chloe2 = "${basePath}chloe_2.gif";
   static const loadingGif = "${basePath}loading_gif.gif";
   static const loadingGif2 = "${basePath}loading2.gif";
-  static const loadingGif4 = "${basePath}loading4.gif";
   static const transitionGif = "${basePath}transition_gif.gif";
   static const cyberpunk = "${basePath}cyperpunk_gif.gif";
 }
 
 class AudioSPath {
   static const basePath = "assets/audios/";
-  static const akazaTheme = "${basePath}akaza_theme.mp3";
   static const blindPick = "${basePath}blind_pick.mp3";
   static const coins = "${basePath}coins.mp3";
   static const defeat = "${basePath}defeat.mp3";
   static const infinityCastle = "${basePath}infinity_castle.mp3";
   static const nakime = "${basePath}nakime.mp3";
-  static const shinobuTheme = "${basePath}shinobu_theme.mp3";
   static const swordEffect = "${basePath}sword_effect.mp3";
   static const victory = "${basePath}victory.mp3";
   static const welcomeSound = "${basePath}welcome_sound.mp3";

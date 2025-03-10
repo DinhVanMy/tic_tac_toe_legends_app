@@ -18,7 +18,7 @@ class BackgroundMusicController extends GetxController {
   var isOnScreen8 = false.obs;
 
   // Danh sách bài hát cho các màn hình 1-4
-  final List<String> playlist = [AudioSPath.shinobuTheme];
+  final List<String> playlist = [AudioSPath.infinityCastle];
 
   var volume = 1.0.obs; // Âm lượng
 

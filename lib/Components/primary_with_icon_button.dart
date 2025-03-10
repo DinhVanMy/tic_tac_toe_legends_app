@@ -1,6 +1,6 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 
 class PrimaryIconWithButton extends StatelessWidget {
   final String buttonText;
@@ -9,6 +9,7 @@ class PrimaryIconWithButton extends StatelessWidget {
   final String iconPath;
   final double? width;
   final double? height;
+  final bool isLogo;
   const PrimaryIconWithButton(
       {super.key,
       this.width,
@@ -16,7 +17,8 @@ class PrimaryIconWithButton extends StatelessWidget {
       required this.buttonText,
       required this.onTap,
       required this.iconPath,
-      required this.color});
+      required this.color,
+      this.isLogo = false});
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +42,15 @@ class PrimaryIconWithButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              iconPath,
-              width: 40,
-            ),
+            isLogo
+                ? Image.asset(
+                    IconsPath.applogo,
+                    width: 40,
+                  )
+                : SvgPicture.asset(
+                    iconPath,
+                    width: 40,
+                  ),
             const SizedBox(
               width: 10,
             ),
@@ -53,20 +60,6 @@ class PrimaryIconWithButton extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primaryContainer,
                   ),
             ),
-            // AnimatedTextKit(
-            //   animatedTexts: [
-            //     WavyAnimatedText(
-            //       buttonText,
-            //       speed: const Duration(milliseconds: 400),
-            //       textStyle: Theme.of(context)
-            //           .textTheme
-            //           .headlineMedium
-            //           ?.copyWith(
-            //             color: Theme.of(context).colorScheme.primaryContainer,
-            //           ),
-            //     )
-            //   ],
-            // ),
           ],
         ),
       ),

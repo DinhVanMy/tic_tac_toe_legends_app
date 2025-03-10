@@ -5,11 +5,11 @@ import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 
-class FriendsNotificationsPage extends StatelessWidget {
+class NotesWidget extends StatelessWidget {
   final ThemeData theme;
   final NotifyInMainController notifyInMainController;
   final FirestoreController firestoreController;
-  const FriendsNotificationsPage(
+  const NotesWidget(
       {super.key,
       required this.theme,
       required this.notifyInMainController,

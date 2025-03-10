@@ -5,6 +5,7 @@ import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Components/gifphy/display_gif_widget.dart';
+import 'package:tictactoe_gameapp/Components/shimmers/messages_placeholder_widget.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Configs/paint_draws/bubble_chat_painter.dart';
 import 'package:tictactoe_gameapp/Data/chat_friend_controller.dart';
@@ -50,7 +51,33 @@ class ChatFriendItem extends StatelessWidget {
             : const SizedBox()),
         Expanded(
           child: Obx(() {
-            if (chatController.filtermessages.isEmpty) {
+            if (chatController.filtermessages.isEmpty &&
+                chatController.isLoadingMore.value) {
+              return Column(
+                children: [
+                  ListView.builder(
+                    itemCount: 5, // Số lượng placeholder hiển thị
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return const MessagesPlaceholderWidget(
+                        isMe: false,
+                      );
+                    },
+                  ),
+                  ListView.builder(
+                    itemCount: 5, // Số lượng placeholder hiển thị
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return const MessagesPlaceholderWidget(
+                        isMe: true,
+                      );
+                    },
+                  ),
+                ],
+              );
+            } else if (chatController.filtermessages.isEmpty) {
               return Center(
                 child: Container(
                   decoration: BoxDecoration(

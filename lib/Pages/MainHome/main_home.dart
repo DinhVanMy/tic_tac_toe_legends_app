@@ -12,11 +12,11 @@ class MainHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final MainHomeController controller = Get.put(MainHomeController());
     final BackgroundMusicController effectiveMusicController = Get.find();
-    
+
     //todo check network
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Get.put(CheckNetworkController(), permanent: true);
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Get.put(CheckNetworkController(), permanent: true);
+    // });
     return Scaffold(
       body: Obx(() {
         final currentPage = controller.pages[controller.currentIndex.value];
@@ -70,7 +70,7 @@ class MainHomePage extends StatelessWidget {
       bottomNavigationBar: CurvedBottomNavBar(
         currentIndex: controller.currentIndex.value,
         onTabChanged: (value) async {
-          await effectiveMusicController.buttonSoundEffect();
+          // await effectiveMusicController.buttonSoundEffect();
           controller.currentIndex.value = value;
         },
       ),

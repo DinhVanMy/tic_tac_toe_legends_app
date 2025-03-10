@@ -11,12 +11,13 @@ import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/agora_livest
 import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/create_livestream_room_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/livestream_doc_service.dart';
-import 'package:tictactoe_gameapp/Test/shimmers/lives_placeholder_widget.dart';
+import 'package:tictactoe_gameapp/Components/shimmers/lives_placeholder_widget.dart';
 
-class WorldBlogPage extends StatelessWidget {
+class SocialLivestreamsWidget extends StatelessWidget {
   final UserModel user;
   final ThemeData theme;
-  const WorldBlogPage({super.key, required this.user, required this.theme});
+  const SocialLivestreamsWidget(
+      {super.key, required this.user, required this.theme});
 
   @override
   Widget build(BuildContext context) {

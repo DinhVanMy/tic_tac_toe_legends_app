@@ -27,11 +27,8 @@ class SettingScreen extends StatelessWidget {
 
     final LanguageController languageController =
         Get.find<LanguageController>();
-    final OnlineStatusController onlineStatusController =
-        Get.find<OnlineStatusController>();
+
     final theme = Theme.of(context);
-    final List<String> playlistLight = [AudioSPath.shinobuTheme];
-    final List<String> playlistDark = [AudioSPath.akazaTheme];
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -153,8 +150,14 @@ class SettingScreen extends StatelessWidget {
               SettingsTile(
                 title: Text("logout_sett".tr),
                 onPressed: (BuildContext context) {
-                  musicController.digitalSoundEffect();
-                  logoutMessage(context, onlineStatusController);
+                  if (Get.isRegistered<OnlineStatusController>()) {
+                    final OnlineStatusController onlineStatusController =
+                        Get.find<OnlineStatusController>();
+                    musicController.digitalSoundEffect();
+                    logoutMessage(context, onlineStatusController);
+                  } else {
+                    errorMessage("you haven't singed in?");
+                  }
                 },
                 leading: const Icon(Icons.logout),
                 description: Text("logout_from_app_sett".tr),
@@ -189,9 +192,9 @@ class SettingScreen extends StatelessWidget {
                     onChanged: (bool value) {
                       if (value) {
                         if (isDarkMode) {
-                          musicController.playMusic(playlistDark);
+                          musicController.playMusic([AudioSPath.infinityCastle]);
                         } else {
-                          musicController.playMusic(playlistLight);
+                          musicController.playMusic([AudioSPath.matchingSound]);
                         }
                       } else {
                         musicController.stopMusic();

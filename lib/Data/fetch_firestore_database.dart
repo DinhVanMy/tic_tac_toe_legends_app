@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
-import 'package:tictactoe_gameapp/Models/message_friend_model.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 
 class FirestoreController extends GetxController {
@@ -15,6 +13,7 @@ class FirestoreController extends GetxController {
   var friendsList = <UserModel>[].obs;
   var filterfriendsList = <UserModel>[].obs;
   var searchText = ''.obs;
+  var isLoadingFriends = false.obs;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String userId = Get.find<AuthController>().getCurrentUserId();
@@ -70,6 +69,7 @@ class FirestoreController extends GetxController {
   }
 
   Future<void> loadFriendsLive() async {
+    isLoadingFriends.value = true;
     try {
       friendsSubscription = _firestore
           .collection('users')
@@ -100,12 +100,15 @@ class FirestoreController extends GetxController {
             friendsList.clear(); // Nếu không có bạn bè, danh sách sẽ rỗng
           }
         }
+        isLoadingFriends.value = false;
         filterFriends();
       }, onError: (e) {
         errorMessage(e.toString());
+        isLoadingFriends.value = false;
       });
     } catch (e) {
       errorMessage(e.toString());
+      isLoadingFriends.value = false;
     }
   }
 

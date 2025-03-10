@@ -29,9 +29,9 @@ class AuthPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SvgPicture.asset(
+                        Image.asset(
                           IconsPath.applogo,
-                          width: 200,
+                          width: 120,
                         )
                       ],
                     ),
@@ -73,6 +73,7 @@ class AuthPage extends StatelessWidget {
                                     await loginBottomSheet(context);
                                   },
                                   iconPath: IconsPath.applogo,
+                                  isLogo: true,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .primary
@@ -89,6 +90,7 @@ class AuthPage extends StatelessWidget {
                                     await registerBottomSheet(context);
                                   },
                                   iconPath: IconsPath.applogo,
+                                  isLogo: true,
                                   color: Theme.of(context)
                                       .colorScheme
                                       .primary

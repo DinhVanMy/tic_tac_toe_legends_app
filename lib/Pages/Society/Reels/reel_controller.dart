@@ -17,12 +17,9 @@ class ReelController extends GetxController {
 
   var reelsList = <ReelModel>[].obs;
   RxBool isLiked = false.obs;
-  bool isFetching = false;
+  RxBool isFetching = false.obs;
   int pageSize = 3;
-
-  //animation like
   RxBool showLikeAnimation = false.obs;
-  // RxBool isLiked = false.obs;
 
   @override
   void onInit() {
@@ -33,8 +30,8 @@ class ReelController extends GetxController {
 
   Future<void> fetchInitialReels() async {
     reelsList.clear();
-    if (isFetching) return;
-    isFetching = true;
+    if (isFetching.value) return;
+    isFetching.value = true;
     try {
       QuerySnapshot snapshot = await _firestore
           .collection('reels')
@@ -51,13 +48,11 @@ class ReelController extends GetxController {
     } catch (e) {
       errorMessage("Error fetching reels: $e");
     } finally {
-      isFetching = false;
+      isFetching.value = false;
     }
   }
 
   Future<void> fetchMoreReels() async {
-    if (isFetching || lastDocument == null) return;
-    isFetching = true;
     try {
       Query query = _firestore
           .collection('reels')
@@ -77,8 +72,6 @@ class ReelController extends GetxController {
       }
     } catch (e) {
       errorMessage("Error fetching more reels: $e");
-    } finally {
-      isFetching = false;
     }
   }
 
@@ -110,19 +103,24 @@ class ReelController extends GetxController {
     required String videoUrl,
     required UserModel user,
     required String description,
-    XFile? thumbnailUrl,
     List<String>? taggedUserIds,
+    XFile? imagePath,
   }) async {
     var uuid = const Uuid();
     String reelId = uuid.v4();
-    final String? thumbnailUrl64 = await _getUrlVideo(thumbnailUrl);
-
+    String? thumbnailUrl;
+    if (imagePath == null) {
+      thumbnailUrl =
+          await CompressImageFunction.generateThumbnailBase64(videoUrl);
+    } else {
+      thumbnailUrl = await _getUrlVideo(imagePath);
+    }
     ReelModel newReel = ReelModel(
       reelId: reelId,
       reelUser: user,
       videoUrl: videoUrl,
       description: description,
-      thumbnailUrl: thumbnailUrl64,
+      thumbnailUrl: thumbnailUrl ?? "",
       taggedUserIds: taggedUserIds,
       createdAt: DateTime.now(),
       likedList: [],
@@ -199,24 +197,6 @@ class ReelController extends GetxController {
       return false.obs;
     }
     return reel.likedList!.contains(userId).obs;
-  }
-
-  Future<XFile?> pickImageGallery() async {
-    final XFile? images = await picker.pickImage(
-      maxHeight: 240,
-      maxWidth: 320,
-      source: ImageSource.gallery,
-    );
-    return images;
-  }
-
-  Future<XFile?> pickImageCamera() async {
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.camera,
-      maxHeight: 240,
-      maxWidth: 320,
-    );
-    return image;
   }
 
   Future<void> incrementSharedCount(

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:http/http.dart' as http;
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -28,7 +29,7 @@ class NotificationController extends GetxController {
   // Khởi tạo flutter_local_notifications
   Future<void> _initializeFlutterLocalNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('branding');
+        AndroidInitializationSettings('app_logo');
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings();
     const InitializationSettings initializationSettings =
@@ -73,10 +74,18 @@ class NotificationController extends GetxController {
     final androidPlugin =
         flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
-    bool? isGranted = await androidPlugin?.requestNotificationsPermission();
-    if (isGranted != null && !isGranted) {
-      // Xử lý khi người dùng từ chối quyền
+    // Yêu cầu quyền thông báo (Android 13+)
+    bool? notificationGranted =
+        await androidPlugin?.requestNotificationsPermission();
+    if (notificationGranted != null && !notificationGranted) {
       errorMessage("Quyền thông báo bị từ chối!");
+    }
+
+    // Yêu cầu quyền full-screen intent (API 34+)
+    bool? fullScreenGranted =
+        await androidPlugin?.requestFullScreenIntentPermission();
+    if (fullScreenGranted != null && !fullScreenGranted) {
+      errorMessage("Quyền full-screen intent bị từ chối!");
     }
   }
 
@@ -109,7 +118,7 @@ class NotificationController extends GetxController {
       importance: Importance.high,
       priority: Priority.high,
       color: Colors.lightBlueAccent,
-      largeIcon: DrawableResourceAndroidBitmap('notification_logo'),
+      largeIcon: DrawableResourceAndroidBitmap('branding'),
       ledColor: Colors.white,
       ledOnMs: 1000, // Đèn LED bật trong 1 giây
       ledOffMs: 1000, // Đèn LED tắt trong 1 giây
@@ -119,7 +128,6 @@ class NotificationController extends GetxController {
     );
     const NotificationDetails notificationDetails =
         NotificationDetails(android: androidDetails);
-
     await flutterLocalNotificationsPlugin.show(
       _createUniqueId(),
       title,
@@ -132,7 +140,7 @@ class NotificationController extends GetxController {
   // Hiển thị thông báo cuộc gọi
   Future<void> showCallNotification(
       String callerName, String callerImage) async {
-    final Uint8List largeIconBytes = await _loadNetworkImage(callerImage);
+    Uint8List largeIconBytes = await _loadNetworkImage(callerImage);
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
       'call_channel_v2',
@@ -148,12 +156,21 @@ class NotificationController extends GetxController {
       vibrationPattern: Int64List.fromList(
           [0, 1000, 500, 1000]), // Mô phỏng highVibrationPattern
       fullScreenIntent: true,
-      timeoutAfter: 30000, // Hết hạn sau 30 giây
+      timeoutAfter: 35000, // Hết hạn sau 30 giây
+      visibility: NotificationVisibility.public,
       actions: [
-        const AndroidNotificationAction('decline_call', 'DECLINE',
-            showsUserInterface: true),
-        const AndroidNotificationAction('accept_call', 'ACCEPT',
-            showsUserInterface: true),
+        const AndroidNotificationAction(
+          'decline_call',
+          'DECLINE',
+          showsUserInterface: true,
+          titleColor: Colors.redAccent,
+        ),
+        const AndroidNotificationAction(
+          'accept_call',
+          'ACCEPT',
+          showsUserInterface: true,
+          titleColor: Colors.greenAccent,
+        ),
       ],
       playSound: true,
       sound: const RawResourceAndroidNotificationSound('call_sound'),
@@ -172,15 +189,20 @@ class NotificationController extends GetxController {
 
   // Hiển thị thông báo tin nhắn
   Future<void> showMessageNotification(
-      String senderName, String message) async {
+      String senderName, String message, String senderImage) async {
+    Uint8List largeIconBytes = await _loadNetworkImage(senderImage);
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'message_channel',
+      'message_channel_v2',
       'Message notifications',
       channelDescription: 'Notification channel for message notifications',
       importance: Importance.high,
       priority: Priority.high,
       color: Colors.blue,
+      largeIcon: ByteArrayAndroidBitmap(largeIconBytes),
+      ledColor: Colors.lightBlueAccent,
+      ledOnMs: 1000, // Đèn LED bật trong 1 giây
+      ledOffMs: 1000, // Đèn LED tắt trong 1 giây
       vibrationPattern: Int64List.fromList([0, 100, 200, 100]),
       groupKey: 'message_group_$senderName', // Nhóm theo người gửi
       setAsGroupSummary: false, // Thông báo chi tiết
@@ -190,13 +212,13 @@ class NotificationController extends GetxController {
             showsUserInterface: true, allowGeneratedReplies: true),
       ],
       playSound: true,
-      sound: const RawResourceAndroidNotificationSound('message_sound'),
+      sound: const RawResourceAndroidNotificationSound('notification_sound'),
     );
 
     // Tạo thông báo tổng hợp cho nhóm
     final AndroidNotificationDetails groupSummaryDetails =
         AndroidNotificationDetails(
-      'message_channel',
+      'message_channel_v2',
       'Message notifications',
       channelDescription: 'Notification channel for message notifications',
       importance: Importance.high,
@@ -279,15 +301,53 @@ class NotificationController extends GetxController {
 
   Future<Uint8List> _loadNetworkImage(String url) async {
     try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return response.bodyBytes; // Trả về dữ liệu byte của ảnh
+      // Kiểm tra cache bằng DefaultCacheManager
+      final fileInfo = await DefaultCacheManager().getFileFromCache(url);
+      if (fileInfo != null) {
+        // Nếu ảnh đã có trong cache, đọc byte từ file cache
+        return await fileInfo.file.readAsBytes();
       } else {
-        throw Exception(
-            'Failed to load image from URL: ${response.statusCode}');
+        // Nếu không có trong cache, tải từ mạng và lưu vào cache
+        final file = await DefaultCacheManager().getSingleFile(url);
+        return await file.readAsBytes();
       }
     } catch (e) {
       throw Exception('Error loading network image: $e');
     }
+  }
+
+  Future<Uint8List> _processImageWithCanvas(Uint8List imageBytes,
+      {int borderWidth = 2, Color borderColor = Colors.blueAccent}) async {
+    final codec = await ui.instantiateImageCodec(imageBytes);
+    final frame = await codec.getNextFrame();
+    final uiImage = frame.image;
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    final size = Size(uiImage.width.toDouble() + borderWidth * 2,
+        uiImage.height.toDouble() + borderWidth * 2);
+
+    // Vẽ viền
+    final paintBorder = Paint()
+      ..color = borderColor
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(
+        Offset(size.width / 2, size.height / 2), size.width / 2, paintBorder);
+
+    // Vẽ ảnh bo tròn
+    canvas.save();
+    canvas.clipRRect(RRect.fromRectAndRadius(
+      Rect.fromLTWH(borderWidth.toDouble(), borderWidth.toDouble(),
+          uiImage.width.toDouble(), uiImage.height.toDouble()),
+      Radius.circular(uiImage.width / 2),
+    ));
+    canvas.drawImage(uiImage,
+        Offset(borderWidth.toDouble(), borderWidth.toDouble()), Paint());
+    canvas.restore();
+
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(size.width.toInt(), size.height.toInt());
+    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
   }
 }

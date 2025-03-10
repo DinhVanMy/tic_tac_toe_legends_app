@@ -1,18 +1,20 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/whitecodel/video_full_screen_widget.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/whitecodel/whitecodel_reels_controller.dart';
 import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-/// Widget sử dụng StatefulWidget để khởi tạo controller chỉ một lần.
 class WhiteCodelReelsPage extends StatefulWidget {
-  final List<String>? videoList;
+  final List<ReelModel>? reels;
   final String? singleVideoUrl;
-  final Widget? loader;
+  final String? reelThumbnail;
   final bool isCaching;
   final int startIndex;
   final ReelController? reelController;
@@ -27,13 +29,13 @@ class WhiteCodelReelsPage extends StatefulWidget {
 
   const WhiteCodelReelsPage({
     super.key,
-    this.videoList,
     this.singleVideoUrl,
-    this.loader,
     this.isCaching = false,
     this.builder,
     this.startIndex = 0,
     this.reelController,
+    this.reelThumbnail,
+    this.reels,
   });
 
   @override
@@ -49,7 +51,6 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
   @override
   void initState() {
     super.initState();
-    // Tạo tag duy nhất dựa trên singleVideoUrl hoặc videoList
     final tag = widget.singleVideoUrl != null
         ? 'whitecodel_reels_controller_${widget.singleVideoUrl.hashCode}'
         : 'whitecodel_reels_controller';
@@ -60,7 +61,7 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
     } else {
       controller = Get.put(
         WhiteCodelReelsController(
-          reelsVideoList: widget.videoList ??
+          reelsVideoList: widget.reels?.map((e) => e.videoUrl!).toList() ??
               (widget.singleVideoUrl != null ? [widget.singleVideoUrl!] : []),
           isCaching: widget.isCaching,
           startIndex: widget.startIndex,
@@ -69,84 +70,126 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
       );
     }
   }
-@override
-void dispose() {
-  _isMounted = false;
-  _progressListeners.forEach((index, listener) {
-    if (index < controller.videoPlayerControllerList.length) {
-      controller.videoPlayerControllerList[index].removeListener(listener);
-    }
-  });
-  _progressControllers.forEach((_, controller) => controller.close());
-  final tag = widget.singleVideoUrl != null
-      ? 'whitecodel_reels_controller_${widget.singleVideoUrl.hashCode}'
-      : 'whitecodel_reels_controller';
-  Get.delete<WhiteCodelReelsController>(tag: tag, force: true);
-  super.dispose();
-}
+
+  @override
+  void dispose() {
+    _isMounted = false;
+    _progressListeners.forEach((index, listener) {
+      if (index < controller.videoPlayerControllerList.length) {
+        controller.videoPlayerControllerList[index].removeListener(listener);
+      }
+    });
+    _progressControllers.forEach((_, controller) => controller.close());
+    final tag = widget.singleVideoUrl != null
+        ? 'whitecodel_reels_controller_${widget.singleVideoUrl.hashCode}'
+        : 'whitecodel_reels_controller';
+    Get.delete<WhiteCodelReelsController>(tag: tag, force: true);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Obx(
-        () => PageView.builder(
+      body: Obx(() {
+        final itemCount = controller.isFetchingMore.value
+            ? controller.videoPlayerControllerList.length + 1
+            : controller.videoPlayerControllerList.length;
+        return PageView.builder(
           controller: controller.pageController,
-          itemCount: controller.videoPlayerControllerList
-              .length, //controller.pageCount.value, //!invalid length
+          itemCount: itemCount,
           scrollDirection: Axis.vertical,
           onPageChanged: (index) async {
-            // Kiểm tra index hợp lệ
-            if (index < 0 ||
-                index >= controller.videoPlayerControllerList.length) {
-              return; // Thoát nếu index không hợp lệ
-            }
-            // Pause tất cả video ngoại trừ video hiện tại
-            for (var i = 0;
-                i < controller.videoPlayerControllerList.length;
-                i++) {
-              if (i != index &&
-                  controller.videoPlayerControllerList[i].value.isInitialized) {
-                await controller.videoPlayerControllerList[i].pause();
+            try {
+              if (index < 0 ||
+                  index >= controller.videoPlayerControllerList.length) {
+                return;
               }
-            }
-            // Chỉ play nếu controller đã được khởi tạo
-            if (controller
-                .videoPlayerControllerList[index].value.isInitialized) {
-              await controller.videoPlayerControllerList[index].play();
-            }
-            if (widget.reelController != null) {
-              controller.checkAndFetchMoreReels(
-                  reelController: widget.reelController!, currentIndex: index);
+              for (var i = 0;
+                  i < controller.videoPlayerControllerList.length;
+                  i++) {
+                if (i != index &&
+                    controller
+                        .videoPlayerControllerList[i].value.isInitialized) {
+                  await controller.videoPlayerControllerList[i].pause();
+                }
+              }
+              if (controller
+                  .videoPlayerControllerList[index].value.isInitialized) {
+                await controller.videoPlayerControllerList[index].play();
+              }
+              if (widget.reelController != null) {
+                controller.checkAndFetchMoreReels(
+                    reelController: widget.reelController!,
+                    currentIndex: index);
+              }
+            } catch (e) {
+              errorMessage("Please calm down the controller");
             }
           },
           itemBuilder: (context, index) {
-            return _buildTile(index);
+            if (index < controller.videoPlayerControllerList.length) {
+              return _buildTile(index);
+            } else {
+              return const Center(
+                  child: CircularProgressIndicator(color: Colors.white));
+            }
           },
-        ),
-      ),
+        );
+      }),
     );
   }
 
   Widget _buildTile(int index) {
+    final reel = widget.reels != null && index < widget.reels!.length
+        ? widget.reels![index]
+        : null;
+    final vpController = controller.videoPlayerControllerList[index];
+    if (vpController.dataSource.isEmpty) {
+      return Center(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: reel?.thumbnailUrl != null
+              ? BoxDecoration(
+                  image: DecorationImage(
+                    image: MemoryImage(base64Decode(reel!.thumbnailUrl!)),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(0.5), BlendMode.dstATop),
+                  ),
+                )
+              : null,
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, color: Colors.white, size: 50),
+              SizedBox(height: 10),
+              Text("Video unavailable",
+                  style: TextStyle(color: Colors.white, fontSize: 16)),
+            ],
+          ),
+        ),
+      );
+    }
+
     return VisibilityDetector(
       key: Key('reel_tile_$index'),
       onVisibilityChanged: (visibilityInfo) async {
         if (!_isMounted) return;
-        if (index < 0 || index >= controller.videoPlayerControllerList.length)
-          // ignore: curly_braces_in_flow_control_structures
+        if (index < 0 || index >= controller.videoPlayerControllerList.length) {
           return;
+        }
         await Future.delayed(const Duration(milliseconds: 100));
         if (visibilityInfo.visibleFraction < 0.5) {
-          if (controller.videoPlayerControllerList[index].value.isInitialized) {
-            await controller.videoPlayerControllerList[index]
-                .seekTo(Duration.zero);
-            await controller.videoPlayerControllerList[index].pause();
+          if (vpController.value.isInitialized) {
+            await vpController.seekTo(Duration.zero);
+            await vpController.pause();
           }
           controller.safeAnimationStop();
         } else {
-          if (controller.videoPlayerControllerList[index].value.isInitialized) {
-            await controller.videoPlayerControllerList[index].play();
+          if (vpController.value.isInitialized) {
+            await vpController.play();
           }
           controller.listenEvents(index);
           await controller.initNearByVideos(index);
@@ -158,11 +201,9 @@ void dispose() {
       },
       child: GestureDetector(
         onTap: () async {
-          if (index < 0 ||
-              index >= controller.videoPlayerControllerList.length) {
+          if (index < 0 || index >= controller.videoPlayerControllerList.length) {
             return;
           }
-          final vpController = controller.videoPlayerControllerList[index];
           if (vpController.value.isInitialized) {
             if (vpController.value.isPlaying) {
               await vpController.pause();
@@ -176,37 +217,48 @@ void dispose() {
           }
         },
         child: Obx(() {
-          // Kiểm tra index hợp lệ trước khi truy cập danh sách
           if (index < 0 ||
               index >= controller.videoPlayerControllerList.length) {
             return const Center(child: Text("Error: Invalid index"));
           }
-          final vpController = controller.videoPlayerControllerList[index];
           if (controller.loading.value || !vpController.value.isInitialized) {
-            return widget.loader ??
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(GifsPath.loadingGif2),
-                      fit: BoxFit.cover,
+            return reel?.thumbnailUrl != null
+                ? Image.memory(
+                    base64Decode(reel!.thumbnailUrl!),
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(GifsPath.loadingGif2),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(GifsPath.loadingGif2),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                );
+                  );
           }
           if (!_progressControllers.containsKey(index)) {
             _progressControllers[index] = StreamController<double>.broadcast();
             void listener() {
-              if (controller
-                      .videoPlayerControllerList[index].value.isInitialized &&
-                  _isMounted) {
-                double videoProgress = controller
-                        .videoPlayerControllerList[index]
-                        .value
-                        .position
-                        .inMilliseconds /
-                    vpController.value.duration.inMilliseconds;
+              if (vpController.value.isInitialized && _isMounted) {
+                double videoProgress =
+                    vpController.value.position.inMilliseconds /
+                        vpController.value.duration.inMilliseconds;
                 _progressControllers[index]!.add(videoProgress);
               }
             }

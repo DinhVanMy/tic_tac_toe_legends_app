@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
+import 'package:tictactoe_gameapp/Models/Functions/compress_image_function.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/api/fetch_url_link_api_page.dart';
@@ -20,7 +23,6 @@ class CreateReelPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ReelController reelController = Get.put(ReelController());
     final ThemeData theme = Theme.of(context);
     final TextEditingController videoUrlTextEditingController =
         TextEditingController();
@@ -56,11 +58,13 @@ class CreateReelPage extends StatelessWidget {
                     onTap: () async {
                       await Get.showOverlay(
                         asyncFunction: () async {
+                          final ReelController reelController =
+                              Get.put(ReelController());
                           await reelController.createReel(
                             videoUrl: videoUrl.value,
                             user: user,
                             description: description.value,
-                            thumbnailUrl: image,
+                            imagePath: image,
                           );
                         },
                         loadingWidget: Center(
@@ -168,17 +172,66 @@ class CreateReelPage extends StatelessWidget {
                 height: 20,
               ),
               Obx(() => isVideoValid.value
-                  ? SizedBox(
-                      height: 300,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: WhiteCodelReelsPage(
-                          // context: context,
-                          singleVideoUrl: videoUrl.value,
-                          
-                          isCaching: false,
+                  ? Column(
+                      children: [
+                        SizedBox(
+                          height: 300,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: WhiteCodelReelsPage(
+                              singleVideoUrl: videoUrl.value,
+                              isCaching: false,
+                            ),
+                          ),
                         ),
-                      ),
+                        FutureBuilder<String?>(
+                          future: CompressImageFunction.generateThumbnailBase64(
+                              videoUrl.value),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Container(
+                                width: double.infinity,
+                                height: 200,
+                                alignment: Alignment.center,
+                                child: const CircularProgressIndicator(),
+                              );
+                            }
+                            if (snapshot.hasError ||
+                                !snapshot.hasData ||
+                                snapshot.data == null) {
+                              return Container(
+                                width: double.infinity,
+                                height: 200,
+                                decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                    image: AssetImage(GifsPath.loadingGif2),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              );
+                            }
+                            return Image.memory(
+                              base64Decode(snapshot.data!),
+                              fit: BoxFit.cover,
+                              width: 270,
+                              height: 480,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(GifsPath.loadingGif2),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
                     )
                   : videoUrl.value.isNotEmpty
                       ? const Column(
@@ -267,7 +320,8 @@ class CreateReelPage extends StatelessWidget {
                   ),
                   OptionalTileWidget(
                     onTap: () async {
-                      image = await reelController.pickImageGallery();
+                      final ProfileController profileController = Get.find();
+                      image = await profileController.pickImageGallery();
                       if (image != null) {
                         imagePath.value = image!.path;
                       } else {
@@ -283,7 +337,8 @@ class CreateReelPage extends StatelessWidget {
                   ),
                   OptionalTileWidget(
                     onTap: () async {
-                      image = await reelController.pickImageCamera();
+                      final ProfileController profileController = Get.find();
+                      image = await profileController.pickImageCamera();
                       if (image != null) {
                         imagePath.value = image!.path;
                       } else {
@@ -307,8 +362,8 @@ class CreateReelPage extends StatelessWidget {
                         videoUrlTextEditingController.text = result;
                       }
                     },
-                    title: "Check in",
-                    icon: Icons.add_location_alt,
+                    title: "Video",
+                    icon: Icons.video_settings_rounded,
                     color: Colors.red,
                   ),
                 ],

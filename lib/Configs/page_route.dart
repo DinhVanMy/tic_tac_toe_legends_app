@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
 import 'package:tictactoe_gameapp/Pages/Auth/auth_page.dart';
-import 'package:tictactoe_gameapp/Pages/Friends/friends_page.dart';
+import 'package:tictactoe_gameapp/Pages/Friends/messenger_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Shop/shop_page.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/home_page.dart';
 import 'package:tictactoe_gameapp/Pages/MainHome/main_home.dart';

@@ -12,7 +12,7 @@ import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/post_comment_controller.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_comment_list_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Comment/post_comment_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/like_user_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';

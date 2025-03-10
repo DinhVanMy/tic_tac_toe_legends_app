@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Gradient Background -->
     <item>
         <shape android:shape="rectangle">
             <gradient
-                android:startColor="@android:color/holo_orange_light"
-                android:endColor="@android:color/holo_red_dark"
-                android:angle="45"/>
+                android:startColor="#FFD700" 
+                android:centerColor="#87CEEB"
+                android:endColor="#00008B"   
+                android:angle="135"/>
         </shape>
     </item>
+    <!-- App Logo -->
     <item>
-        <bitmap android:gravity="center" android:src="@drawable/app_logo"/>
+        <bitmap 
+            android:gravity="center" 
+            android:src="@drawable/app_logo"/>
     </item>
+    <!-- Branding Image -->
     <item android:bottom="16dp">
         <bitmap
             android:src="@drawable/branding_dark"

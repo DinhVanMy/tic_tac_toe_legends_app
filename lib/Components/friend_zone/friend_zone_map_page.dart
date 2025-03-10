@@ -12,7 +12,6 @@ import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/Overlays/profile_tooltip.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Enums/popup_position.dart';
-
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Components/rippleanimation/ripple_animation_widget.dart';
 import 'package:tictactoe_gameapp/Components/friend_zone/tinder_cards/tinder_cards_widget.dart';
@@ -91,7 +90,6 @@ class FriendZoneMapPage extends StatelessWidget {
                           : IconButton(
                               onPressed: () async {
                                 FocusScope.of(context).unfocus();
-
                                 await Get.showOverlay(
                                   asyncFunction: () async {
                                     await locationController
@@ -297,62 +295,116 @@ class FriendZoneMapPage extends StatelessWidget {
                         ),
                       );
                     }),
-                    ...firestoreController.usersList.map((friend) {
-                      final randomPosition = _generateRandomLatLng(
-                        locationController.currentPosition.value == null
-                            ? latlng
-                            : LatLng(
-                                locationController
-                                    .currentPosition.value!.latitude,
-                                locationController
-                                    .currentPosition.value!.longitude),
-                        0.009,
-                      );
-                      final GlobalKey itemKey = GlobalKey();
-                      return Marker(
-                        point: randomPosition,
-                        width: 50,
-                        height: 50,
-                        child: InkWell(
-                          key: itemKey,
-                          onDoubleTap: () async {
-                            await locationController.getRouteToFriend(
-                                userPosition: latlng,
-                                friendPos: randomPosition);
-                          },
-                          onTap: () {
-                            profileTooltip.showProfileTooltip(
-                              context,
-                              itemKey,
-                              friend,
-                              PopupPosition.above,
-                              null,
-                              null,
-                              null,
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.redAccent,
-                              border:
-                                  Border.all(color: Colors.redAccent, width: 3),
-                            ),
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundImage: friend.image != null &&
-                                      friend.image!.isNotEmpty
-                                  ? CachedNetworkImageProvider(friend.image!)
-                                  : null,
-                              child:
-                                  friend.image == null || friend.image!.isEmpty
-                                      ? const Icon(Icons.person_2_outlined)
-                                      : null,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
+                    // ...locationController.displayUsers.map((nearUser) {
+                    //   final LatLng nearUserLatLng = nearUser.location == null
+                    //       ? defaultLatLng
+                    //       : LatLng(
+                    //           nearUser.location!.latitude,
+                    //           nearUser.location!.longitude,
+                    //         );
+                    //   final GlobalKey markerKey = GlobalKey();
+                    //   return Marker(
+                    //     point: nearUserLatLng,
+                    //     width: 50,
+                    //     height: 50,
+                    //     child: InkWell(
+                    //       key: markerKey,
+                    //       onDoubleTap: () async {
+                    //         await locationController.getRouteToFriend(
+                    //           userPosition: latlng,
+                    //           friendPos: nearUserLatLng,
+                    //         );
+                    //       },
+                    //       onTap: () {
+                    //         profileTooltip.showProfileTooltip(
+                    //           context,
+                    //           markerKey,
+                    //           nearUser,
+                    //           PopupPosition.above,
+                    //           null,
+                    //           null,
+                    //           null,
+                    //         );
+                    //       },
+                    //       child: Container(
+                    //         decoration: BoxDecoration(
+                    //           shape: BoxShape.circle,
+                    //           color: Colors.green,
+                    //           border: Border.all(color: Colors.green, width: 3),
+                    //         ),
+                    //         child: CircleAvatar(
+                    //           radius: 30,
+                    //           backgroundImage: nearUser.image != null &&
+                    //                   nearUser.image!.isNotEmpty
+                    //               ? CachedNetworkImageProvider(nearUser.image!)
+                    //               : null,
+                    //           child: nearUser.image == null ||
+                    //                   nearUser.image!.isEmpty
+                    //               ? const Icon(Icons.person_2_outlined)
+                    //               : null,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   );
+                    // }),
+                    // ...firestoreController.usersList.map(
+                    //   (friend) {
+                    //     final randomPosition = _generateRandomLatLng(
+                    //       locationController.currentPosition.value == null
+                    //           ? latlng
+                    //           : LatLng(
+                    //               locationController
+                    //                   .currentPosition.value!.latitude,
+                    //               locationController
+                    //                   .currentPosition.value!.longitude),
+                    //       0.009,
+                    //     );
+                    //     final GlobalKey itemKey = GlobalKey();
+                    //     return Marker(
+                    //       point: randomPosition,
+                    //       width: 50,
+                    //       height: 50,
+                    //       child: InkWell(
+                    //         key: itemKey,
+                    //         onDoubleTap: () async {
+                    //           await locationController.getRouteToFriend(
+                    //               userPosition: latlng,
+                    //               friendPos: randomPosition);
+                    //         },
+                    //         onTap: () {
+                    //           profileTooltip.showProfileTooltip(
+                    //             context,
+                    //             itemKey,
+                    //             friend,
+                    //             PopupPosition.above,
+                    //             null,
+                    //             null,
+                    //             null,
+                    //           );
+                    //         },
+                    //         child: Container(
+                    //           decoration: BoxDecoration(
+                    //             shape: BoxShape.circle,
+                    //             color: Colors.redAccent,
+                    //             border: Border.all(
+                    //                 color: Colors.redAccent, width: 3),
+                    //           ),
+                    //           child: CircleAvatar(
+                    //             radius: 30,
+                    //             backgroundImage: friend.image != null &&
+                    //                     friend.image!.isNotEmpty
+                    //                 ? CachedNetworkImageProvider(friend.image!)
+                    //                 : null,
+                    //             child: friend.image == null ||
+                    //                     friend.image!.isEmpty
+                    //                 ? const Icon(Icons.person_2_outlined)
+                    //                 : null,
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
                   ],
                 ),
               ),

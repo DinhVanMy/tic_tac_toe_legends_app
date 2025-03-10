@@ -25,7 +25,7 @@ class PostController extends GetxController {
   var postsList = <PostModel>[].obs;
   RxBool isLiked = false.obs;
 
-  bool isFetching = false;
+  RxBool isFetching = false.obs;
   int pageSize = 2;
 
   @override
@@ -40,8 +40,8 @@ class PostController extends GetxController {
 
   // Hàm tải dữ liệu trang đầu tiên
   Future<void> fetchInitialPosts() async {
-    if (isFetching) return; // Nếu đang tải, bỏ qua
-    isFetching = true;
+    if (isFetching.value) return; // Nếu đang tải, bỏ qua
+    isFetching.value = true;
 
     try {
       QuerySnapshot snapshot = await _firestore
@@ -60,13 +60,13 @@ class PostController extends GetxController {
     } catch (e) {
       errorMessage("Error fetching posts: $e");
     } finally {
-      isFetching = false;
+      isFetching.value = false;
     }
   }
 
   Future<void> fetchFilteredPosts() async {
-    if (isFetching) return;
-    isFetching = true;
+    if (isFetching.value) return;
+    isFetching.value = true;
 
     try {
       Query query = _firestore.collection('posts').limit(pageSize);
@@ -93,14 +93,14 @@ class PostController extends GetxController {
     } catch (e) {
       errorMessage("Error fetching posts: $e");
     } finally {
-      isFetching = false;
+      isFetching.value = false;
     }
   }
 
   // Hàm tải thêm bình luận
   Future<void> fetchMoreFilteredPosts() async {
-    if (isFetching || lastDocument == null) return;
-    isFetching = true;
+    if (isFetching.value || lastDocument == null) return;
+    isFetching.value = true;
 
     try {
       // Khởi tạo query và sắp xếp trước
@@ -134,7 +134,7 @@ class PostController extends GetxController {
     } catch (e) {
       errorMessage("Error fetching more posts: $e");
     } finally {
-      isFetching = false;
+      isFetching.value = false;
     }
   }
 

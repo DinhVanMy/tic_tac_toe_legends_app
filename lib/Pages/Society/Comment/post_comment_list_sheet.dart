@@ -13,7 +13,7 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/post_comment_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Comment/post_reply_comment_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/expandable_text_custom.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_reply_comment_list_sheet.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Comment/post_reply_comment_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_model.dart';
 import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
 

@@ -13,6 +13,7 @@ class CurvedBottomNavBar extends StatelessWidget {
     return CurvedNavigationBar(
       key: GlobalKey(),
       index: currentIndex,
+      height: 60,
       items: <Widget>[
         // Icon(Icons.android_outlined, size: 30, color: Colors.white),
         Container(
@@ -32,7 +33,8 @@ class CurvedBottomNavBar extends StatelessWidget {
         ),
         const Icon(Icons.chat_outlined, size: 30, color: Colors.white),
         const Icon(Icons.home_filled, size: 30, color: Colors.white),
-        const Icon(Icons.widgets_outlined, size: 30, color: Colors.white),
+        const Icon(Icons.video_collection_rounded,
+            size: 30, color: Colors.white),
         const Icon(Icons.newspaper_outlined, size: 30, color: Colors.white),
       ],
       color: Colors.blue,

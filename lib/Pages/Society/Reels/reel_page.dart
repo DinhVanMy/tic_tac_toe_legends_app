@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
 import 'package:tictactoe_gameapp/Models/Functions/fetch_firestore_data_functions.dart';
 import 'package:tictactoe_gameapp/Models/Functions/general_bottomsheet_show_function.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
@@ -25,16 +26,17 @@ import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_model.dart';
 import 'package:video_player/video_player.dart';
 
 class ReelPage extends StatelessWidget {
-  final UserModel user;
-  const ReelPage({super.key, required this.user});
+  const ReelPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final ReelController reelController = Get.put(ReelController());
+    final ProfileController profileController = Get.find<ProfileController>();
+    final user = profileController.user!;
     return Scaffold(
       body: Obx(() {
-        if (reelController.reelsList.isEmpty) {
+        if (reelController.isFetching.value) {
           return Container(
             width: double.infinity,
             height: double.infinity,
@@ -54,7 +56,7 @@ class ReelPage extends StatelessWidget {
               WhiteCodelReelsPage(
                 isCaching: true,
                 reelController: reelController,
-                videoList: reels.map((e) => e.videoUrl!).toList(),
+                reels: reels,
                 builder: (context, index, child, videoPlayerController,
                     pageController, videoProgressController) {
                   if (index < 0 || index >= reels.length) {
@@ -114,7 +116,7 @@ class ReelPage extends StatelessWidget {
                         bottom: 10,
                         right: 0,
                         child: _buildActionButtons(
-                            context, reel, index, reelController),
+                            context, reel, index, reelController, user),
                       ),
                       if (reelController.showLikeAnimation.value)
                         LikeAnimationWidget(
@@ -200,7 +202,7 @@ class ReelPage extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context, ReelModel reel, int index,
-      ReelController reelController) {
+      ReelController reelController, UserModel user) {
     return Column(
       children: [
         AvatarUserWidget(

@@ -194,17 +194,7 @@ class ChatWithFriendPage extends StatelessWidget {
                 color: Colors.deepPurpleAccent,
                 size: 30,
               ),
-              onPressed: () async {
-                await GeneralBottomsheetShowFunction
-                    .showScrollableGeneralBottomsheet(
-                  widgetBuilder: (context, controller) => BackgroundListSheet(
-                    scrollController: controller,
-                    chatFriendController: chatController,
-                  ),
-                  context: context,
-                  initHeight: 0.9,
-                );
-              },
+              onPressed: () async => _openThemeChange(context, chatController),
             ),
           ],
         ),
@@ -220,21 +210,28 @@ class ChatWithFriendPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Obx(
-                () => chatController.isEmptyMessage.value
-                    ? _buildProfilePreview(theme)
-                    : Expanded(
-                        child: ChatFriendItem(
-                          userFriend: userFriend,
-                          currentUserId: firestoreController.userId,
-                          chatController: chatController,
-                          firestoreController: firestoreController,
-                          color: backgroundColors,
-                          theme: theme,
-                        ),
-                      )
-                        .animate()
-                        .slide(duration: const Duration(milliseconds: 750)),
+              Expanded(
+                child: GestureDetector(
+                  onLongPress: () async =>
+                      _openThemeChange(context, chatController),
+                  child: Obx(
+                    () => chatController.isEmptyMessage.value
+                        ? _buildProfilePreview(theme)
+                        : ChatFriendItem(
+                            userFriend: userFriend,
+                            currentUserId: firestoreController.userId,
+                            chatController: chatController,
+                            firestoreController: firestoreController,
+                            color: backgroundColors,
+                            theme: theme,
+                          )
+                            .animate()
+                            .slide(duration: const Duration(milliseconds: 750)),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
               ),
               Obx(() {
                 if (imagePath.value.isNotEmpty) {
@@ -454,6 +451,18 @@ class ChatWithFriendPage extends StatelessWidget {
         ),
       );
     });
+  }
+
+  Future<void> _openThemeChange(
+      BuildContext context, ChatFriendController chatController) async {
+    await GeneralBottomsheetShowFunction.showScrollableGeneralBottomsheet(
+      widgetBuilder: (context, controller) => BackgroundListSheet(
+        scrollController: controller,
+        chatFriendController: chatController,
+      ),
+      context: context,
+      initHeight: 0.9,
+    );
   }
 
   Widget _buildProfilePreview(ThemeData theme) {

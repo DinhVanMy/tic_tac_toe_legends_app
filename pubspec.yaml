@@ -12,7 +12,6 @@ dependencies:
   agora_token_service: ^0.1.2
   animated_text_kit: ^4.2.2
   any_link_preview: ^3.0.2
-  flutter_local_notifications: ^18.0.1
   bottom_sheet: ^4.0.4
   cached_network_image: ^3.3.1
   cloud_firestore: ^4.15.10
@@ -35,6 +34,7 @@ dependencies:
   flutter_chat_bubble: ^2.0.2
   flutter_dotenv: ^5.2.1
   flutter_inappwebview: ^6.0.0
+  flutter_local_notifications: ^18.0.1
   flutter_map: ^7.0.2
   flutter_polls: ^0.1.6
   flutter_settings_ui: ^3.0.1
@@ -59,6 +59,7 @@ dependencies:
   speech_to_text: null
   uuid: ^4.4.0
   video_player: ^2.9.2
+  video_thumbnail: ^0.5.3
   visibility_detector: ^0.4.0+2
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
@@ -85,7 +86,6 @@ flutter:
     - assets/borders/
     - assets/emotes/
     - assets/jajas/
-    - assets/videos/
     - .env
 
   fonts:
