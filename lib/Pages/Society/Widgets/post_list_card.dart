@@ -29,7 +29,6 @@ class PostListCard extends StatelessWidget {
   final UserModel currentUser;
   final ThemeData theme;
   final PostController postController;
-  final bool isHero;
   const PostListCard({
     super.key,
     required this.post,
@@ -37,7 +36,6 @@ class PostListCard extends StatelessWidget {
     required this.theme,
     required this.postController,
     required this.currentUser,
-    this.isHero = true,
   });
 
   @override
@@ -53,23 +51,16 @@ class PostListCard extends StatelessWidget {
       child: Column(
         children: [
           GestureDetector(
-            onTap: !isHero
-                ? null
-                : () {
-                    Get.to(UserAboutPage(
-                      unknownableUser: postUser,
-                      intdexString: post.postId!,
-                    ));
-                  },
+            onTap: () {
+              Get.to(
+                  UserAboutPage(
+                    unknownableUser: postUser,
+                  ),
+                  transition: Transition.leftToRightWithFade);
+            },
             child: Row(
               children: [
-                isHero
-                    ? Hero(
-                        tag: "user_avatar_${post.postId}",
-                        child: AvatarUserWidget(
-                            radius: 20, imagePath: postUser.image!),
-                      )
-                    : AvatarUserWidget(radius: 20, imagePath: postUser.image!),
+                AvatarUserWidget(radius: 20, imagePath: postUser.image!),
                 const SizedBox(
                   width: 10,
                 ),

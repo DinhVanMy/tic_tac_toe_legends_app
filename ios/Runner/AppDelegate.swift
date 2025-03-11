@@ -19,6 +19,11 @@ import flutter_local_notifications
     }
 
     GeneratedPluginRegistrant.register(with: self)
+
+    //configure for video thumbnail
+    let controller = window?.rootViewController as! FlutterViewController
+    ThumbnailPlugin.register(with: controller)
+
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

@@ -4,6 +4,7 @@ import 'package:tictactoe_gameapp/Components/profile_tooltip_widget.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/Overlays/draw_tria.dart';
 import 'package:tictactoe_gameapp/Enums/popup_position.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 
 class ProfileTooltip extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -121,7 +122,17 @@ class ProfileTooltip extends GetxController
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20)),
                           type: MaterialType.card,
-                          child: ProfileTooltipCustom(friend: user),
+                          child: ProfileTooltipCustom(
+                            friend: user,
+                            onTapInfo: () {
+                              removePopup();
+                              Get.to(
+                                  UserAboutPage(
+                                    unknownableUser: user,
+                                  ),
+                                  transition: Transition.fadeIn);
+                            },
+                          ),
                         ),
                       ],
                     ),

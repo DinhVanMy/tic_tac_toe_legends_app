@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Reels/api/video_thumbnail.dart';
 
 class CompressImageFunction {
   static Future<List<String>> processImages(List<XFile>? imageFiles) async {

@@ -69,6 +69,7 @@ class FirestoreController extends GetxController {
   }
 
   Future<void> loadFriendsLive() async {
+    if (isLoadingFriends.value) return;
     isLoadingFriends.value = true;
     try {
       friendsSubscription = _firestore
@@ -100,14 +101,13 @@ class FirestoreController extends GetxController {
             friendsList.clear(); // Nếu không có bạn bè, danh sách sẽ rỗng
           }
         }
-        isLoadingFriends.value = false;
         filterFriends();
       }, onError: (e) {
         errorMessage(e.toString());
-        isLoadingFriends.value = false;
       });
     } catch (e) {
       errorMessage(e.toString());
+    } finally {
       isLoadingFriends.value = false;
     }
   }

@@ -139,7 +139,6 @@ class HyperlinkTextFunction {
     if (tagUser != null) {
       Get.to(
           () => UserAboutPage(
-                intdexString: username,
                 unknownableUser: tagUser,
               ),
           transition: Transition.zoom);

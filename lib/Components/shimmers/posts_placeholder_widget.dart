@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class PostsPlaceholderWidget extends StatelessWidget {
-  const PostsPlaceholderWidget({super.key});
+  final int itemCount;
+  const PostsPlaceholderWidget({super.key, this.itemCount = 3});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +12,9 @@ class PostsPlaceholderWidget extends StatelessWidget {
 
   Widget _postPlaceholder() {
     return ListView.builder(
-      itemCount: 3,
+      itemCount: itemCount,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Column(

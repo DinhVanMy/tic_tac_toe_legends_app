@@ -44,7 +44,6 @@ class CardTinderWidget extends StatelessWidget {
               ),
               child: UserAboutPage(
                 unknownableUser: user,
-                intdexString: index.toString(),
                 isCardTinder: true,
               ),
             ),

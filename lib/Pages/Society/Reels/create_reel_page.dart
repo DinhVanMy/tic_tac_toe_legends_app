@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
-import 'package:tictactoe_gameapp/Models/Functions/compress_image_function.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/optional_tile_custom.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/api/fetch_url_link_api_page.dart';
@@ -184,53 +181,53 @@ class CreateReelPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        FutureBuilder<String?>(
-                          future: CompressImageFunction.generateThumbnailBase64(
-                              videoUrl.value),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Container(
-                                width: double.infinity,
-                                height: 200,
-                                alignment: Alignment.center,
-                                child: const CircularProgressIndicator(),
-                              );
-                            }
-                            if (snapshot.hasError ||
-                                !snapshot.hasData ||
-                                snapshot.data == null) {
-                              return Container(
-                                width: double.infinity,
-                                height: 200,
-                                decoration: const BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage(GifsPath.loadingGif2),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              );
-                            }
-                            return Image.memory(
-                              base64Decode(snapshot.data!),
-                              fit: BoxFit.cover,
-                              width: 270,
-                              height: 480,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  decoration: const BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(GifsPath.loadingGif2),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        ),
+                        // FutureBuilder<String?>(
+                        //   future: CompressImageFunction.generateThumbnailBase64(
+                        //       videoUrl.value),
+                        //   builder: (context, snapshot) {
+                        //     if (snapshot.connectionState ==
+                        //         ConnectionState.waiting) {
+                        //       return Container(
+                        //         width: double.infinity,
+                        //         height: 200,
+                        //         alignment: Alignment.center,
+                        //         child: const CircularProgressIndicator(),
+                        //       );
+                        //     }
+                        //     if (snapshot.hasError ||
+                        //         !snapshot.hasData ||
+                        //         snapshot.data == null) {
+                        //       return Container(
+                        //         width: double.infinity,
+                        //         height: 200,
+                        //         decoration: const BoxDecoration(
+                        //           image: DecorationImage(
+                        //             image: AssetImage(GifsPath.loadingGif2),
+                        //             fit: BoxFit.cover,
+                        //           ),
+                        //         ),
+                        //       );
+                        //     }
+                        //     return Image.memory(
+                        //       base64Decode(snapshot.data!),
+                        //       fit: BoxFit.cover,
+                        //       width: 270,
+                        //       height: 480,
+                        //       errorBuilder: (context, error, stackTrace) {
+                        //         return Container(
+                        //           width: double.infinity,
+                        //           height: double.infinity,
+                        //           decoration: const BoxDecoration(
+                        //             image: DecorationImage(
+                        //               image: AssetImage(GifsPath.loadingGif2),
+                        //               fit: BoxFit.cover,
+                        //             ),
+                        //           ),
+                        //         );
+                        //       },
+                        //     );
+                        //   },
+                        // ),
                       ],
                     )
                   : videoUrl.value.isNotEmpty

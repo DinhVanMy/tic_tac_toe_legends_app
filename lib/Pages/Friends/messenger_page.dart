@@ -148,59 +148,61 @@ class FriendsPage extends StatelessWidget {
                                   ),
                                 ),
                               );
-                            } else if (firestoreController
-                                .friendsList.isEmpty) {
-                              return const SizedBox();
-                            }
-                            var friends =
-                                firestoreController.friendsList.toList();
-                            return Expanded(
-                              child: SizedBox(
-                                height: 120,
-                                child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  physics: const BouncingScrollPhysics(),
-                                  itemCount: friends.length,
-                                  itemBuilder: (context, index) {
-                                    var friend = friends[index];
-                                    return Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: [
-                                          Stack(
+                            } else {
+                              if (firestoreController.friendsList.isEmpty) {
+                                return const SizedBox();
+                              } else {
+                                var friends =
+                                    firestoreController.friendsList.toList();
+                                return Expanded(
+                                  child: SizedBox(
+                                    height: 120,
+                                    child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      physics: const BouncingScrollPhysics(),
+                                      itemCount: friends.length,
+                                      itemBuilder: (context, index) {
+                                        var friend = friends[index];
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
                                             children: [
-                                              AvatarUserWidget(
-                                                radius: 35,
-                                                imagePath: friend.image!,
-                                              ),
-                                              Positioned(
-                                                bottom: 0,
-                                                right: 0,
-                                                child: Container(
-                                                  width: 20,
-                                                  height: 20,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.green,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            100),
-                                                    border: Border.all(
-                                                      color: Colors.white,
-                                                      width: 3,
+                                              Stack(
+                                                children: [
+                                                  AvatarUserWidget(
+                                                    radius: 35,
+                                                    imagePath: friend.image!,
+                                                  ),
+                                                  Positioned(
+                                                    bottom: 0,
+                                                    right: 0,
+                                                    child: Container(
+                                                      width: 20,
+                                                      height: 20,
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.green,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 3,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
+                                              Text(friend.name!),
                                             ],
                                           ),
-                                          Text(friend.name!),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
                           }),
                         ],
                       ),

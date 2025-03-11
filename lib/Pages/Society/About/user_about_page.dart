@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
+import 'package:tictactoe_gameapp/Components/shimmers/friendavatar_placeholder_widget.dart';
+import 'package:tictactoe_gameapp/Components/shimmers/posts_placeholder_widget.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/MainHome/notify_in_main_controller.dart';
@@ -9,31 +11,30 @@ import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/chat_with_friend_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/About/user_about_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/create_post_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_list_card.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
 
 class UserAboutPage extends StatelessWidget {
-  final String intdexString;
   final UserModel unknownableUser;
   final bool isCardTinder;
 
   const UserAboutPage({
     super.key,
     required this.unknownableUser,
-    required this.intdexString,
     this.isCardTinder = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final ProfileController profileController = Get.find();
-    UserModel currentUser = profileController.user!;
+    final UserModel currentUser = profileController.user!;
     final ThemeData theme = Theme.of(context);
     final ScrollController scrollController = ScrollController();
     final UserAboutController userAboutController = Get.put(
         UserAboutController(userId: unknownableUser.id!),
-        tag: unknownableUser.id! + intdexString);
+        tag: unknownableUser.id!);
     final FirestoreController firestoreController =
         Get.find<FirestoreController>();
     final List<String> options = ["Favoritest", "Newest", "Oldest"];
@@ -85,14 +86,11 @@ class UserAboutPage extends StatelessWidget {
                     Positioned(
                       bottom: -100,
                       left: 20,
-                      child: Hero(
-                        tag: "user_avatar_$intdexString",
-                        child: AvatarUserWidget(
-                          radius: 100,
-                          imagePath: unknownableUser.image!,
-                          gradientColors: const [Colors.white, Colors.white],
-                          borderThickness: 5.0,
-                        ),
+                      child: AvatarUserWidget(
+                        radius: 100,
+                        imagePath: unknownableUser.image!,
+                        gradientColors: const [Colors.white, Colors.white],
+                        borderThickness: 5.0,
                       ),
                     ),
                   ],
@@ -280,46 +278,45 @@ class UserAboutPage extends StatelessWidget {
                         "Details",
                         style: theme.textTheme.bodyLarge,
                       ),
-                      SizedBox(
-                        height: 200,
-                        child: ListView.builder(
-                            itemCount: PostEditModel.listPostEditModels.length,
-                            itemBuilder: (context, index) {
-                              var option =
-                                  PostEditModel.listPostEditModels[index];
-                              return Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {},
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          option.icon,
-                                          size: 25,
-                                          color: Colors.blueGrey,
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Expanded(
-                                          child: Text(
-                                            option.description,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.black,
-                                              fontStyle: FontStyle.italic,
-                                            ),
+                      ListView.builder(
+                          itemCount: PostEditModel.listPostEditModels.length,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            var option =
+                                PostEditModel.listPostEditModels[index];
+                            return Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {},
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        option.icon,
+                                        size: 25,
+                                        color: Colors.blueGrey,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          option.description,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.black,
+                                            fontStyle: FontStyle.italic,
                                           ),
-                                        )
-                                      ],
-                                    ),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
-                              );
-                            }),
-                      ),
+                              ),
+                            );
+                          }),
                       const SizedBox(
                         height: 10,
                       ),
@@ -329,64 +326,77 @@ class UserAboutPage extends StatelessWidget {
                       ),
                       Obx(
                         () {
-                          if (userAboutController.friendsList.isEmpty) {
-                            return const SizedBox();
-                          }
-                          var friends =
-                              userAboutController.friendsList.toList();
-                          return SizedBox(
-                            height: 120,
-                            width: double.infinity,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: friends.length,
-                              itemBuilder: (context, index) {
-                                var friend = friends[index];
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: [
-                                      Stack(
+                          if (userAboutController.isLoadingFriends.value) {
+                            return SizedBox(
+                              height: 120,
+                              width: double.infinity,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 5,
+                                itemBuilder: (context, index) {
+                                  return const FriendavatarPlaceholderWidget();
+                                },
+                              ),
+                            );
+                          } else {
+                            if (userAboutController.friendsList.isEmpty) {
+                              return const SizedBox();
+                            } else {
+                              var friends =
+                                  userAboutController.friendsList.toList();
+                              return SizedBox(
+                                height: 120,
+                                width: double.infinity,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const BouncingScrollPhysics(),
+                                  itemCount: friends.length,
+                                  itemBuilder: (context, index) {
+                                    var friend = friends[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
                                         children: [
-                                          AvatarUserWidget(
-                                              radius: 35,
-                                              imagePath: friend.image!),
-                                          Positioned(
-                                            bottom: 0,
-                                            right: 0,
-                                            child: Container(
-                                              width: 20,
-                                              height: 20,
-                                              decoration: BoxDecoration(
-                                                color: Colors.green,
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
-                                                border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 3,
+                                          Stack(
+                                            children: [
+                                              AvatarUserWidget(
+                                                  radius: 35,
+                                                  imagePath: friend.image!),
+                                              Positioned(
+                                                bottom: 0,
+                                                right: 0,
+                                                child: Container(
+                                                  width: 20,
+                                                  height: 20,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.green,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            100),
+                                                    border: Border.all(
+                                                      color: Colors.white,
+                                                      width: 3,
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
+                                          ),
+                                          Text(
+                                            friend.name!,
+                                            style: theme.textTheme.bodyLarge!
+                                                .copyWith(
+                                                    color: Colors.blueAccent),
                                           ),
                                         ],
                                       ),
-                                      Text(
-                                        friend.name!,
-                                        style: theme.textTheme.bodyLarge!
-                                            .copyWith(color: Colors.blueAccent),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          );
+                                    );
+                                  },
+                                ),
+                              );
+                            }
+                          }
                         },
-                      ),
-                      Text(
-                        "${unknownableUser.name}'s Posts",
-                        style: theme.textTheme.bodyLarge,
                       ),
                       Obx(() => DropdownButton<String>(
                             value: selectedOption.value,
@@ -417,41 +427,70 @@ class UserAboutPage extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      Obx(() {
-                        if (userAboutController.postsList.isEmpty) {
-                          return Center(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              child: const CircularProgressIndicator(
-                                color: Colors.blue,
-                              ),
-                            ),
-                          );
-                        } else {
-                          var posts = userAboutController.postsList.toList();
-                          return ListView.builder(
-                              itemCount: posts.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                var post = posts[index];
-                                var postUser = post.postUser!;
-                                final PostController postController =
-                                    Get.put(PostController());
-                                return PostListCard(
-                                  theme: theme,
-                                  post: post,
-                                  postUser: postUser,
-                                  currentUser: currentUser,
-                                  postController: postController,
-                                  isHero: false,
-                                );
-                              });
-                        }
-                      })
+                      Obx(
+                        () {
+                          if (userAboutController.isLoadingPosts.value) {
+                            return const PostsPlaceholderWidget(
+                              itemCount: 1,
+                            );
+                          } else {
+                            if (userAboutController.postsList.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "You haven't yet push any post?",
+                                      style: theme.textTheme.bodyLarge,
+                                    ),
+                                    Text(
+                                      "Post now",
+                                      style: theme.textTheme.bodySmall,
+                                    ),
+                                    IconButton(
+                                      onPressed: () {
+                                        final PostController postController =
+                                            Get.put(PostController());
+                                        Get.to(
+                                          CreatePostPage(
+                                            userModel: currentUser,
+                                            postController: postController,
+                                          ),
+                                          transition: Transition.downToUp,
+                                        );
+                                      },
+                                      icon: const Icon(
+                                          Icons.arrow_circle_right_outlined),
+                                      iconSize: 40,
+                                      color: Colors.blueAccent,
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              var posts =
+                                  userAboutController.postsList.toList();
+                              return ListView.builder(
+                                  itemCount: posts.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    var post = posts[index];
+                                    var postUser = post.postUser!;
+                                    final PostController postController =
+                                        Get.put(PostController());
+                                    return PostListCard(
+                                      theme: theme,
+                                      post: post,
+                                      postUser: postUser,
+                                      currentUser: currentUser,
+                                      postController: postController,
+                                    );
+                                  });
+                            }
+                          }
+                        },
+                      )
                     ],
                   ),
                 ),

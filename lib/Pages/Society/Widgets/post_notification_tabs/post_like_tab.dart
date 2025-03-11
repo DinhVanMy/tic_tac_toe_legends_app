@@ -62,10 +62,11 @@ class PostLikeTab extends StatelessWidget {
                   onTap: () async {
                     await postNotificationController
                         .markAsRead(likeNotification.id!);
-                    Get.to(UserAboutPage(
-                      unknownableUser: likeUser,
-                      intdexString: likeNotification.postId!,
-                    ));
+                    Get.to(
+                        UserAboutPage(
+                          unknownableUser: likeUser,
+                        ),
+                        transition: Transition.leftToRightWithFade);
                   },
                   onLongPress: () async {
                     await postNotificationController

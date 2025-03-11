@@ -9,7 +9,8 @@ class UserAboutController extends GetxController {
 
   var friendsList = <UserModel>[].obs;
   var postsList = <PostModel>[].obs;
-
+  RxBool isLoadingFriends = false.obs;
+  RxBool isLoadingPosts = false.obs;
   final String userId;
   UserAboutController({required this.userId});
 
@@ -22,6 +23,8 @@ class UserAboutController extends GetxController {
 
   // Tải danh sách bạn bè từ Firestore khi khởi tạo
   Future<void> fetchFriendsList() async {
+    if (isLoadingFriends.value) return;
+    isLoadingFriends.value = true;
     try {
       friendsList.clear();
 
@@ -51,12 +54,16 @@ class UserAboutController extends GetxController {
             .toList());
       }
     } catch (e) {
-      errorMessage(e.toString());
+      print(e.toString());
+    } finally {
+      isLoadingFriends.value = false;
     }
   }
 
   // Hàm lấy danh sách bài đăng của người dùng hiện tại từ Firestore
   Future<void> fetchPostsList() async {
+    if (isLoadingPosts.value) return;
+    isLoadingPosts.value = true;
     try {
       // Query các tài liệu trong collection 'posts' với điều kiện postUserId == currentUserId
       QuerySnapshot querySnapshot = await _firestore
@@ -71,6 +78,8 @@ class UserAboutController extends GetxController {
       postsList.value = posts;
     } catch (e) {
       errorMessage("Error fetching posts by current user: $e");
+    } finally {
+      isLoadingPosts.value = false;
     }
   }
 }
