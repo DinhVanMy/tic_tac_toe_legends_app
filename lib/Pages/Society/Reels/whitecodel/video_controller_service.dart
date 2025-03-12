@@ -1,10 +1,9 @@
 import 'dart:developer';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:video_player/video_player.dart';
-
-/// Abstract class định nghĩa phương thức lấy controller cho video.
 abstract class VideoControllerService {
-  Future<VideoPlayerController?> getControllerForVideo(String url, bool isCaching);
+  Future<VideoPlayerController?> getControllerForVideo(
+      String url, bool isCaching);
 }
 
 class CachedVideoControllerService extends VideoControllerService {
@@ -13,7 +12,8 @@ class CachedVideoControllerService extends VideoControllerService {
   CachedVideoControllerService(this._cacheManager);
 
   @override
-  Future<VideoPlayerController?> getControllerForVideo(String url, bool isCaching) async {
+  Future<VideoPlayerController?> getControllerForVideo(
+      String url, bool isCaching) async {
     if (isCaching) {
       try {
         FileInfo? fileInfo = await _cacheManager.getFileFromCache(url);
@@ -42,12 +42,11 @@ class CustomCacheManager {
   static CacheManager instance = CacheManager(
     Config(
       key,
-      stalePeriod: const Duration(hours: 1),
-      maxNrOfCacheObjects: 20,
+      stalePeriod: const Duration(minutes: 30), // Xóa cache sau 30 phút
+      maxNrOfCacheObjects: 10, // Giới hạn tối đa 10 video trong cache
       repo: JsonCacheInfoRepository(databaseName: key),
       fileSystem: IOFileSystem(key),
       fileService: HttpFileService(),
     ),
   );
-  static CacheManager defaultInstance = DefaultCacheManager();
 }

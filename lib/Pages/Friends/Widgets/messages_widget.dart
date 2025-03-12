@@ -9,6 +9,7 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/chat_with_friend_page.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/listen_latest_messages_controller.dart';
 import 'package:tictactoe_gameapp/Components/shimmers/chats_placeholder_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 
 class MessagesWidget extends StatelessWidget {
   final ListenLatestMessagesController listenLatestMessagesController;
@@ -139,11 +140,17 @@ class MessagesWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const SizedBox(width: 10),
-            const Icon(
-              Icons.share,
-              color: Colors.blue,
-              size: 35,
-            ), // Icon share
+            IconButton(
+                onPressed: () {
+                  Get.to(
+                      UserAboutPage(
+                        unknownableUser: friend,
+                      ),
+                      transition: Transition.leftToRightWithFade);
+                },
+                icon: const Icon(
+                  Icons.info_rounded,
+                )),
             const Icon(
               Icons.pin_drop,
               color: Colors.blue,

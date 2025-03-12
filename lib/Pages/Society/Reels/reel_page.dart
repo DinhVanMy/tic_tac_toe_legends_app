@@ -26,7 +26,8 @@ import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_model.dart';
 import 'package:video_player/video_player.dart';
 
 class ReelPage extends StatelessWidget {
-  const ReelPage({super.key});
+  final bool isBackable;
+  const ReelPage({super.key, this.isBackable = false});
 
   @override
   Widget build(BuildContext context) {
@@ -131,15 +132,17 @@ class ReelPage extends StatelessWidget {
                   );
                 },
               ),
-              Positioned(
-                top: 10,
-                left: 10,
-                child: IconButton(
-                  onPressed: () => Get.toNamed("mainHome"),
-                  icon: const Icon(Icons.arrow_back_rounded,
-                      color: Colors.white, size: 30),
-                ),
-              ),
+              isBackable
+                  ? Positioned(
+                      top: 10,
+                      left: 10,
+                      child: IconButton(
+                        onPressed: () => Get.toNamed("mainHome"),
+                        icon: const Icon(Icons.arrow_back_rounded,
+                            color: Colors.white, size: 30),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
               Positioned(
                 top: 10,
                 right: 10,

@@ -109,7 +109,9 @@ class SocialMediaPage extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            Get.to(const ReelPage());
+                            Get.to(const ReelPage(
+                              isBackable: true,
+                            ));
                           },
                           icon: const Icon(
                             Icons.video_collection_rounded,

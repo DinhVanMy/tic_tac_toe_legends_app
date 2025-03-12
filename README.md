@@ -50,7 +50,7 @@ Story Feature – Share disappearing content similar to Instagram & Facebook Sto
 ```sh
 git status
 git add .
-git commit -m "Commit message"
+git commit -m "New commmit updating"
 git push origin master
 ```
 

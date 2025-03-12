@@ -8,6 +8,9 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         GeneratedPluginRegistrant.registerWith(flutterEngine)
-        flutterEngine.plugins.add(ThumbnailPlugin()) // Đăng ký ThumbnailPlugin
+        val pluginRegistry = flutterEngine.plugins
+        if (!pluginRegistry.has(ThumbnailPlugin::class.java)) {
+            pluginRegistry.add(ThumbnailPlugin())
+        }
     }
 }

@@ -1,8 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_edit_model.dart';
 
 class ShareSheetCustom extends StatelessWidget {
@@ -55,11 +56,8 @@ class ShareSheetCustom extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        backgroundImage:
-                            CachedNetworkImageProvider(currentUser.image!),
-                        radius: 30,
-                      ),
+                      AvatarUserWidget(
+                          radius: 30, imagePath: currentUser.image!),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
@@ -272,10 +270,16 @@ class ShareSheetCustom extends StatelessWidget {
                           children: [
                             Stack(
                               children: [
-                                CircleAvatar(
-                                  backgroundImage:
-                                      CachedNetworkImageProvider(friend.image!),
-                                  radius: 35,
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.to(
+                                        UserAboutPage(
+                                          unknownableUser: friend,
+                                        ),
+                                        transition: Transition.upToDown);
+                                  },
+                                  child: AvatarUserWidget(
+                                      radius: 35, imagePath: friend.image!),
                                 ),
                                 Positioned(
                                   bottom: 0,

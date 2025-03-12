@@ -40,9 +40,9 @@ class PostController extends GetxController {
 
   // Hàm tải dữ liệu trang đầu tiên
   Future<void> fetchInitialPosts() async {
+    postsList.clear();
     if (isFetching.value) return; // Nếu đang tải, bỏ qua
     isFetching.value = true;
-
     try {
       QuerySnapshot snapshot = await _firestore
           .collection('posts')
@@ -65,9 +65,9 @@ class PostController extends GetxController {
   }
 
   Future<void> fetchFilteredPosts() async {
+    postsList.clear();
     if (isFetching.value) return;
     isFetching.value = true;
-
     try {
       Query query = _firestore.collection('posts').limit(pageSize);
 
@@ -126,7 +126,9 @@ class PostController extends GetxController {
         var newPosts = snapshot.docs.map((doc) {
           return PostModel.fromJson(doc.data() as Map<String, dynamic>);
         }).toList();
-        postsList.addAll(newPosts);
+        var uniqueNewPosts = newPosts.where((newPost) =>
+            !postsList.any((post) => post.postId == newPost.postId));
+        postsList.addAll(uniqueNewPosts);
         lastDocument = snapshot.docs.last;
       } else {
         lastDocument = null;
@@ -145,21 +147,21 @@ class PostController extends GetxController {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .listen((snapshot) {
+      // if (isFetching.value) return;
       for (var change in snapshot.docChanges) {
+        var newPost =
+            PostModel.fromJson(change.doc.data() as Map<String, dynamic>);
         if (change.type == DocumentChangeType.added) {
-          // Bài viết mới được thêm
-          postsList.insert(
-              0, PostModel.fromJson(change.doc.data() as Map<String, dynamic>));
+          if (!postsList.any((post) => post.postId == newPost.postId)) {
+            postsList.insert(0, newPost);
+          }
         } else if (change.type == DocumentChangeType.modified) {
-          // Bài viết được cập nhật
           int index =
               postsList.indexWhere((post) => post.postId == change.doc.id);
           if (index != -1) {
-            postsList[index] =
-                PostModel.fromJson(change.doc.data() as Map<String, dynamic>);
+            postsList[index] = newPost;
           }
         } else if (change.type == DocumentChangeType.removed) {
-          // Bài viết bị xóa
           postsList.removeWhere((post) => post.postId == change.doc.id);
         }
       }

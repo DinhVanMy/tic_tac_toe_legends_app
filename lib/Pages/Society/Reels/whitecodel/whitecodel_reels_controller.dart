@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_controller.dart';
 import 'package:video_player/video_player.dart';
@@ -13,7 +12,7 @@ class WhiteCodelReelsController extends GetxController
   RxList<VideoPlayerController> videoPlayerControllerList =
       <VideoPlayerController>[].obs;
   final CachedVideoControllerService videoControllerService =
-      CachedVideoControllerService(DefaultCacheManager());
+      CachedVideoControllerService(CustomCacheManager.instance);
 
   RxBool loading = true.obs;
   RxBool visible = false.obs;
@@ -181,7 +180,7 @@ class WhiteCodelReelsController extends GetxController
     String url = videoList[index];
     if (caching.contains(url)) return;
     caching.add(url);
-    final cacheManager = DefaultCacheManager();
+    final cacheManager = CustomCacheManager.instance;
     try {
       final fileInfo = await cacheManager.getFileFromCache(url);
       if (fileInfo != null) return;

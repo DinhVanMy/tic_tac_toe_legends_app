@@ -59,13 +59,14 @@ class ReelController extends GetxController {
           .orderBy('createdAt', descending: true)
           .startAfterDocument(lastDocument!)
           .limit(pageSize);
-
       QuerySnapshot snapshot = await query.get();
       if (snapshot.docs.isNotEmpty) {
         var newReels = snapshot.docs.map((doc) {
           return ReelModel.fromJson(doc.data() as Map<String, dynamic>);
         }).toList();
-        reelsList.addAll(newReels);
+        var uniqueNewReels = newReels.where((newReel) =>
+            !reelsList.any((reel) => reel.reelId == newReel.reelId));
+        reelsList.addAll(uniqueNewReels);
         lastDocument = snapshot.docs.last;
       } else {
         lastDocument = null;
@@ -82,15 +83,17 @@ class ReelController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       for (var change in snapshot.docChanges) {
+        var newReel =
+            ReelModel.fromJson(change.doc.data() as Map<String, dynamic>);
         if (change.type == DocumentChangeType.added) {
-          reelsList.insert(
-              0, ReelModel.fromJson(change.doc.data() as Map<String, dynamic>));
+          if (!reelsList.any((reel) => reel.reelId == newReel.reelId)) {
+            reelsList.insert(0, newReel);
+          }
         } else if (change.type == DocumentChangeType.modified) {
           int index =
               reelsList.indexWhere((reel) => reel.reelId == change.doc.id);
           if (index != -1) {
-            reelsList[index] =
-                ReelModel.fromJson(change.doc.data() as Map<String, dynamic>);
+            reelsList[index] = newReel;
           }
         } else if (change.type == DocumentChangeType.removed) {
           reelsList.removeWhere((reel) => reel.reelId == change.doc.id);

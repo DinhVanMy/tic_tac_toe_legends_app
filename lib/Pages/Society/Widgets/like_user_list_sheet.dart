@@ -1,7 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 
 class LikeUserListSheet extends StatelessWidget {
   final List<UserModel> likeUsers;
@@ -64,10 +65,16 @@ class LikeUserListSheet extends StatelessWidget {
                             borderRadius: BorderRadius.circular(100),
                             border: Border.all(color: Colors.blue, width: 3),
                           ),
-                          child: CircleAvatar(
-                            backgroundImage:
-                                CachedNetworkImageProvider(likeUser.image!),
-                            radius: 30,
+                          child: GestureDetector(
+                            onTap: () {
+                              Get.to(
+                                  UserAboutPage(
+                                    unknownableUser: likeUser,
+                                  ),
+                                  transition: Transition.leftToRightWithFade);
+                            },
+                            child: AvatarUserWidget(
+                                radius: 30, imagePath: likeUser.image!),
                           ),
                         ),
                         const SizedBox(

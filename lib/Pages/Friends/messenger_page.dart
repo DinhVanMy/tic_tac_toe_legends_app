@@ -11,6 +11,7 @@ import 'package:tictactoe_gameapp/Pages/Friends/Widgets/messages_widget.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/notes_widget.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/listen_latest_messages_controller.dart';
 import 'package:tictactoe_gameapp/Pages/HomePage/Drawer/drawer_nav_bar.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 
 class FriendsPage extends StatelessWidget {
   const FriendsPage({super.key});
@@ -169,9 +170,20 @@ class FriendsPage extends StatelessWidget {
                                             children: [
                                               Stack(
                                                 children: [
-                                                  AvatarUserWidget(
-                                                    radius: 35,
-                                                    imagePath: friend.image!,
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Get.to(
+                                                          UserAboutPage(
+                                                            unknownableUser:
+                                                                friend,
+                                                          ),
+                                                          transition: Transition
+                                                              .upToDown);
+                                                    },
+                                                    child: AvatarUserWidget(
+                                                      radius: 35,
+                                                      imagePath: friend.image!,
+                                                    ),
                                                   ),
                                                   Positioned(
                                                     bottom: 0,

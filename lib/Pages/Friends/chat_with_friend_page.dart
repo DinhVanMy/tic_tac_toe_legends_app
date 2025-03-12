@@ -22,6 +22,7 @@ import 'package:tictactoe_gameapp/Pages/Friends/Widgets/agora_call_page.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/background_list_sheet.dart';
 import 'package:tictactoe_gameapp/Pages/Friends/Widgets/chat_friend_item.dart';
 import 'package:tictactoe_gameapp/Components/emotes_picker_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatWithFriendPage extends StatelessWidget {
@@ -78,41 +79,50 @@ class ChatWithFriendPage extends StatelessWidget {
               ),
             ),
           ),
-          title: Row(
-            children: [
-              Hero(
-                tag: 'friendAvatar-${userFriend.id}',
-                transitionOnUserGestures: true,
-                child:
-                    AvatarUserWidget(radius: 25, imagePath: userFriend.image!),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(userFriend.name!, style: theme.textTheme.bodyLarge),
-                    userFriend.lastActive == null
-                        ? Text(
-                            "${userFriend.status ?? "Online"} 1 hour ago",
-                            style: theme.textTheme.bodySmall!
-                                .copyWith(color: Colors.grey),
-                          )
-                        : Text(
-                            "Online ${TimeFunctions.displayDate(userFriend.lastActive!)} - ${TimeFunctions.displayTimeDefault(userFriend.lastActive!)}",
-                            style: theme.textTheme.bodySmall!.copyWith(
-                              color: themColors != null
-                                  ? Colors.lightGreenAccent
-                                  : Colors.blueGrey,
-                            ),
-                            maxLines: 2,
-                          ),
-                  ],
+          title: GestureDetector(
+            onTap: () {
+              Get.to(
+                  UserAboutPage(
+                    unknownableUser: userFriend,
+                  ),
+                  transition: Transition.leftToRightWithFade);
+            },
+            child: Row(
+              children: [
+                Hero(
+                  tag: 'friendAvatar-${userFriend.id}',
+                  transitionOnUserGestures: true,
+                  child: AvatarUserWidget(
+                      radius: 25, imagePath: userFriend.image!),
                 ),
-              )
-            ],
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(userFriend.name!, style: theme.textTheme.bodyLarge),
+                      userFriend.lastActive == null
+                          ? Text(
+                              "${userFriend.status ?? "Online"} 1 hour ago",
+                              style: theme.textTheme.bodySmall!
+                                  .copyWith(color: Colors.grey),
+                            )
+                          : Text(
+                              "Online ${TimeFunctions.displayDate(userFriend.lastActive!)} - ${TimeFunctions.displayTimeDefault(userFriend.lastActive!)}",
+                              style: theme.textTheme.bodySmall!.copyWith(
+                                color: themColors != null
+                                    ? Colors.lightGreenAccent
+                                    : Colors.blueGrey,
+                              ),
+                              maxLines: 2,
+                            ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
           elevation: 3.0,
           actions: [
@@ -527,7 +537,13 @@ class ChatWithFriendPage extends StatelessWidget {
             height: 10,
           ),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Get.to(
+                  UserAboutPage(
+                    unknownableUser: userFriend,
+                  ),
+                  transition: Transition.upToDown);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white54,
             ),

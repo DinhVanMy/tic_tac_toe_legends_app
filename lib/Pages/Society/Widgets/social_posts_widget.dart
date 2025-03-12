@@ -6,6 +6,7 @@ import 'package:tictactoe_gameapp/Components/shimmers/friendavatar_placeholder_w
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Data/fetch_firestore_database.dart';
 import 'package:tictactoe_gameapp/Models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/About/user_about_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/create_post_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_list_card.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
@@ -91,9 +92,19 @@ class SocialPostsWidget extends StatelessWidget {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             50)),
-                                                child: AvatarUserWidget(
-                                                    radius: 25,
-                                                    imagePath: user.image!),
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    Get.to(
+                                                        UserAboutPage(
+                                                          unknownableUser: user,
+                                                        ),
+                                                        transition: Transition
+                                                            .upToDown);
+                                                  },
+                                                  child: AvatarUserWidget(
+                                                      radius: 25,
+                                                      imagePath: user.image!),
+                                                ),
                                               ),
                                               const SizedBox(
                                                 width: 10,
@@ -199,12 +210,22 @@ class SocialPostsWidget extends StatelessWidget {
                                                             children: [
                                                               Stack(
                                                                 children: [
-                                                                  AvatarUserWidget(
-                                                                      radius:
-                                                                          35,
-                                                                      imagePath:
-                                                                          friend
-                                                                              .image!),
+                                                                  GestureDetector(
+                                                                    onTap: () {
+                                                                      Get.to(
+                                                                          UserAboutPage(
+                                                                            unknownableUser:
+                                                                                friend,
+                                                                          ),
+                                                                          transition:
+                                                                              Transition.upToDown);
+                                                                    },
+                                                                    child: AvatarUserWidget(
+                                                                        radius:
+                                                                            35,
+                                                                        imagePath:
+                                                                            friend.image!),
+                                                                  ),
                                                                   Positioned(
                                                                     bottom: 0,
                                                                     right: 0,
