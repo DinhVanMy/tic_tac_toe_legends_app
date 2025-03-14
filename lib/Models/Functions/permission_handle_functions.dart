@@ -56,4 +56,5 @@ class PermissionHandleFunctions {
       await openAppSettings();
     }
   }
+
 }

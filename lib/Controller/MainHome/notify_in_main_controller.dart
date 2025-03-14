@@ -126,8 +126,13 @@ class NotifyInMainController extends GetxController {
 
       // Hiển thị lời mời chơi game và xóa sau 30 giây
       for (var invite in gameInvites) {
-        showGameInviteRequest(invite);
-
+        // showGameInviteRequest(invite);
+        // final NotificationController notificationController =
+        //     Get.put(NotificationController());
+        // notificationController.showMessageNotification(context,
+        //   invite.senderModel!,
+        //   "Uint8List largeIconBytes = await _loadNetworkImage(callerImage);",
+        // );
         // Xóa lời mời chơi game từ Firestore sau 30 giây
         Future.delayed(const Duration(seconds: 10), () {
           if (invite.id != null) {

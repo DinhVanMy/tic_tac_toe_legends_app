@@ -125,7 +125,7 @@ class CreatePostPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                 AvatarUserWidget(radius: 35, imagePath: userModel.image!),
+                  AvatarUserWidget(radius: 35, imagePath: userModel.image!),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -416,17 +416,9 @@ class CreatePostPage extends StatelessWidget {
                   ],
                 );
               }),
-              Column(
-                children: [
-                  PreviewGifWidget(selectedGif: selectedGif),
-                  IconButton(
-                    onPressed: () {
-                      selectedGif.value = null;
-                    },
-                    icon: const Icon(Icons.delete, size: 40, color: Colors.red),
-                  ),
-                ],
-              ),
+              GestureDetector(
+                  onTap: () => selectedGif.value = null,
+                  child: PreviewGifWidget(selectedGif: selectedGif)),
               const SizedBox(
                 height: 10,
               ),

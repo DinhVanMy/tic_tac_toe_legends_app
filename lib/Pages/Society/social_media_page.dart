@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/create_post_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/social_posts_widget.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_notification_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/social_livestreams_widget.dart';
+import 'package:tictactoe_gameapp/Pages/Society/agora_livestreaming/create_livestream_room_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/social_post_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/create_reel_page.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Reels/reel_page.dart';
@@ -119,16 +121,52 @@ class SocialMediaPage extends StatelessWidget {
                             color: Colors.deepPurpleAccent,
                           ),
                         ),
-                        IconButton(
-                          onPressed: () => Get.to(
-                            CreateReelPage(user: user),
-                            transition: Transition.upToDown,
-                          ),
-                          icon: const Icon(
-                            Icons.add_circle_rounded,
-                            size: 35,
-                            color: Colors.deepPurpleAccent,
-                          ),
+                        MenuAnchor(
+                          builder: (BuildContext context,
+                              MenuController controller, Widget? child) {
+                            return IconButton(
+                              onPressed: () {
+                                if (controller.isOpen) {
+                                  controller.close();
+                                } else {
+                                  controller.open();
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.add_circle_rounded,
+                                size: 35,
+                                color: Colors.deepPurpleAccent,
+                              ),
+                            );
+                          },
+                          menuChildren: [
+                            MenuItemButton(
+                              onPressed: () => Get.to(
+                                CreatePostPage(
+                                  userModel: user,
+                                  postController: postController,
+                                ),
+                                transition: Transition.upToDown,
+                              ),
+                              child: const Text(
+                                'Post',
+                              ),
+                            ),
+                            MenuItemButton(
+                              onPressed: () => Get.to(
+                                CreateReelPage(user: user),
+                                transition: Transition.upToDown,
+                              ),
+                              child: const Text('Reel'),
+                            ),
+                            MenuItemButton(
+                              onPressed: () => Get.to(
+                                CreateLivestreamRoomPage(currentUser: user),
+                                transition: Transition.upToDown,
+                              ),
+                              child: const Text('Stream'),
+                            ),
+                          ],
                         ),
                         IconButton(
                           onPressed: () {

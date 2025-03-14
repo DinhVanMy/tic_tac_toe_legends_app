@@ -244,3 +244,32 @@ void winnerDialog(
     ),
   );
 }
+
+Future<bool> showPermissionDeniedDialog() async {
+    bool? retry;
+    await Get.dialog(
+      AlertDialog(
+        title: const Text("Yêu Cầu Quyền Overlay"),
+        content: const Text(
+          "Ứng dụng cần quyền overlay để hiển thị bong bóng chat. Bạn có muốn cấp quyền không?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(); // Đóng dialog
+              retry = false; // Bỏ qua
+            },
+            child: const Text("Bỏ Qua"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back(); // Đóng dialog
+              retry = true; // Thử lại
+            },
+            child: const Text("Thử Lại"),
+          ),
+        ],
+      ),
+    );
+    return retry ?? false; // Mặc định bỏ qua nếu không chọn
+  }

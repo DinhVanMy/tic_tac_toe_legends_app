@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
+import 'package:tictactoe_gameapp/Models/user_model.dart';
 
 class NotificationController extends GetxController {
   static NotificationController get to => Get.find();
@@ -157,7 +158,6 @@ class NotificationController extends GetxController {
           [0, 1000, 500, 1000]), // Mô phỏng highVibrationPattern
       fullScreenIntent: true,
       timeoutAfter: 35000, // Hết hạn sau 30 giây
-      visibility: NotificationVisibility.public,
       actions: [
         const AndroidNotificationAction(
           'decline_call',
@@ -189,8 +189,8 @@ class NotificationController extends GetxController {
 
   // Hiển thị thông báo tin nhắn
   Future<void> showMessageNotification(
-      String senderName, String message, String senderImage) async {
-    Uint8List largeIconBytes = await _loadNetworkImage(senderImage);
+      UserModel senderModel, String message) async {
+    Uint8List largeIconBytes = await _loadNetworkImage(senderModel.image!);
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
       'message_channel_v2',
@@ -204,7 +204,7 @@ class NotificationController extends GetxController {
       ledOnMs: 1000, // Đèn LED bật trong 1 giây
       ledOffMs: 1000, // Đèn LED tắt trong 1 giây
       vibrationPattern: Int64List.fromList([0, 100, 200, 100]),
-      groupKey: 'message_group_$senderName', // Nhóm theo người gửi
+      groupKey: 'message_group_${senderModel.name}', // Nhóm theo người gửi
       setAsGroupSummary: false, // Thông báo chi tiết
       actions: [
         const AndroidNotificationAction('dismiss_mess', 'DISMISS'),
@@ -223,7 +223,7 @@ class NotificationController extends GetxController {
       channelDescription: 'Notification channel for message notifications',
       importance: Importance.high,
       priority: Priority.high,
-      groupKey: 'message_group_$senderName',
+      groupKey: 'message_group_${senderModel.name}',
       setAsGroupSummary: true, // Thông báo tổng hợp
     );
 
@@ -234,7 +234,7 @@ class NotificationController extends GetxController {
 
     await flutterLocalNotificationsPlugin.show(
       _createUniqueId(),
-      senderName,
+      senderModel.name,
       '📩 $message',
       notificationDetails,
       payload: 'dismiss_mess',
@@ -244,7 +244,7 @@ class NotificationController extends GetxController {
     await flutterLocalNotificationsPlugin.show(
       0, // ID cố định cho thông báo tổng hợp
       'New Messages',
-      'You have new messages from $senderName',
+      'You have new messages from ${senderModel.name}',
       summaryDetails,
     );
   }

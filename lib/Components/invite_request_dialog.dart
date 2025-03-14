@@ -200,18 +200,20 @@ class CallInviteRequestDialog extends StatelessWidget {
   final Function() onPressedAccept;
   final Function() onPressedRefuse;
   final bool isVideoCall;
+  final double height;
+  final double width;
   const CallInviteRequestDialog(
       {super.key,
       required this.friend,
       required this.onPressedAccept,
       required this.onPressedRefuse,
-      required this.isVideoCall});
+      required this.isVideoCall,  this.height = 400,  this.width =400});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 400,
-      width: 400,
+      height: height,
+      width: width,
       alignment: Alignment.center,
       // padding: const EdgeInsets.all(10.0),
       decoration: BoxDecoration(

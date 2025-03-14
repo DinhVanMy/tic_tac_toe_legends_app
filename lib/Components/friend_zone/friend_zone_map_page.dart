@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -20,6 +19,7 @@ class FriendZoneMapPage extends StatelessWidget {
   final FirestoreController firestoreController;
   final UserModel user;
   final LatLng latlng;
+
   const FriendZoneMapPage({
     super.key,
     required this.user,
@@ -35,6 +35,8 @@ class FriendZoneMapPage extends StatelessWidget {
         Get.put(LocationController(userId: user.id!));
     RxString searchText = "".obs;
     final TextEditingController textEditingController = TextEditingController();
+    final FocusNode searchFocusNode =
+        FocusNode(); // Thêm FocusNode để quản lý focus
     const List<String> mapUrl = [
       "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
@@ -42,119 +44,9 @@ class FriendZoneMapPage extends StatelessWidget {
     ];
     RxString selectedUrl = mapUrl[0].obs;
     RxBool isExpanded = false.obs;
+    RxBool isSearching = false.obs;
+
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        leading: Row(
-          children: [
-            IconButton(
-                onPressed: () => Get.back(),
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 35,
-                  color: Colors.redAccent,
-                )),
-          ],
-        ),
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 25,
-              child: user.image != null && user.image!.isNotEmpty
-                  ? CircleAvatar(
-                      backgroundImage: CachedNetworkImageProvider(user.image!),
-                      maxRadius: 55,
-                    )
-                  : const Icon(Icons.person_2_outlined),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
-            Expanded(
-              child: Obx(() => TextField(
-                    controller: textEditingController,
-                    onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        searchText.value = value;
-                      } else {
-                        searchText.value = "";
-                      }
-                    },
-                    decoration: InputDecoration(
-                      hintText: "Search someone...",
-                      suffixIcon: searchText.value == ""
-                          ? const Icon(
-                              Icons.search_off,
-                              color: Colors.grey,
-                            )
-                          : IconButton(
-                              onPressed: () async {
-                                FocusScope.of(context).unfocus();
-                                await Get.showOverlay(
-                                  asyncFunction: () async {
-                                    await locationController
-                                        .findFriendLocationByName(
-                                            searchText.value);
-                                    if (locationController
-                                            .friendLocation.value !=
-                                        null) {
-                                      await locationController.getRouteToFriend(
-                                          userPosition: latlng,
-                                          friendPos: locationController
-                                              .friendLocation.value!);
-                                    }
-                                  },
-                                  loadingWidget: Container(
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    decoration: const BoxDecoration(
-                                      image: DecorationImage(
-                                        image: AssetImage(
-                                          GifsPath.transitionGif,
-                                        ),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                ).then((_) {
-                                  if (locationController.friendLocation.value !=
-                                      null) {
-                                    locationController.mapController
-                                        .moveAndRotate(
-                                            locationController
-                                                    .friendLocation.value ??
-                                                latlng,
-                                            16,
-                                            1);
-                                  }
-                                });
-                                searchText.value = "";
-                                textEditingController.clear();
-                              },
-                              icon: const Icon(
-                                Icons.search,
-                                color: Colors.blueAccent,
-                                size: 30,
-                              )),
-                    ),
-                  )),
-            )
-          ],
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                isExpanded.value = !isExpanded.value;
-              },
-              icon: Obx(() => Icon(
-                    isExpanded.value
-                        ? Icons.remove_red_eye
-                        : Icons.remove_red_eye_outlined,
-                    size: 35,
-                    color: Colors.black,
-                  ))),
-        ],
-      ),
       body: Stack(
         children: [
           FlutterMap(
@@ -194,6 +86,66 @@ class FriendZoneMapPage extends StatelessWidget {
               Obx(
                 () => MarkerLayer(
                   markers: [
+                    ...locationController.displayUsers.map((nearUser) {
+                      final LatLng nearUserLatLng = nearUser.location == null
+                          ? defaultLatLng
+                          : LatLng(
+                              nearUser.location!.latitude,
+                              nearUser.location!.longitude,
+                            );
+                      final GlobalKey markerKey = GlobalKey();
+                      return Marker(
+                        point: nearUserLatLng,
+                        width: 50,
+                        height: 50,
+                        child: InkWell(
+                          key: markerKey,
+                          onDoubleTap: () async {
+                            await locationController.getRouteToFriend(
+                              userPosition:
+                                  locationController.currentPosition.value ==
+                                          null
+                                      ? latlng
+                                      : LatLng(
+                                          locationController
+                                              .currentPosition.value!.latitude,
+                                          locationController.currentPosition
+                                              .value!.longitude),
+                              friendPos: nearUserLatLng,
+                            );
+                          },
+                          onTap: () {
+                            profileTooltip.showProfileTooltip(
+                              context,
+                              markerKey,
+                              nearUser,
+                              PopupPosition.above,
+                              null,
+                              null,
+                              null,
+                            );
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.green,
+                              border: Border.all(color: Colors.green, width: 3),
+                            ),
+                            child: CircleAvatar(
+                              radius: 30,
+                              backgroundImage: nearUser.image != null &&
+                                      nearUser.image!.isNotEmpty
+                                  ? CachedNetworkImageProvider(nearUser.image!)
+                                  : null,
+                              child: nearUser.image == null ||
+                                      nearUser.image!.isEmpty
+                                  ? const Icon(Icons.person_2_outlined)
+                                  : null,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                     Marker(
                       point: locationController.currentPosition.value == null
                           ? latlng
@@ -246,80 +198,302 @@ class FriendZoneMapPage extends StatelessWidget {
                             : const Icon(Icons.person_2_outlined),
                       ),
                     ),
-                    ...firestoreController.friendsList.map((friend) {
-                      final LatLng friendLatLng = friend.location == null
-                          ? defaultLatLng
-                          : LatLng(friend.location!.latitude,
-                              friend.location!.longitude);
-                      final GlobalKey itemKey = GlobalKey();
-                      return Marker(
-                        point: friendLatLng,
-                        width: 50,
-                        height: 50,
-                        child: InkWell(
-                          key: itemKey,
-                          onDoubleTap: () async {
-                            await locationController.getRouteToFriend(
-                                userPosition: latlng, friendPos: friendLatLng);
-                          },
-                          onTap: () {
-                            profileTooltip.showProfileTooltip(
-                              context,
-                              itemKey,
-                              friend,
-                              PopupPosition.above,
-                              null,
-                              null,
-                              null,
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.redAccent,
-                              border:
-                                  Border.all(color: Colors.redAccent, width: 3),
-                            ),
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundImage: friend.image != null &&
-                                      friend.image!.isNotEmpty
-                                  ? CachedNetworkImageProvider(friend.image!)
-                                  : null,
-                              child:
-                                  friend.image == null || friend.image!.isEmpty
-                                      ? const Icon(Icons.person_2_outlined)
-                                      : null,
-                            ),
-                          ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: 10,
+            child: Obx(() => AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                height: isExpanded.value ? 80 : 0,
+                width: MediaQuery.sizeOf(context).width,
+                padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Obx(() {
+                  if (locationController.displayUsers.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "No User is here?",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
                         ),
-                      );
-                    }),
-                    // ...locationController.displayUsers.map((nearUser) {
-                    //   final LatLng nearUserLatLng = nearUser.location == null
+                      ),
+                    );
+                  } else {
+                    var nearUsers = locationController.displayUsers.toList();
+                    return ListView.builder(
+                        itemCount: nearUsers.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final nearUser = nearUsers[index];
+                          return GestureDetector(
+                            onTap: nearUsers.isEmpty
+                                ? null
+                                : () async {
+                                    await Get.dialog(
+                                      Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        child: MapFriendTinderWidget(
+                                          users: nearUsers,
+                                          initialIndex: index,
+                                        ),
+                                      )
+                                          .animate()
+                                          .scale(duration: duration750)
+                                          .fadeIn(duration: duration750),
+                                    );
+                                  },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    AvatarUserWidget(
+                                        radius: 20, imagePath: nearUser.image!),
+                                    Text(
+                                      nearUser.name!,
+                                      style: TextStyle(
+                                        color: index % 2 == 0
+                                            ? Colors.green
+                                            : Colors.deepPurple,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        });
+                  }
+                }))),
+          ),
+          Obx(() => isSearching.value
+              ? Positioned(
+                  top: 50, // Đặt vị trí cố định để tránh chồng lấn
+                  left: 10,
+                  right: 10,
+                  child: Obx(
+                    () => TextField(
+                      controller: textEditingController,
+                      focusNode: searchFocusNode, // Gắn FocusNode
+                      onChanged: (value) {
+                        searchText.value = value;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Search someone...",
+                        suffixIcon: searchText.value.isEmpty
+                            ? const Icon(
+                                Icons.search_off,
+                                color: Colors.grey,
+                              )
+                            : IconButton(
+                                onPressed: () async {
+                                  if (searchText.value.isNotEmpty) {
+                                    await Get.showOverlay(
+                                      asyncFunction: () async {
+                                        await locationController
+                                            .findFriendLocationByName(
+                                                searchText.value);
+                                        if (locationController
+                                                .friendLocation.value !=
+                                            null) {
+                                          await locationController
+                                              .getRouteToFriend(
+                                            userPosition: latlng,
+                                            friendPos: locationController
+                                                .friendLocation.value!,
+                                          );
+                                        }
+                                      },
+                                      loadingWidget: Container(
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        decoration: const BoxDecoration(
+                                          image: DecorationImage(
+                                            image: AssetImage(
+                                              GifsPath.transitionGif,
+                                            ),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ).then((_) {
+                                      if (locationController
+                                              .friendLocation.value !=
+                                          null) {
+                                        locationController.mapController
+                                            .moveAndRotate(
+                                          locationController
+                                                  .friendLocation.value ??
+                                              latlng,
+                                          16,
+                                          1,
+                                        );
+                                      }
+                                      textEditingController.clear();
+                                      searchText.value = "";
+                                      searchFocusNode.unfocus();
+                                    });
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.search,
+                                  color: Colors.blueAccent,
+                                  size: 30,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink()),
+          Positioned(
+            bottom: 20,
+            left: 50,
+            right: 50,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.blueAccent.withOpacity(0.85),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        isExpanded.value = !isExpanded.value;
+                      },
+                      icon: const Icon(
+                        Icons.location_history,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        isSearching.value = !isSearching.value;
+                        if (isSearching.value) {
+                          Future.delayed(const Duration(milliseconds: 100),
+                              () => searchFocusNode.requestFocus());
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.search_rounded,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(2.0),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          locationController.mapController.move(
+                              locationController.currentPosition.value == null
+                                  ? latlng
+                                  : LatLng(
+                                      locationController
+                                          .currentPosition.value!.latitude,
+                                      locationController
+                                          .currentPosition.value!.longitude),
+                              14.0);
+                        },
+                        icon: const Icon(
+                          Icons.location_on,
+                          size: 40,
+                          color: Colors.purpleAccent,
+                        ),
+                      ),
+                    ),
+                    MenuAnchor(
+                      builder: (context, controller, child) {
+                        return IconButton(
+                          onPressed: () {
+                            if (controller.isOpen) {
+                              controller.close();
+                            } else {
+                              controller.open();
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.settings,
+                            size: 40,
+                            color: Colors.white,
+                          ),
+                        );
+                      },
+                      menuChildren: [
+                        MenuItemButton(
+                          onPressed: () => selectedUrl.value = mapUrl[0],
+                          child: const Text('Default'),
+                        ),
+                        MenuItemButton(
+                          onPressed: () => selectedUrl.value = mapUrl[1],
+                          child: const Text('Light'),
+                        ),
+                        MenuItemButton(
+                          onPressed: () => selectedUrl.value = mapUrl[2],
+                          child: const Text('Dark'),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      onPressed: () => Get.back(),
+                      icon: const Icon(
+                        Icons.exit_to_app_rounded,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+ // ...firestoreController.friendsList.map((friend) {
+                    //   final LatLng friendLatLng = friend.location == null
                     //       ? defaultLatLng
-                    //       : LatLng(
-                    //           nearUser.location!.latitude,
-                    //           nearUser.location!.longitude,
-                    //         );
-                    //   final GlobalKey markerKey = GlobalKey();
+                    //       : LatLng(friend.location!.latitude,
+                    //           friend.location!.longitude);
+                    //   final GlobalKey itemKey = GlobalKey();
                     //   return Marker(
-                    //     point: nearUserLatLng,
+                    //     point: friendLatLng,
                     //     width: 50,
                     //     height: 50,
                     //     child: InkWell(
-                    //       key: markerKey,
+                    //       key: itemKey,
                     //       onDoubleTap: () async {
                     //         await locationController.getRouteToFriend(
-                    //           userPosition: latlng,
-                    //           friendPos: nearUserLatLng,
-                    //         );
+                    //             userPosition: latlng, friendPos: friendLatLng);
                     //       },
                     //       onTap: () {
                     //         profileTooltip.showProfileTooltip(
                     //           context,
-                    //           markerKey,
-                    //           nearUser,
+                    //           itemKey,
+                    //           friend,
                     //           PopupPosition.above,
                     //           null,
                     //           null,
@@ -329,24 +503,26 @@ class FriendZoneMapPage extends StatelessWidget {
                     //       child: Container(
                     //         decoration: BoxDecoration(
                     //           shape: BoxShape.circle,
-                    //           color: Colors.green,
-                    //           border: Border.all(color: Colors.green, width: 3),
+                    //           color: Colors.redAccent,
+                    //           border:
+                    //               Border.all(color: Colors.redAccent, width: 3),
                     //         ),
                     //         child: CircleAvatar(
                     //           radius: 30,
-                    //           backgroundImage: nearUser.image != null &&
-                    //                   nearUser.image!.isNotEmpty
-                    //               ? CachedNetworkImageProvider(nearUser.image!)
+                    //           backgroundImage: friend.image != null &&
+                    //                   friend.image!.isNotEmpty
+                    //               ? CachedNetworkImageProvider(friend.image!)
                     //               : null,
-                    //           child: nearUser.image == null ||
-                    //                   nearUser.image!.isEmpty
-                    //               ? const Icon(Icons.person_2_outlined)
-                    //               : null,
+                    //           child:
+                    //               friend.image == null || friend.image!.isEmpty
+                    //                   ? const Icon(Icons.person_2_outlined)
+                    //                   : null,
                     //         ),
                     //       ),
                     //     ),
                     //   );
                     // }),
+
                     // ...firestoreController.usersList.map(
                     //   (friend) {
                     //     final randomPosition = _generateRandomLatLng(
@@ -405,191 +581,3 @@ class FriendZoneMapPage extends StatelessWidget {
                     //     );
                     //   },
                     // ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            top: 70,
-            left: 10,
-            child: Column(
-              children: [
-                MenuAnchor(
-                  builder: (BuildContext context, MenuController controller,
-                      Widget? child) {
-                    return IconButton(
-                      onPressed: () {
-                        if (controller.isOpen) {
-                          controller.close();
-                        } else {
-                          controller.open();
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.filter_hdr_sharp,
-                        size: 35,
-                        color: Colors.blueAccent,
-                      ),
-                    );
-                  },
-                  menuChildren: [
-                    MenuItemButton(
-                      onPressed: () {},
-                      child: const Text('All'),
-                    ),
-                    MenuItemButton(
-                      onPressed: () {},
-                      child: const Text('Friends'),
-                    ),
-                    MenuItemButton(
-                      onPressed: () {},
-                      child: const Text('Nearers'),
-                    ),
-                  ],
-                ),
-                MenuAnchor(
-                  builder: (BuildContext context, MenuController controller,
-                      Widget? child) {
-                    return IconButton(
-                      onPressed: () {
-                        if (controller.isOpen) {
-                          controller.close();
-                        } else {
-                          controller.open();
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.light_mode,
-                        size: 35,
-                        color: Colors.blueAccent,
-                      ),
-                    );
-                  },
-                  menuChildren: [
-                    MenuItemButton(
-                      onPressed: () {
-                        selectedUrl.value = mapUrl[0];
-                      },
-                      child: const Text('Default'),
-                    ),
-                    MenuItemButton(
-                      onPressed: () {
-                        selectedUrl.value = mapUrl[1];
-                      },
-                      child: const Text('Light'),
-                    ),
-                    MenuItemButton(
-                      onPressed: () {
-                        selectedUrl.value = mapUrl[2];
-                      },
-                      child: const Text('Dark'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 90,
-            right: 10,
-            child: Obx(() => AnimatedContainer(
-                duration: const Duration(milliseconds: 500),
-                height: isExpanded.value ? 80 : 0,
-                width: MediaQuery.sizeOf(context).width * 0.8,
-                padding: const EdgeInsets.only(top: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                ),
-                child: Obx(() {
-                  if (locationController.displayUsers.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "No User is here?",
-                        style: TextStyle(
-                          color: Colors.redAccent,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    );
-                  } else {
-                    var nearUsers = locationController.displayUsers.toList();
-                    return ListView.builder(
-                        itemCount: nearUsers.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          final nearUser = nearUsers[index];
-                          return GestureDetector(
-                            onTap: nearUsers.isEmpty
-                                ? null
-                                : () async {
-                                    await Get.dialog(
-                                      Dialog(
-                                        backgroundColor: Colors.transparent,
-                                        child: MapFriendTinderWidget(
-                                          users: nearUsers,
-                                          initialIndex: index,
-                                        ),
-                                      )
-                                          .animate()
-                                          .scale(duration: duration750)
-                                          .fadeIn(duration: duration750),
-                                    );
-                                  },
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 10),
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    AvatarUserWidget(
-                                        radius: 20, imagePath: nearUser.image!),
-                                    Text(
-                                      nearUser.name!,
-                                      style: TextStyle(
-                                        color: index % 2 == 0
-                                            ? Colors.green
-                                            : Colors.deepPurple,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        });
-                  }
-                }))),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        elevation: 5.0,
-        splashColor: Colors.white,
-        backgroundColor: Colors.blueAccent,
-        onPressed: () {
-          locationController.mapController.move(
-              locationController.currentPosition.value == null
-                  ? latlng
-                  : LatLng(locationController.currentPosition.value!.latitude,
-                      locationController.currentPosition.value!.longitude),
-              15.0);
-        },
-        child: const Icon(
-          Icons.location_searching_rounded,
-          size: 40,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
-  LatLng _generateRandomLatLng(LatLng center, double maxDistance) {
-    final random = Random();
-    final dx = (random.nextDouble() - 0.5) * 2 * maxDistance;
-    final dy = (random.nextDouble() - 0.5) * 2 * maxDistance;
-    return LatLng(center.latitude + dx, center.longitude + dy);
-  }
-}

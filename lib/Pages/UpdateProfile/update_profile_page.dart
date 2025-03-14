@@ -182,6 +182,7 @@ class UpdateProfile extends StatelessWidget {
                     const SizedBox(height: 20),
                     TextFormField(
                       controller: nameController,
+                      maxLength: 20,
                       validator: nameProfile.call,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: const InputDecoration(

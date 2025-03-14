@@ -57,12 +57,13 @@ class FriendsPage extends StatelessWidget {
                 //   'Nội dung',
                 //   {'key': 'value'},
                 // );
-                notificationController.showCallNotification(
-                    user.name!, user.image!);
+                // notificationController.showCallNotification(
+                //     user.name!, user.image!);
                 notificationController.showMessageNotification(
-                    user.name!,
-                    "Uint8List largeIconBytes = await _loadNetworkImage(callerImage);",
-                    user.image!);
+                  user,
+                  "Uint8List largeIconBytes = await _loadNetworkImage(callerImage);",
+                );
+               
               },
               icon: const Icon(
                 Icons.edit,

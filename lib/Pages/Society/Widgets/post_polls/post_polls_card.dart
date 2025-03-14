@@ -139,21 +139,6 @@ class PostPollWidget extends StatelessWidget {
     );
   }
 
-//   Widget _buildPollChart(){
-
-//   return PieChart(
-//     PieChartData(
-//       sections: postPollsModel.options!.map((option) {
-//         return PieChartSectionData(
-//           value: option.votes!.toDouble(),
-//           title: "${option.title!}: ${option.votes}",
-//           color: Colors.blueAccent, // Tuỳ chỉnh màu theo ý muốn
-//         );
-//       }).toList(),
-//     ),
-//   );
-// }
-
   String _pollStatusText(int days) {
     if (days < 0) {
       return "Poll ended";

@@ -50,7 +50,7 @@ Story Feature – Share disappearing content similar to Instagram & Facebook Sto
 ```sh
 git status
 git add .
-git commit -m "New commmit updating"
+git commit -m "Realse 3.0"
 git push origin master
 ```
 
@@ -60,4 +60,8 @@ git push origin master
 firebase deploy --only functions
 firebase deploy --only hosting:tictactoe-flutter-672ff
 ```
+## Release New Version
 
+```sh
+flutter build apk --release
+```

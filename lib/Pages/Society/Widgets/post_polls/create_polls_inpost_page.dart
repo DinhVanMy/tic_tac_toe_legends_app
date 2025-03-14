@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
-import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/post_polls_model.dart';
+import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/poll_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Society/Widgets/post_polls/text_field_custom_widget.dart';
-import 'package:uuid/uuid.dart';
 
 class CreatePollsInpostPage extends StatelessWidget {
   const CreatePollsInpostPage({super.key});
@@ -29,9 +28,8 @@ class CreatePollsInpostPage extends StatelessWidget {
         ),
         actions: [
           Obx(() {
-            final isEnabled = pollController.isComplete.value;
             return InkWell(
-              onTap: isEnabled
+              onTap: pollController.isComplete.value
                   ? () =>
                       Get.back(result: pollController.createPostPollsModel())
                   : null,
@@ -39,14 +37,18 @@ class CreatePollsInpostPage extends StatelessWidget {
                 height: 50,
                 width: 100,
                 decoration: BoxDecoration(
-                  color: isEnabled ? Colors.blueAccent : Colors.grey,
+                  color: pollController.isComplete.value
+                      ? Colors.blueAccent
+                      : Colors.grey,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
                   child: Text(
                     "Done",
                     style: theme.textTheme.bodyLarge!.copyWith(
-                        color: isEnabled ? Colors.white : Colors.black45),
+                        color: pollController.isComplete.value
+                            ? Colors.white
+                            : Colors.black45),
                   ),
                 ),
               ),
@@ -239,66 +241,6 @@ class OptionField extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class PollController extends GetxController {
-  var uuid = const Uuid();
-  RxString questionContent = "".obs;
-  RxList<TextEditingController> optionControllers = <TextEditingController>[
-    TextEditingController(),
-    TextEditingController()
-  ].obs;
-  Rxn<DateTime> selectedDateTime = Rxn<DateTime>();
-  RxBool isComplete = false.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
-    everAll([questionContent, optionControllers, selectedDateTime], (_) {
-      isComplete.value = _checkCompletion();
-    });
-  }
-
-  @override
-  void onClose() {
-    for (var controller in optionControllers) {
-      controller.dispose();
-    }
-    super.onClose();
-  }
-
-  bool _checkCompletion() {
-    return questionContent.isNotEmpty &&
-        optionControllers.length >= 2 &&
-        optionControllers.every((controller) => controller.text.isNotEmpty) &&
-        selectedDateTime.value != null;
-  }
-
-  void addOptionField() {
-    optionControllers.add(TextEditingController());
-  }
-
-  void removeOptionField(int index) {
-    optionControllers.removeAt(index);
-  }
-
-  PostPollsModel createPostPollsModel() {
-    String pollId = uuid.v4().substring(0, 12);
-    return PostPollsModel(
-      pollId: pollId,
-      question: questionContent.value,
-      endDate: selectedDateTime.value,
-      options: optionControllers
-          .asMap()
-          .entries
-          .map((entry) => OptionalPolls(
-                id: entry.key + 1,
-                title: entry.value.text,
-                votes: 0,
-              ))
-          .toList(),
     );
   }
 }

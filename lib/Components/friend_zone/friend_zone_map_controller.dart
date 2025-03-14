@@ -14,12 +14,13 @@ class LocationController extends GetxController {
 
   final Rx<Position?> currentPosition = Rx<Position?>(null);
   final Rx<LatLng?> friendLocation = Rx<LatLng?>(null);
-  final RxDouble viewRadius = 5000.0.obs;
+  final RxDouble viewRadius = 5000.0.obs; // Bán kính tìm kiếm (mét)
   final RxList<UserModel> displayUsers = RxList<UserModel>();
   final RouteService _routeService = RouteService();
   final RxList<LatLng> routePoints = <LatLng>[].obs;
 
   StreamSubscription<Position>? _positionStreamSubscription;
+  StreamSubscription<QuerySnapshot>? _nearbyUsersSubscription;
   Timer? _debounceTimer;
 
   final String userId;
@@ -31,127 +32,137 @@ class LocationController extends GetxController {
     mapController = MapController();
     mapController.mapEventStream.listen((event) {
       if (event is MapEventMoveEnd) {
-        lazyLoadOnCameraMove();
+        _lazyLoadOnCameraMove();
       }
-      //  else if (event is MapEventMove) {
-      //   printInfo(info: "Camera move");
-      // }
     });
     _initializeLocationUpdates();
+    // _startGpsMonitoring();
   }
 
+  /// Khởi tạo cập nhật vị trí
   Future<void> _initializeLocationUpdates() async {
-    await _requestPermission();
     await _fetchCurrentPosition();
-    // _listenToPositionUpdates();
+    _listenToPositionUpdates();
+    _fetchNearbyUsers(viewRadius.value);
   }
 
-  Future<void> _requestPermission() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-    }
-    if (permission != LocationPermission.always &&
-        permission != LocationPermission.whileInUse) {
-      await Geolocator.openLocationSettings();
-    }
-  }
-
+  /// Lấy vị trí hiện tại
   Future<void> _fetchCurrentPosition() async {
     try {
-      final position = await Geolocator.getCurrentPosition();
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
       currentPosition.value = position;
       _debouncedUpdateUserLocation(position);
+      mapController.move(
+        LatLng(position.latitude, position.longitude),
+        14.0,
+      );
     } catch (e) {
-      errorMessage("Lỗi khi lấy vị trí hiện tại: $e");
+      errorMessage("Failed to get current location: $e");
     }
   }
 
+  /// Theo dõi cập nhật vị trí theo thời gian thực
   void _listenToPositionUpdates() {
-    _positionStreamSubscription =
-        Geolocator.getPositionStream().listen((Position position) {
-      currentPosition.value = position;
-      _debouncedUpdateUserLocation(position);
-      _fetchNearbyUsers(viewRadius.value);
-    });
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      desiredAccuracy: LocationAccuracy.best,
+      distanceFilter: 10, // Chỉ cập nhật khi di chuyển 10m
+    ).listen(
+      (Position position) {
+        currentPosition.value = position;
+        _debouncedUpdateUserLocation(position);
+        _fetchNearbyUsers(viewRadius.value);
+      },
+      onError: (e) {
+        errorMessage("Location updates failed: $e");
+        // _checkGpsStatus();
+      },
+    );
   }
 
+  /// Debounce cập nhật vị trí lên Firestore
   void _debouncedUpdateUserLocation(Position position) {
-    _debounceTimer = Timer(const Duration(seconds: 10), () {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(seconds: 5), () {
       _updateUserLocation(position);
     });
   }
 
+  /// Cập nhật vị trí người dùng lên Firestore
   Future<void> _updateUserLocation(Position position) async {
     try {
       await _firestore.collection('users').doc(userId).update({
         'location': GeoPoint(position.latitude, position.longitude),
-      });
+        'lastUpdated': FieldValue.serverTimestamp(),
+      }).catchError((e) => errorMessage("Error when update loaction: $e"));
     } catch (e) {
-      errorMessage("Lỗi khi cập nhật vị trí: $e");
+      errorMessage("Failed to update location: $e");
     }
   }
 
+  /// Tìm kiếm bạn bè theo tên
   Future<void> findFriendLocationByName(String friendName) async {
     try {
-      // Truy vấn Firestore để tìm người dùng với tên trùng khớp
       final querySnapshot = await _firestore
           .collection('users')
           .where('name', isEqualTo: friendName)
+          .limit(1)
           .get();
-
-      // Kiểm tra nếu tìm thấy người dùng có tên trùng khớp
       if (querySnapshot.docs.isNotEmpty) {
         final userDoc = querySnapshot.docs.first;
-
         final GeoPoint? location = userDoc['location'];
-
         if (location != null) {
           friendLocation.value = LatLng(location.latitude, location.longitude);
+          mapController.move(friendLocation.value!, 14.0);
         } else {
-          errorMessage("Người dùng không có thông tin tọa độ.");
-          return;
+          errorMessage("This user has no location data.");
         }
       } else {
-        errorMessage("Không tìm thấy bạn bè với tên này.");
-        return;
+        errorMessage("No friend found with this name.");
       }
     } catch (e) {
-      errorMessage("Có lỗi xảy ra khi tìm kiếm: $e");
-      return;
+      errorMessage("Error searching for friend: $e");
     }
   }
 
-  // Hàm fetch những người gần vị trí hiện tại
+  /// Lấy danh sách người dùng gần đó
   void _fetchNearbyUsers(double radius) {
     final userPosition = currentPosition.value;
     if (userPosition == null) return;
 
-    _firestore.collection('users').snapshots().listen((snapshot) {
+    _nearbyUsersSubscription
+        ?.cancel(); // Hủy subscription cũ để tránh trùng lặp
+    _nearbyUsersSubscription = _firestore
+        .collection('users')
+        .where('location', isNotEqualTo: null)
+        .snapshots()
+        .listen((snapshot) {
       displayUsers.clear();
       for (var doc in snapshot.docs) {
+        if (doc.id == userId) continue; // Bỏ qua chính người dùng
         final data = doc.data();
-        if (data.containsKey('location') && data['location'] != null) {
-          final GeoPoint location = data['location'];
+        final GeoPoint? location = data['location'];
+        if (location != null) {
           final distance = Geolocator.distanceBetween(
             userPosition.latitude,
             userPosition.longitude,
             location.latitude,
             location.longitude,
           );
-
           if (distance <= radius) {
-            final UserModel user = UserModel.fromJson(doc.data());
+            final user = UserModel.fromJson(data);
             displayUsers.add(user);
-            // printInfo(info: "Distance: $distance");
           }
         }
       }
+    }, onError: (e) {
+      errorMessage("Error fetching nearby users: $e");
     });
   }
 
-  // Hàm lazy load khi camera di chuyển
-  void lazyLoadOnCameraMove() {
+  /// Lazy load khi camera di chuyển
+  void _lazyLoadOnCameraMove() {
     try {
       final cameraCenter = mapController.camera.center;
       if (currentPosition.value != null) {
@@ -161,35 +172,55 @@ class LocationController extends GetxController {
           currentPosition.value!.latitude,
           currentPosition.value!.longitude,
         );
-        _fetchNearbyUsers(radius);
-      } else {
-        errorMessage("Your current position is out of date?");
-        return;
+        if (radius > viewRadius.value) {
+          viewRadius.value = radius + 1000;
+        }
+        _fetchNearbyUsers(viewRadius.value);
       }
     } catch (e) {
-      errorMessage("Error getting camera bounds: $e");
+      errorMessage("Error during camera move: $e");
     }
   }
 
-  Future<void> getRouteToFriend(
-      {required LatLng userPosition, required LatLng friendPos}) async {
+  /// Lấy tuyến đường đến bạn bè
+  Future<void> getRouteToFriend({
+    required LatLng userPosition,
+    required LatLng friendPos,
+  }) async {
     try {
-      // Fetch route from RouteService
       routePoints.clear();
       final route = await _routeService.fetchRoute(userPosition, friendPos);
-      routePoints.assignAll(route); // Update the route points
-
-      // Move camera to the starting position
-      mapController.move(friendPos, mapController.camera.zoom);
+      routePoints.assignAll(route);
+      mapController.move(friendPos, 14.0);
     } catch (e) {
       errorMessage("Error fetching route: $e");
     }
   }
 
+  // /// Theo dõi trạng thái GPS
+  // void _startGpsMonitoring() {
+  //   _gpsCheckTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
+  //     if (!await FriendZoneMapService.ensureLocationPermission()) {
+  //       isGpsEnabled.value = false;
+  //     } else {
+  //       isGpsEnabled.value = true;
+  //     }
+  //   });
+  // }
+
+  // /// Kiểm tra trạng thái GPS khi có lỗi
+  // void _checkGpsStatus() async {
+  //   if (!await FriendZoneMapService.ensureLocationPermission()) {
+  //     isGpsEnabled.value = false;
+  //   }
+  // }
+
   @override
   void onClose() {
     _positionStreamSubscription?.cancel();
+    _nearbyUsersSubscription?.cancel();
     _debounceTimer?.cancel();
+    // _gpsCheckTimer?.cancel();
     mapController.dispose();
     super.onClose();
   }

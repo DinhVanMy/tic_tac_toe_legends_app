@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
-import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_page.dart';
+import 'package:tictactoe_gameapp/Components/friend_zone/friend_zone_map_service.dart';
 import 'package:tictactoe_gameapp/Components/primary_with_icon_button.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:get/get.dart';
@@ -40,7 +39,6 @@ class HomePage extends StatelessWidget {
         controller.notifyInMainController;
     final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     final theme = Theme.of(context);
-
     final BackgroundMusicController musicController =
         Get.find<BackgroundMusicController>();
     final FirestoreController firestoreController =
@@ -258,7 +256,7 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                SizedBox(height: 250, child: MiddleCustomWidget()),
+                const SizedBox(height: 250, child: MiddleCustomWidget()),
                 Column(
                   children: [
                     PrimaryIconWithButton(
@@ -351,100 +349,83 @@ class HomePage extends StatelessWidget {
           ),
           Positioned(
             top: 100,
-            left: 30,
-            child: Wrap(
-              children: [
-                JajasTopIconWidget(
-                    onTap: () {
-                      Get.dialog(
-                        const Dialog(
-                                backgroundColor: Colors.transparent,
-                                child: DailyRewardPage())
-                            .animate()
-                            .scale(),
-                        barrierDismissible: true,
-                      );
-                    },
-                    icon: Jajas.banner,
-                    name: "Daily"),
-                const SizedBox(
-                  width: 20,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    JajasTopIconWidget(
+                        onTap: () {
+                          Get.dialog(
+                            const Dialog(
+                                    backgroundColor: Colors.transparent,
+                                    child: DailyRewardPage())
+                                .animate()
+                                .scale(),
+                            barrierDismissible: true,
+                          );
+                        },
+                        icon: Jajas.banner,
+                        name: "Daily"),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    JajasTopIconWidget(
+                        onTap: _onTapCommingSoon,
+                        icon: Jajas.event,
+                        name: "Event"),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    JajasTopIconWidget(
+                        onTap: () {
+                          Get.dialog(
+                            const Dialog(
+                              backgroundColor: Colors.transparent,
+                              child: FortuneWheelMain(),
+                            ).animate().scale(),
+                            barrierDismissible: false,
+                          );
+                        },
+                        icon: Jajas.spinner,
+                        name: "Spinner"),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    JajasTopIconWidget(
+                        onTap: _onTapCommingSoon,
+                        icon: Jajas.worldNews,
+                        name: "Discovery"),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    JajasTopIconWidget(
+                        onTap: _onTapCommingSoon,
+                        icon: Jajas.clans,
+                        name: "Clans"),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    JajasTopIconWidget(
+                        onTap: () {}, icon: Jajas.tinder, name: "Tinder"),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                  ],
                 ),
-                JajasTopIconWidget(
-                    onTap: _onTapCommingSoon, icon: Jajas.event, name: "Event"),
-                const SizedBox(
-                  width: 20,
-                ),
-                JajasTopIconWidget(
-                    onTap: () {
-                      Get.dialog(
-                        const Dialog(
-                          backgroundColor: Colors.transparent,
-                          child: FortuneWheelMain(),
-                        ).animate().scale(),
-                        barrierDismissible: false,
-                      );
-                    },
-                    icon: Jajas.spinner,
-                    name: "Spinner"),
-                const SizedBox(
-                  width: 20,
-                ),
-                JajasTopIconWidget(
-                    onTap: _onTapCommingSoon,
-                    icon: Jajas.worldNews,
-                    name: "Discovery"),
-                const SizedBox(
-                  width: 20,
-                ),
-                JajasTopIconWidget(
-                    onTap: _onTapCommingSoon, icon: Jajas.clans, name: "Clans"),
-                const SizedBox(
-                  width: 20,
-                ),
-                JajasTopIconWidget(
-                    onTap: () {
-                      Get.dialog(
-                        const Dialog(
-                          backgroundColor: Colors.transparent,
-                          // child: Example(),
-                        ).animate().scale(),
-                      );
-                      // Get.to(() => const Example(),
-                      //     transition: Transition.zoom);
-                    },
-                    icon: Jajas.tinder,
-                    name: "Tinder"),
-                const SizedBox(
-                  width: 20,
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-              ],
+              ),
             ),
           ),
           Positioned(
             top: 180,
             right: 2,
             child: JajasTopIconWidget(
-                onTap: () {
-                  late LatLng latlng;
-                  if (user.location != null) {
-                    latlng = LatLng(
-                        user.location!.latitude, user.location!.longitude);
-                  } else {
-                    latlng = const LatLng(21.0000992, 105.8399243);
-                  }
-                  Get.to(
-                    () => FriendZoneMapPage(
-                      user: user,
-                      firestoreController: firestoreController,
-                      latlng: latlng,
-                    ),
-                    transition: Transition.zoom,
-                  );
-                },
+                onTap: () async => FriendZoneMapService.navigateFriendZoneMap(
+                    user: user, firestoreController: firestoreController),
                 icon: Jajas.mission,
                 name: "Map"),
           ),
