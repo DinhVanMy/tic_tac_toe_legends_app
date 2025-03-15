@@ -154,10 +154,10 @@ class NotifyInMainController extends GetxController {
       // Hiển thị lời mời call và xóa sau 30 giây
       for (var call in callInvites) {
         showCallInviteRequest(call);
-        final NotificationController notificationController =
-            Get.put(NotificationController());
-        notificationController.showCallNotification(
-            call.senderModel!.name!, call.senderModel!.image!);
+        // final NotificationController notificationController =
+        //     Get.put(NotificationController());
+        // notificationController.showCallNotification(
+        //     call.senderModel!.name!, call.senderModel!.image!);
 
         // Xóa lời mời call từ Firestore sau 30 giây
         Future.delayed(const Duration(seconds: 10), () async {

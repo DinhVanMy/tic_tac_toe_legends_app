@@ -49,22 +49,7 @@ class FriendsPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(50),
             ),
             child: IconButton(
-              onPressed: () {
-                final NotificationController notificationController =
-                    Get.put(NotificationController());
-                // notificationController.showNotification(
-                //   'Tiêu đề',
-                //   'Nội dung',
-                //   {'key': 'value'},
-                // );
-                // notificationController.showCallNotification(
-                //     user.name!, user.image!);
-                notificationController.showMessageNotification(
-                  user,
-                  "Uint8List largeIconBytes = await _loadNetworkImage(callerImage);",
-                );
-               
-              },
+              onPressed: () {},
               icon: const Icon(
                 Icons.edit,
                 size: 25,
@@ -181,7 +166,8 @@ class FriendsPage extends StatelessWidget {
                                                     child: AvatarUserWidget(
                                                       radius: 35,
                                                       imagePath: friend.image!,
-                                                      gradientColors: friend.avatarFrame,
+                                                      gradientColors:
+                                                          friend.avatarFrame,
                                                     ),
                                                   ),
                                                   Positioned(

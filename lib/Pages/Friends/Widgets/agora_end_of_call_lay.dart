@@ -1,6 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 
 class EndOfCallLay extends StatelessWidget {
@@ -16,18 +16,18 @@ class EndOfCallLay extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 30),
           child: Column(
             children: [
-              CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(url),
-                radius: 50,
+              AvatarUserWidget(
+                radius: 40,
+                imagePath: url,
               ),
               const Spacer(
                 flex: 1,
               ),
-               Column(
+              Column(
                 children: [
                   const Text(
                     "Call ended",
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
                     ),
