@@ -302,6 +302,7 @@ class UserAboutPage extends StatelessWidget {
                                           child: AvatarUserWidget(
                                             radius: 35,
                                             imagePath: friend.image!,
+                                            gradientColors: friend.avatarFrame,
                                           ),
                                         ),
                                         Positioned(
@@ -547,7 +548,7 @@ class MySliverHeader extends SliverPersistentHeaderDelegate {
             child: AvatarUserWidget(
               radius: 100,
               imagePath: user.image!,
-              gradientColors: const [Colors.white, Colors.white],
+              gradientColors: user.avatarFrame ?? ["#FFE0E0E0", "#FFB0BEC5"],
               borderThickness: 5.0,
             ),
           ),

@@ -125,7 +125,11 @@ class CreatePostPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  AvatarUserWidget(radius: 35, imagePath: userModel.image!),
+                  AvatarUserWidget(
+                    radius: 35,
+                    imagePath: userModel.image!,
+                    gradientColors: userModel.avatarFrame,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(

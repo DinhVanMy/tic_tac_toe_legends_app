@@ -211,11 +211,8 @@ class ReelPage extends StatelessWidget {
         AvatarUserWidget(
           radius: 30,
           imagePath: reel.reelUser!.image!,
-          borderThickness: 2,
-          gradientColors: const [
-            Colors.lightBlueAccent,
-            Colors.lightGreenAccent
-          ],
+          gradientColors:
+              reel.reelUser!.avatarFrame ?? ["#FFE0E0E0", "#FFB0BEC5"],
         ),
         GestureDetector(
             onTap: () async {},

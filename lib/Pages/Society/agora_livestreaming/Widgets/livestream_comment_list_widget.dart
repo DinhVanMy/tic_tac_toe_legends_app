@@ -32,10 +32,7 @@ class LiveStreamCommentListWidget extends StatelessWidget {
                           radius: 25,
                           imagePath: comment['photoUrl']!,
                           borderThickness: 2,
-                          gradientColors: const [
-                            Colors.lightBlueAccent,
-                            Colors.lightGreenAccent
-                          ],
+                          
                         ),
                         const SizedBox(
                           width: 5,

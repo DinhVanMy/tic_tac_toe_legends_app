@@ -233,10 +233,7 @@ class SocialLivestreamsWidget extends StatelessWidget {
                                                 radius: 20,
                                                 imagePath: streamer.image!,
                                                 borderThickness: 2,
-                                                gradientColors: const [
-                                                  Colors.white,
-                                                  Colors.blueAccent
-                                                ],
+                                                gradientColors:streamer.avatarFrame,
                                               ),
                                               const SizedBox(
                                                 width: 5,

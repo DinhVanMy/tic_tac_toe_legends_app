@@ -65,11 +65,16 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                   ),
                   const Text("Replies", style: TextStyle(fontSize: 20)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AvatarUserWidget(radius: 30, imagePath: commentUser.image!),
+                        AvatarUserWidget(
+                          radius: 30,
+                          imagePath: commentUser.image!,
+                          gradientColors: commentUser.avatarFrame,
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
@@ -85,12 +90,16 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                               ),
                               ExpandableContent(
                                 content: commentModel.content!,
-                                style: const TextStyle(color: Colors.black, fontSize: 19),
+                                style: const TextStyle(
+                                    color: Colors.black, fontSize: 19),
                                 maxLines: 5,
                               ),
                               Text(
-                                TimeFunctions.timeAgo(now: DateTime.now(), createdAt: commentModel.createdAt!),
-                                style: const TextStyle(color: Colors.blueGrey, fontSize: 13),
+                                TimeFunctions.timeAgo(
+                                    now: DateTime.now(),
+                                    createdAt: commentModel.createdAt!),
+                                style: const TextStyle(
+                                    color: Colors.blueGrey, fontSize: 13),
                               ),
                             ],
                           ),
@@ -99,27 +108,43 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                           children: [
                             commentModel.likedList != null
                                 ? Obx(() {
-                                    RxBool isLiked = commentController.isLikedComment(
-                                        currentUser.id!, commentModel.id!);
+                                    RxBool isLiked =
+                                        commentController.isLikedComment(
+                                            currentUser.id!, commentModel.id!);
                                     return !isLiked.value
                                         ? IconButton(
-                                            icon: const Icon(Icons.favorite_border, size: 30, color: Colors.black),
-                                            onPressed: () => commentController.likeComment(commentModel.id!, currentUser.id!),
+                                            icon: const Icon(
+                                                Icons.favorite_border,
+                                                size: 30,
+                                                color: Colors.black),
+                                            onPressed: () =>
+                                                commentController.likeComment(
+                                                    commentModel.id!,
+                                                    currentUser.id!),
                                           )
                                         : IconButton(
-                                            icon: const Icon(Icons.favorite, size: 30, color: Colors.red),
-                                            onPressed: () => commentController.unlikeComment(commentModel.id!, currentUser.id!),
+                                            icon: const Icon(Icons.favorite,
+                                                size: 30, color: Colors.red),
+                                            onPressed: () =>
+                                                commentController.unlikeComment(
+                                                    commentModel.id!,
+                                                    currentUser.id!),
                                           );
                                   })
                                 : IconButton(
-                                    icon: const Icon(Icons.favorite_border, size: 30, color: Colors.black),
-                                    onPressed: () => commentController.likeComment(commentModel.id!, currentUser.id!),
+                                    icon: const Icon(Icons.favorite_border,
+                                        size: 30, color: Colors.black),
+                                    onPressed: () =>
+                                        commentController.likeComment(
+                                            commentModel.id!, currentUser.id!),
                                   ),
                             Text(
-                              commentModel.likedList == null || commentModel.likedList!.isEmpty
+                              commentModel.likedList == null ||
+                                      commentModel.likedList!.isEmpty
                                   ? "0"
                                   : "${commentModel.likedList!.length}",
-                              style: const TextStyle(color: Colors.blueGrey, fontSize: 17),
+                              style: const TextStyle(
+                                  color: Colors.blueGrey, fontSize: 17),
                             ),
                           ],
                         ),
@@ -129,7 +154,9 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(onPressed: () {}, icon: const Icon(Icons.info_outline, size: 35)),
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.info_outline, size: 35)),
           ],
         ),
         Expanded(
@@ -140,7 +167,8 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text("No replies yet", style: TextStyle(fontSize: 25)),
-                    Text("Start the conversation...", style: TextStyle(fontSize: 15, color: Colors.grey)),
+                    Text("Start the conversation...",
+                        style: TextStyle(fontSize: 15, color: Colors.grey)),
                   ],
                 ),
               );
@@ -148,7 +176,8 @@ class ReelReplyCommentListSheet extends StatelessWidget {
             var comments = subCommentController.subCommentsList.toList();
             return NotificationListener<ScrollNotification>(
               onNotification: (scrollInfo) {
-                if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent - 200) {
+                if (scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent - 200) {
                   subCommentController.loadMoreSubComments();
                 }
                 return true;
@@ -164,7 +193,11 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AvatarUserWidget(radius: 20, imagePath: commentUser.image!),
+                        AvatarUserWidget(
+                          radius: 20,
+                          imagePath: commentUser.image!,
+                          gradientColors: commentUser.avatarFrame,
+                        ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Column(
@@ -174,30 +207,42 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                                 children: [
                                   Text(
                                     commentUser.name!,
-                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blueAccent),
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    TimeFunctions.timeAgo(now: DateTime.now(), createdAt: comment.createdAt!),
-                                    style: const TextStyle(color: Colors.blueGrey, fontSize: 12),
+                                    TimeFunctions.timeAgo(
+                                        now: DateTime.now(),
+                                        createdAt: comment.createdAt!),
+                                    style: const TextStyle(
+                                        color: Colors.blueGrey, fontSize: 12),
                                   ),
                                 ],
                               ),
                               ExpandableContent(
                                 content: comment.content!,
-                                style: const TextStyle(color: Colors.black, fontSize: 17),
+                                style: const TextStyle(
+                                    color: Colors.black, fontSize: 17),
                                 maxLines: 5,
                               ),
-                              if (comment.gif != null) DisplayGifWidget(gifUrl: comment.gif!),
+                              if (comment.gif != null)
+                                DisplayGifWidget(gifUrl: comment.gif!),
                               GestureDetector(
                                 onTap: () {
                                   replyCommentId.value = comment.id!;
-                                  textController.text = "@${commentUser.name!} ";
+                                  textController.text =
+                                      "@${commentUser.name!} ";
                                   textController.selection =
-                                      TextSelection.fromPosition(TextPosition(offset: textController.text.length));
+                                      TextSelection.fromPosition(TextPosition(
+                                          offset: textController.text.length));
                                   focusNode.requestFocus();
                                 },
-                                child: const Text("Reply", style: TextStyle(color: Colors.blueGrey, fontSize: 14)),
+                                child: const Text("Reply",
+                                    style: TextStyle(
+                                        color: Colors.blueGrey, fontSize: 14)),
                               ),
                             ],
                           ),
@@ -206,30 +251,53 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                           children: [
                             comment.likedList != null
                                 ? Obx(() {
-                                    RxBool isLiked = subCommentController.isLikedSubComment(currentUser.id!, comment.id!);
+                                    RxBool isLiked =
+                                        subCommentController.isLikedSubComment(
+                                            currentUser.id!, comment.id!);
                                     return !isLiked.value
                                         ? IconButton(
-                                            icon: const Icon(Icons.favorite_border, size: 25, color: Colors.black),
-                                            onPressed: () => subCommentController.likeSubComment(comment.id!, currentUser.id!),
+                                            icon: const Icon(
+                                                Icons.favorite_border,
+                                                size: 25,
+                                                color: Colors.black),
+                                            onPressed: () =>
+                                                subCommentController
+                                                    .likeSubComment(comment.id!,
+                                                        currentUser.id!),
                                           )
                                         : IconButton(
-                                            icon: const Icon(Icons.favorite, size: 25, color: Colors.red),
-                                            onPressed: () => subCommentController.unlikeSubComment(comment.id!, currentUser.id!),
+                                            icon: const Icon(Icons.favorite,
+                                                size: 25, color: Colors.red),
+                                            onPressed: () =>
+                                                subCommentController
+                                                    .unlikeSubComment(
+                                                        comment.id!,
+                                                        currentUser.id!),
                                           );
                                   })
                                 : IconButton(
-                                    icon: const Icon(Icons.favorite_border, size: 25, color: Colors.black),
-                                    onPressed: () => subCommentController.likeSubComment(comment.id!, currentUser.id!),
+                                    icon: const Icon(Icons.favorite_border,
+                                        size: 25, color: Colors.black),
+                                    onPressed: () =>
+                                        subCommentController.likeSubComment(
+                                            comment.id!, currentUser.id!),
                                   ),
                             Text(
-                              comment.likedList == null || comment.likedList!.isEmpty ? "0" : "${comment.likedList!.length}",
-                              style: const TextStyle(color: Colors.blueGrey, fontSize: 15),
+                              comment.likedList == null ||
+                                      comment.likedList!.isEmpty
+                                  ? "0"
+                                  : "${comment.likedList!.length}",
+                              style: const TextStyle(
+                                  color: Colors.blueGrey, fontSize: 15),
                             ),
                           ],
                         ),
                       ],
                     ),
-                  ).animate().scale(duration: duration750).fadeIn(duration: duration750);
+                  )
+                      .animate()
+                      .scale(duration: duration750)
+                      .fadeIn(duration: duration750);
                 },
               ),
             );
@@ -241,7 +309,8 @@ class ReelReplyCommentListSheet extends StatelessWidget {
             children: [
               Obx(() => replyCommentId.value.isNotEmpty
                   ? Container(
-                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 10),
                       margin: const EdgeInsets.only(bottom: 10),
                       width: double.infinity,
                       height: 50,
@@ -252,7 +321,8 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                           Expanded(
                             child: Text(
                               "Replying to ${textController.text} ",
-                              style: const TextStyle(color: Colors.black, fontSize: 15),
+                              style: const TextStyle(
+                                  color: Colors.black, fontSize: 15),
                             ),
                           ),
                           GestureDetector(
@@ -260,7 +330,9 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                               replyCommentId.value = "";
                               textController.clear();
                             },
-                            child: const Text("X", style: TextStyle(color: Colors.redAccent, fontSize: 25)),
+                            child: const Text("X",
+                                style: TextStyle(
+                                    color: Colors.redAccent, fontSize: 25)),
                           ),
                         ],
                       ),
@@ -271,14 +343,17 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                 onEmojiSelected: (emoji) {
                   textController.text += emoji;
                   commentContent.value = textController.text;
-                  textController.selection = TextSelection.fromPosition(TextPosition(offset: textController.text.length));
+                  textController.selection = TextSelection.fromPosition(
+                      TextPosition(offset: textController.text.length));
                 },
                 onBackspacePressed: () {
                   final text = textController.text;
                   if (text.isNotEmpty) {
-                    textController.text = text.characters.skipLast(1).toString();
+                    textController.text =
+                        text.characters.skipLast(1).toString();
                     commentContent.value = textController.text;
-                    textController.selection = TextSelection.fromPosition(TextPosition(offset: textController.text.length));
+                    textController.selection = TextSelection.fromPosition(
+                        TextPosition(offset: textController.text.length));
                   }
                 },
                 isEmojiPickerVisible: isEmojiPickerVisible,
@@ -286,7 +361,11 @@ class ReelReplyCommentListSheet extends StatelessWidget {
               ),
               Row(
                 children: [
-                  AvatarUserWidget(radius: 25, imagePath: currentUser.image!),
+                  AvatarUserWidget(
+                    radius: 25,
+                    imagePath: currentUser.image!,
+                    gradientColors: currentUser.avatarFrame,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: TextField(
@@ -296,9 +375,11 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                       decoration: InputDecoration(
                         fillColor: Colors.grey.shade400,
                         hintStyle: const TextStyle(color: Colors.black54),
-                        hintText: "Reply a comment of @${commentModel.commentUser!.name!}",
+                        hintText:
+                            "Reply a comment of @${commentModel.commentUser!.name!}",
                         prefixIcon: IconButton(
-                          icon: const Icon(Icons.gif_box_outlined, color: Colors.blueAccent, size: 30),
+                          icon: const Icon(Icons.gif_box_outlined,
+                              color: Colors.blueAccent, size: 30),
                           onPressed: () async {
                             final gif = await GiphyPicker.pickGif(
                               context: context,
@@ -308,7 +389,8 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                               loadingBuilder: (context) => Center(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(100),
-                                  child: Image.asset(GifsPath.loadingGif, height: 200, width: 200),
+                                  child: Image.asset(GifsPath.loadingGif,
+                                      height: 200, width: 200),
                                 ),
                               ),
                             );
@@ -318,8 +400,10 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                         suffixIcon: Obx(() => IconButton(
                               onPressed: () => isEmojiPickerVisible.toggle(),
                               icon: isEmojiPickerVisible.value
-                                  ? const Icon(Icons.emoji_emotions, color: Colors.blue, size: 30)
-                                  : const Icon(Icons.emoji_emotions_outlined, color: Colors.blue, size: 30),
+                                  ? const Icon(Icons.emoji_emotions,
+                                      color: Colors.blue, size: 30)
+                                  : const Icon(Icons.emoji_emotions_outlined,
+                                      color: Colors.blue, size: 30),
                             )),
                       ),
                     ),
@@ -338,7 +422,8 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                             commentContent.value = "";
                             selectedGif.value = null;
                           },
-                          icon: const Icon(Icons.arrow_outward_rounded, size: 35, color: Colors.blue),
+                          icon: const Icon(Icons.arrow_outward_rounded,
+                              size: 35, color: Colors.blue),
                         )),
                 ],
               ),

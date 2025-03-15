@@ -78,7 +78,10 @@ class PostReplyCommentListSheet extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AvatarUserWidget(
-                            radius: 30, imagePath: commentUser.image!),
+                          radius: 30,
+                          imagePath: commentUser.image!,
+                          gradientColors: commentUser.avatarFrame,
+                        ),
                         const SizedBox(
                           width: 10,
                         ),
@@ -228,7 +231,10 @@ class PostReplyCommentListSheet extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 AvatarUserWidget(
-                                    radius: 20, imagePath: commentUser.image!),
+                                  radius: 20,
+                                  imagePath: commentUser.image!,
+                                  gradientColors: commentUser.avatarFrame,
+                                ),
                                 const SizedBox(
                                   width: 10,
                                 ),
@@ -407,7 +413,11 @@ class PostReplyCommentListSheet extends StatelessWidget {
               ),
               Row(
                 children: [
-                  AvatarUserWidget(radius: 25, imagePath: currentUser.image!),
+                  AvatarUserWidget(
+                    radius: 25,
+                    imagePath: currentUser.image!,
+                    gradientColors: currentUser.avatarFrame,
+                  ),
                   const SizedBox(
                     width: 10,
                   ),

@@ -74,7 +74,10 @@ class LikeUserListSheet extends StatelessWidget {
                                   transition: Transition.leftToRightWithFade);
                             },
                             child: AvatarUserWidget(
-                                radius: 30, imagePath: likeUser.image!),
+                              radius: 30,
+                              imagePath: likeUser.image!,
+                              gradientColors: likeUser.avatarFrame,
+                            ),
                           ),
                         ),
                         const SizedBox(

@@ -91,10 +91,7 @@ class AgoraLivestreamingPage extends StatelessWidget {
                             radius: 25,
                             imagePath: streamUser.image!,
                             borderThickness: 2,
-                            gradientColors: const [
-                              Colors.lightBlueAccent,
-                              Colors.lightGreenAccent
-                            ],
+                            gradientColors: streamUser.avatarFrame,
                           ),
                           const SizedBox(
                             width: 5,

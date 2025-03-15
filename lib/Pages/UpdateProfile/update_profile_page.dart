@@ -10,6 +10,7 @@ import 'package:tictactoe_gameapp/Configs/theme/colors.dart';
 import 'package:tictactoe_gameapp/Configs/constants.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 import 'package:tictactoe_gameapp/Controller/profile_controller.dart';
+import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 import 'package:tictactoe_gameapp/Pages/UpdateProfile/border_frame_controller.dart';
 import '../../Configs/assets_path.dart';
 
@@ -26,6 +27,7 @@ class UpdateProfile extends StatelessWidget {
         ConfettiController(duration: const Duration(seconds: 5));
     final BorderFrameController frameController =
         Get.put(BorderFrameController());
+    RxList<Color> avatarFrame = <Color>[].obs;
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -46,31 +48,6 @@ class UpdateProfile extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        actions: [
-          InkWell(
-            borderRadius: BorderRadius.circular(10),
-            splashColor: Colors.white,
-            onTap: () {},
-            child: Ink(
-              height: 50,
-              width: 100,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Center(
-                child: Text(
-                  "Save",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(bottom: 5, right: 20, left: 20),
@@ -95,36 +72,89 @@ class UpdateProfile extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Obx(
-                          () => imagePath.isEmpty
+                          () => avatarFrame.toList().isNotEmpty
                               ? Container(
-                                  width: 200,
-                                  height: 200,
+                                  padding: const EdgeInsets.all(5.0),
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    gradient: LinearGradient(
+                                      colors: avatarFrame.toList(),
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
                                     borderRadius: BorderRadius.circular(40),
                                   ),
-                                  child: const Icon(
-                                    Icons.add_a_photo_outlined,
-                                    size: 50,
-                                    color: Colors.grey,
+                                  child: Obx(
+                                    () => imagePath.isEmpty
+                                        ? Container(
+                                            width: 200,
+                                            height: 200,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(40),
+                                            ),
+                                            child: const Icon(
+                                              Icons.add_a_photo_outlined,
+                                              size: 50,
+                                              color: Colors.grey,
+                                            ),
+                                          )
+                                        : Container(
+                                            width: 200,
+                                            height: 200,
+                                            decoration: BoxDecoration(
+                                              // color: Colors.red,
+                                              borderRadius:
+                                                  BorderRadius.circular(40),
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(40),
+                                              child: Image.file(
+                                                File(
+                                                  imagePath.value,
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
                                   ),
                                 )
-                              : Container(
-                                  width: 200,
-                                  height: 200,
-                                  decoration: BoxDecoration(
-                                    // color: Colors.red,
-                                    borderRadius: BorderRadius.circular(40),
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(40),
-                                    child: Image.file(
-                                      File(
-                                        imagePath.value,
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
+                              : Obx(
+                                  () => imagePath.isEmpty
+                                      ? Container(
+                                          width: 200,
+                                          height: 200,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(40),
+                                          ),
+                                          child: const Icon(
+                                            Icons.add_a_photo_outlined,
+                                            size: 50,
+                                            color: Colors.grey,
+                                          ),
+                                        )
+                                      : Container(
+                                          width: 200,
+                                          height: 200,
+                                          decoration: BoxDecoration(
+                                            // color: Colors.red,
+                                            borderRadius:
+                                                BorderRadius.circular(40),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(40),
+                                            child: Image.file(
+                                              File(
+                                                imagePath.value,
+                                              ),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
                                 ),
                         ),
                         const SizedBox(width: 20),
@@ -226,7 +256,7 @@ class UpdateProfile extends StatelessWidget {
                                   var colors = frameController.gradients[index];
                                   return InkWell(
                                     splashColor: Colors.blue,
-                                    onTap: () {},
+                                    onTap: () => avatarFrame.value = colors,
                                     child: Container(
                                       margin: const EdgeInsets.only(right: 5),
                                       padding: const EdgeInsets.all(5),
@@ -284,6 +314,12 @@ class UpdateProfile extends StatelessWidget {
                               nameController.text,
                               imagePath.value,
                               confettiController,
+                              avatarFrame
+                                  .toList()
+                                  .map((color) =>
+                                      ColorStringReverseFunction.colorToHex(
+                                          color))
+                                  .toList(),
                             );
                             await profileController.initialize();
                           },

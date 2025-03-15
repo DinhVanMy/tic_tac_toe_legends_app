@@ -65,7 +65,11 @@ class PostListCard extends StatelessWidget {
               },
               child: Row(
                 children: [
-                  AvatarUserWidget(radius: 20, imagePath: postUser.image!),
+                  AvatarUserWidget(
+                    radius: 20,
+                    imagePath: postUser.image!,
+                    gradientColors: postUser.avatarFrame,
+                  ),
                   const SizedBox(
                     width: 10,
                   ),

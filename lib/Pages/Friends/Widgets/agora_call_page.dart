@@ -173,6 +173,9 @@ class AgoraCallPage extends StatelessWidget {
                         AvatarUserWidget(
                           radius: 100,
                           imagePath: userFriend.image!,
+                          gradientColors: userFriend.avatarFrame ??
+                              ["#FF4CAF50", "#FF81C784"],
+                          borderThickness: 5,
                         ),
                         const SizedBox(height: 10),
                         Text(

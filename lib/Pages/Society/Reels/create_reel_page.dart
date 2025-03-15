@@ -121,7 +121,11 @@ class CreateReelPage extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  AvatarUserWidget(radius: 35, imagePath: user.image!),
+                  AvatarUserWidget(
+                    radius: 35,
+                    imagePath: user.image!,
+                    gradientColors: user.avatarFrame,
+                  ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(

@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:tictactoe_gameapp/Models/Functions/color_string_reverse_function.dart';
 
 class AvatarUserWidget extends StatelessWidget {
   final double radius;
   final String imagePath;
-  final List<Color>? gradientColors;
+  final List<String>? gradientColors;
   final double borderThickness;
 
   const AvatarUserWidget({
@@ -26,7 +27,9 @@ class AvatarUserWidget extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: gradientColors!,
+                colors: gradientColors!
+                    .map((hex) => ColorStringReverseFunction.hexToColor(hex))
+                    .toList(),
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

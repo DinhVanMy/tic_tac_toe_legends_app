@@ -14,6 +14,7 @@ class UserModel {
   String? status;
   Timestamp? lastActive;
   GeoPoint? location;
+  List<String>? avatarFrame;
 
   UserModel({
     this.role,
@@ -29,6 +30,7 @@ class UserModel {
     this.status,
     this.lastActive,
     this.location,
+    this.avatarFrame,
   });
 
   UserModel.fromJson(Map<String, dynamic> json) {
@@ -69,6 +71,9 @@ class UserModel {
       lastActive = json["lastActive"];
     }
     location = json["location"] as GeoPoint?;
+    if (json["avatarFrame"] is List) {
+      avatarFrame = List<String>.from(json["avatarFrame"]);
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -86,6 +91,7 @@ class UserModel {
     data["status"] = status;
     data["lastActive"] = lastActive;
     data["location"] = location;
+    data["avatarFrame"] = avatarFrame;
     return data;
   }
 }

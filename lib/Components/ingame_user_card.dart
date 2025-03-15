@@ -39,6 +39,8 @@ class InGameUserCard extends StatelessWidget {
               const SizedBox(height: 40),
               Text(
                 name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       color: Colors.deepPurple,
                       fontWeight: FontWeight.bold,

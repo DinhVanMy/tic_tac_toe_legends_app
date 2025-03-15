@@ -81,7 +81,9 @@ class MessagesWidget extends StatelessWidget {
                           tag: 'friendAvatar-${friend.id}',
                           transitionOnUserGestures: true,
                           child: AvatarUserWidget(
-                              radius: 35, imagePath: friend.image!),
+                            radius: 35,
+                            imagePath: friend.image!,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(

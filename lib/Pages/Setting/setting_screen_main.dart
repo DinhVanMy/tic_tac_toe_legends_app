@@ -102,7 +102,12 @@ class SettingScreen extends StatelessWidget {
                   children: [
                     const Icon(Icons.dark_mode),
                     const SizedBox(width: 5),
-                    Text("description_dark_theme_sett".tr),
+                    Expanded(
+                      child: Text(
+                        "description_dark_theme_sett".tr,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
                 trailing: Obx(() {
@@ -192,7 +197,8 @@ class SettingScreen extends StatelessWidget {
                     onChanged: (bool value) {
                       if (value) {
                         if (isDarkMode) {
-                          musicController.playMusic([AudioSPath.infinityCastle]);
+                          musicController
+                              .playMusic([AudioSPath.infinityCastle]);
                         } else {
                           musicController.playMusic([AudioSPath.matchingSound]);
                         }

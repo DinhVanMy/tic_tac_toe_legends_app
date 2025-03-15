@@ -65,8 +65,12 @@ class ProfileController extends GetxController {
     });
   }
 
-  Future<void> updateProfile(String name, String imagePath,
-      ConfettiController confettiController) async {
+  Future<void> updateProfile(
+    String name,
+    String imagePath,
+    ConfettiController confettiController,
+    List<String>? avatarFrame,
+  ) async {
     try {
       bool exists = await isUserNameExists(name);
       if (imagePath != "" && name != "" && exists == false) {
@@ -86,6 +90,7 @@ class ProfileController extends GetxController {
           totalCoins: "0",
           totalWins: "0",
           status: "online",
+          avatarFrame: avatarFrame,
         );
         await db
             .collection("users")

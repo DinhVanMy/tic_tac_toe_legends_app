@@ -1,7 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Controller/Animations/Overlays/profile_tooltip.dart';
 import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Enums/popup_position.dart';
@@ -46,6 +46,8 @@ class UserCard extends StatelessWidget {
               const SizedBox(height: 50),
               Text(
                 user.name ?? '',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       color: user.email == authController.getCurrentUserEmail()
                           ? Colors.blueAccent
@@ -136,27 +138,15 @@ class UserCard extends StatelessWidget {
               //     : Colors.redAccent,
             ),
             child: Container(
-              width: 100,
-              height: 100,
+              width: 95,
+              height: 95,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondary,
-                borderRadius: BorderRadius.circular(100),
-                border: Border.all(
-                  color: user.email == authController.getCurrentUserEmail()
-                      ? Colors.blue
-                      : Colors.red,
-                  width: 5,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: CachedNetworkImage(
-                  imageUrl: user.image ?? "",
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
+                  color: Theme.of(context).colorScheme.secondary,
+                  shape: BoxShape.circle),
+              child: AvatarUserWidget(
+                radius: 40,
+                imagePath: user.image!,
+                gradientColors: user.avatarFrame,
               ),
             ),
           ),

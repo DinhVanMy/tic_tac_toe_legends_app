@@ -126,7 +126,12 @@ class ChatBotPage extends StatelessWidget {
               ),
             ),
             user.image != null && user.image!.isNotEmpty
-                ? AvatarUserWidget(radius: 25, imagePath: user.image!)
+                ? AvatarUserWidget(
+                    radius: 25,
+                    imagePath: user.image!,
+                    gradientColors:
+                        user.avatarFrame ?? ["#FF2196F3", "#FF42A5F5"],
+                  )
                 : const Icon(Icons.person_2_outlined)
           ],
         ),

@@ -6,7 +6,8 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 class ProfileTooltipCustom extends StatelessWidget {
   final UserModel friend;
   final VoidCallback onTapInfo;
-  const ProfileTooltipCustom({super.key, required this.friend, required this.onTapInfo});
+  const ProfileTooltipCustom(
+      {super.key, required this.friend, required this.onTapInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +27,8 @@ class ProfileTooltipCustom extends StatelessWidget {
               child: AvatarUserWidget(
                 radius: 30,
                 imagePath: friend.image!,
-                gradientColors: const [
-                  Colors.lightBlueAccent,
-                  Colors.redAccent
-                ],
+                gradientColors:
+                    friend.avatarFrame ?? ["#FFE0E0E0", "#FFB0BEC5"],
               ),
             ),
             const SizedBox(height: 5),
@@ -110,7 +109,7 @@ class ProfileTooltipCustom extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed:onTapInfo,
+                    onPressed: onTapInfo,
                     icon: const Icon(
                       Icons.info,
                       size: 30,

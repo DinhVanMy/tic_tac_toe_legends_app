@@ -476,84 +476,86 @@ class ChatWithFriendPage extends StatelessWidget {
   }
 
   Widget _buildProfilePreview(ThemeData theme) {
-    return Expanded(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          AvatarUserWidget(radius: 80, imagePath: userFriend.image!),
-          const SizedBox(
-            height: 10,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AvatarUserWidget(
+          radius: 80,
+          imagePath: userFriend.image!,
+          gradientColors: userFriend.avatarFrame,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          userFriend.name!,
+          style: theme.textTheme.headlineLarge!.copyWith(
+            color: Colors.deepPurple,
           ),
-          Text(
-            userFriend.name!,
-            style: theme.textTheme.headlineLarge!.copyWith(
-              color: Colors.deepPurple,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          "Email: ${userFriend.email!}",
+          style: const TextStyle(
+            color: Colors.blueAccent,
+            fontSize: 15,
+          ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        const Text(
+          "You are friends on Tic Tac Toe",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Total Wins: ${userFriend.totalWins ?? "0"}",
+              style: const TextStyle(
+                color: Colors.blueGrey,
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          Text(
-            "Email: ${userFriend.email!}",
-            style: const TextStyle(
-              color: Colors.blueAccent,
-              fontSize: 15,
+            const SizedBox(
+              width: 10,
             ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          const Text(
-            "You are friends on Tic Tac Toe",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
+            Text(
+              "Total Coins: ${userFriend.totalCoins ?? "0"}",
+              style: const TextStyle(
+                color: Colors.blueGrey,
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Total Wins: ${userFriend.totalWins ?? "0"}",
-                style: const TextStyle(
-                  color: Colors.blueGrey,
+          ],
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Get.to(
+                UserAboutPage(
+                  unknownableUser: userFriend,
                 ),
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(
-                "Total Coins: ${userFriend.totalCoins ?? "0"}",
-                style: const TextStyle(
-                  color: Colors.blueGrey,
-                ),
-              ),
-            ],
+                transition: Transition.upToDown);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white54,
           ),
-          const SizedBox(
-            height: 10,
+          child: Text(
+            "View Profile",
+            style: theme.textTheme.bodyLarge,
           ),
-          ElevatedButton(
-            onPressed: () {
-              Get.to(
-                  UserAboutPage(
-                    unknownableUser: userFriend,
-                  ),
-                  transition: Transition.upToDown);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white54,
-            ),
-            child: Text(
-              "View Profile",
-              style: theme.textTheme.bodyLarge,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

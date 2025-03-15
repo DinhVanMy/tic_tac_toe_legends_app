@@ -179,7 +179,11 @@ class ChatFriendItem extends StatelessWidget {
             isMe ? CrossAxisAlignment.center : CrossAxisAlignment.start,
         children: [
           if (!isMe && showAvatar)
-            AvatarUserWidget(radius: 25, imagePath: userFriend.image!),
+            AvatarUserWidget(
+              radius: 25,
+              imagePath: userFriend.image!,
+              gradientColors: userFriend.avatarFrame,
+            ),
           if (!isMe && !showAvatar) const SizedBox(width: 50),
           Flexible(
             child: ChatBubble(

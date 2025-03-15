@@ -57,7 +57,10 @@ class ShareSheetCustom extends StatelessWidget {
                   Row(
                     children: [
                       AvatarUserWidget(
-                          radius: 30, imagePath: currentUser.image!),
+                        radius: 30,
+                        imagePath: currentUser.image!,
+                        gradientColors: currentUser.avatarFrame,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Column(
@@ -279,7 +282,10 @@ class ShareSheetCustom extends StatelessWidget {
                                         transition: Transition.upToDown);
                                   },
                                   child: AvatarUserWidget(
-                                      radius: 35, imagePath: friend.image!),
+                                    radius: 35,
+                                    imagePath: friend.image!,
+                                    gradientColors:friend.avatarFrame,
+                                  ),
                                 ),
                                 Positioned(
                                   bottom: 0,

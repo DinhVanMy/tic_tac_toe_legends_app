@@ -125,46 +125,15 @@ class FriendZoneMapPage extends StatelessWidget {
                               null,
                             );
                           },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.green,
-                              border: Border.all(color: Colors.green, width: 3),
-                            ),
-                            child: CircleAvatar(
-                              radius: 30,
-                              backgroundImage: nearUser.image != null &&
-                                      nearUser.image!.isNotEmpty
-                                  ? CachedNetworkImageProvider(nearUser.image!)
-                                  : null,
-                              child: nearUser.image == null ||
-                                      nearUser.image!.isEmpty
-                                  ? const Icon(Icons.person_2_outlined)
-                                  : null,
-                            ),
+                          child: AvatarUserWidget(
+                            radius: 30,
+                            imagePath: nearUser.image!,
+                            gradientColors:
+                                user.avatarFrame ?? ["#FF4CAF50", "#FF81C784"],
                           ),
                         ),
                       );
                     }),
-                    Marker(
-                      point: locationController.currentPosition.value == null
-                          ? latlng
-                          : LatLng(
-                              locationController
-                                  .currentPosition.value!.latitude,
-                              locationController
-                                  .currentPosition.value!.longitude),
-                      height: MediaQuery.sizeOf(context).width,
-                      width: MediaQuery.sizeOf(context).width,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                          border:
-                              Border.all(color: Colors.blueAccent, width: 3),
-                        ),
-                      ),
-                    ),
                     Marker(
                       point: locationController.currentPosition.value == null
                           ? latlng
@@ -187,15 +156,10 @@ class FriendZoneMapPage extends StatelessWidget {
                                   .currentPosition.value!.longitude),
                       width: 50,
                       height: 50,
-                      child: CircleAvatar(
+                      child: AvatarUserWidget(
                         radius: 30,
-                        child: user.image != null && user.image!.isNotEmpty
-                            ? CircleAvatar(
-                                backgroundImage:
-                                    CachedNetworkImageProvider(user.image!),
-                                maxRadius: 55,
-                              )
-                            : const Icon(Icons.person_2_outlined),
+                        imagePath: user.image!,
+                        gradientColors: user.avatarFrame,
                       ),
                     ),
                   ],
@@ -257,7 +221,10 @@ class FriendZoneMapPage extends StatelessWidget {
                                 child: Column(
                                   children: [
                                     AvatarUserWidget(
-                                        radius: 20, imagePath: nearUser.image!),
+                                      radius: 20,
+                                      imagePath: nearUser.image!,
+                                      gradientColors: nearUser.avatarFrame,
+                                    ),
                                     Text(
                                       nearUser.name!,
                                       style: TextStyle(
@@ -472,7 +439,25 @@ class FriendZoneMapPage extends StatelessWidget {
     );
   }
 }
-
+// Marker(
+                    //   point: locationController.currentPosition.value == null
+                    //       ? latlng
+                    //       : LatLng(
+                    //           locationController
+                    //               .currentPosition.value!.latitude,
+                    //           locationController
+                    //               .currentPosition.value!.longitude),
+                    //   height: MediaQuery.sizeOf(context).width,
+                    //   width: MediaQuery.sizeOf(context).width,
+                    //   child: Container(
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.blue.withOpacity(0.1),
+                    //       shape: BoxShape.circle,
+                    //       border:
+                    //           Border.all(color: Colors.blueAccent, width: 3),
+                    //     ),
+                    //   ),
+                    // ),
  // ...firestoreController.friendsList.map((friend) {
                     //   final LatLng friendLatLng = friend.location == null
                     //       ? defaultLatLng

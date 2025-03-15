@@ -91,7 +91,10 @@ class PostLikeTab extends StatelessWidget {
                           clipBehavior: Clip.none,
                           children: [
                             AvatarUserWidget(
-                                radius: 25, imagePath: likeUser.image!),
+                              radius: 25,
+                              imagePath: likeUser.image!,
+                              gradientColors: likeUser.avatarFrame,
+                            ),
                             Positioned(
                               bottom: -10,
                               right: -10,

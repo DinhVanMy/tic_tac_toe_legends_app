@@ -26,7 +26,11 @@ class GameHistoryPage extends StatelessWidget {
         centerTitle: false,
         title: Row(
           children: [
-            AvatarUserWidget(radius: 25, imagePath: user.image!),
+            AvatarUserWidget(
+              radius: 25,
+              imagePath: user.image!,
+              gradientColors: user.avatarFrame,
+            ),
             const SizedBox(
               width: 5,
             ),

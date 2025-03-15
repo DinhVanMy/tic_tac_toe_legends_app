@@ -631,21 +631,7 @@ class PlayWithPlayerController extends GetxController {
                     ],
                   ),
                 )
-                // Expanded(
-                //   child: ListView.builder(
-                //     itemCount: quickChatMessages.length,
-                //     itemBuilder: (context, index) {
-                //       return Padding(
-                //         padding: const EdgeInsets.symmetric(vertical: 8.0),
-                //         child: Text(
-                //           quickChatMessages[index],
-                //           style: const TextStyle(
-                //               fontSize: 13.0, color: Colors.white),
-                //         ),
-                //       );
-                //     },
-                //   ),
-                // ),
+               
               ],
             ),
           ),

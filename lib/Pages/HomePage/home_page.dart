@@ -101,10 +101,8 @@ class HomePage extends StatelessWidget {
                             ? AvatarUserWidget(
                                 radius: 30,
                                 imagePath: user.image!,
-                                gradientColors: const [
-                                  Colors.white,
-                                  Colors.blueAccent
-                                ],
+                                gradientColors: user.avatarFrame ??
+                                    ["#FF2196F3", "#FF42A5F5"],
                               )
                             : const Icon(Icons.person_2_outlined),
                         const SizedBox(width: 10),

@@ -123,10 +123,7 @@ class FriendsPage extends StatelessWidget {
                                 AvatarUserWidget(
                                   radius: 40,
                                   imagePath: user.image!,
-                                  gradientColors: const [
-                                    Colors.blueAccent,
-                                    Colors.greenAccent
-                                  ],
+                                  gradientColors: user.avatarFrame,
                                 ),
                                 const Text(
                                   "Your Story",
@@ -184,6 +181,7 @@ class FriendsPage extends StatelessWidget {
                                                     child: AvatarUserWidget(
                                                       radius: 35,
                                                       imagePath: friend.image!,
+                                                      gradientColors: friend.avatarFrame,
                                                     ),
                                                   ),
                                                   Positioned(
