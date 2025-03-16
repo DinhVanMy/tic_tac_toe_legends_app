@@ -437,6 +437,7 @@ class PostCommentListSheet extends StatelessWidget {
                       child: TextField(
                     focusNode: focusNode,
                     controller: textController,
+                    textInputAction: TextInputAction.done,
                     onChanged: (value) {
                       if (value.isNotEmpty) {
                         commentContent.value = value;

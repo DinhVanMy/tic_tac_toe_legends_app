@@ -6,11 +6,10 @@ class MessageFriendModel {
   String? receiverId;
   String? content;
   String? imagePath;
-    String? gif;
+  String? gif;
   Timestamp? timestamp;
   String? status;
   String? replyTo;
-  
 
   MessageFriendModel({
     this.messageId,

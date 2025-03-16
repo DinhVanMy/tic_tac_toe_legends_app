@@ -92,9 +92,13 @@ class MessagesWidget extends StatelessWidget {
                             children: [
                               Text(friend.name!,
                                   style: theme.textTheme.bodyLarge),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 5),
                               latestMessage != null
-                                  ? Text(latestMessage.content!)
+                                  ? Text(
+                                      latestMessage.content!,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 2,
+                                    )
                                   : const Text(
                                       "Hello friend ! How are you? ",
                                       overflow: TextOverflow.ellipsis,

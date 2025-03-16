@@ -22,13 +22,15 @@ class WhiteCodelReelsController extends GetxController
 
   final List<String> reelsVideoList;
   List<String> videoList = <String>[];
-  int loadLimit = 3;
+  int loadLimit = 1; // Giảm từ 3 xuống 1 để tối ưu hiệu suất
   List<int> alreadyListened = [];
   List<String> caching = [];
   RxInt pageCount = 0.obs;
   final int startIndex;
   bool isCaching;
   bool _isDisposed = false;
+  final Map<int, int> _retryAttempts =
+      {}; // Theo dõi số lần thử lại cho mỗi video
 
   WhiteCodelReelsController({
     required this.reelsVideoList,
@@ -71,6 +73,28 @@ class WhiteCodelReelsController extends GetxController
     super.onClose();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      for (var controller in videoPlayerControllerList) {
+        if (controller.value.isInitialized && controller.value.isPlaying) {
+          controller.pause();
+        }
+      }
+      safeAnimationStop();
+    } else if (state == AppLifecycleState.resumed) {
+      final currentIndex = pageController.page?.toInt() ?? startIndex;
+      if (currentIndex >= 0 &&
+          currentIndex < videoPlayerControllerList.length) {
+        final controller = videoPlayerControllerList[currentIndex];
+        if (controller.value.isInitialized && !controller.value.isPlaying) {
+          controller.play();
+        }
+      }
+    }
+  }
+
   Future<void> _initializeVideoControllers(int startIndex) async {
     loading.value = true;
     List<String> validUrls = [];
@@ -84,8 +108,8 @@ class WhiteCodelReelsController extends GetxController
           videoPlayerControllerList.add(controller);
           validUrls.add(url);
         } else {
-          videoPlayerControllerList.add(VideoPlayerController.networkUrl(
-              Uri.parse(''))); // Controller rỗng
+          videoPlayerControllerList
+              .add(VideoPlayerController.networkUrl(Uri.parse('')));
           validUrls.add(url);
         }
       } catch (e) {
@@ -127,8 +151,7 @@ class WhiteCodelReelsController extends GetxController
           newControllers.add(controller);
           validUrls.add(url);
         } else {
-          newControllers.add(VideoPlayerController.networkUrl(
-              Uri.parse(''))); // Controller rỗng
+          newControllers.add(VideoPlayerController.networkUrl(Uri.parse('')));
           validUrls.add(url);
         }
       } catch (e) {
@@ -145,9 +168,7 @@ class WhiteCodelReelsController extends GetxController
   void checkAndFetchMoreReels(
       {required ReelController reelController,
       required int currentIndex}) async {
-    if (currentIndex >= videoList.length - 1 &&
-        !isFetchingMore.value &&
-        !reelController.isFetching.value) {
+    if (currentIndex >= videoList.length - 1 && !isFetchingMore.value) {
       isFetchingMore.value = true;
       for (var controller in videoPlayerControllerList) {
         if (controller.value.isInitialized && controller.value.isPlaying) {
@@ -166,6 +187,7 @@ class WhiteCodelReelsController extends GetxController
     alreadyListened.add(index);
     var vpController = videoPlayerControllerList[index];
     vpController.addListener(() {
+      if (_isDisposed) return;
       if (vpController.value.isInitialized &&
           vpController.value.position >= vpController.value.duration &&
           vpController.value.duration != Duration.zero) {
@@ -176,7 +198,7 @@ class WhiteCodelReelsController extends GetxController
   }
 
   Future<void> cacheVideo(int index) async {
-    if (!isCaching) return;
+    if (!isCaching || _isDisposed) return;
     String url = videoList[index];
     if (caching.contains(url)) return;
     caching.add(url);
@@ -192,23 +214,82 @@ class WhiteCodelReelsController extends GetxController
   }
 
   Future<void> initNearByVideos(int index) async {
+    if (_isDisposed) return;
     try {
-      for (int i = index; i < index + loadLimit; i++) {
-        if (videoList.asMap().containsKey(i) &&
-            !videoPlayerControllerList[i].value.isInitialized) {
-          await videoPlayerControllerList[i].initialize();
-        }
+      if (videoList.asMap().containsKey(index) &&
+          !videoPlayerControllerList[index].value.isInitialized) {
+        await videoPlayerControllerList[index].initialize();
       }
-      for (int i = index - 1; i >= index - loadLimit; i--) {
-        if (videoList.asMap().containsKey(i) &&
-            !videoPlayerControllerList[i].value.isInitialized) {
-          await videoPlayerControllerList[i].initialize();
+
+      for (int i = 1; i <= loadLimit; i++) {
+        if (_isDisposed) return;
+        int nextIndex = index + i;
+        int prevIndex = index - i;
+
+        if (videoList.asMap().containsKey(nextIndex) &&
+            !videoPlayerControllerList[nextIndex].value.isInitialized) {
+          await Future.delayed(const Duration(milliseconds: 150));
+          if (!_isDisposed) {
+            await videoPlayerControllerList[nextIndex].initialize();
+          }
+        }
+        if (videoList.asMap().containsKey(prevIndex) &&
+            !videoPlayerControllerList[prevIndex].value.isInitialized) {
+          await Future.delayed(const Duration(milliseconds: 150));
+          if (!_isDisposed) {
+            await videoPlayerControllerList[prevIndex].initialize();
+          }
         }
       }
     } catch (e) {
       log('Error initializing nearby videos at index $index: $e');
     }
     loading.value = false;
+  }
+
+  Future<bool> retryInitializeVideo(int index) async {
+    if (_isDisposed || index < 0 || index >= videoList.length) return false;
+
+    // Tăng số lần thử lại
+    _retryAttempts[index] = (_retryAttempts[index] ?? 0) + 1;
+
+    try {
+      final url = videoList[index];
+      final newController =
+          await videoControllerService.getControllerForVideo(url, isCaching);
+      if (newController != null) {
+        await videoPlayerControllerList[index].pause();
+        videoPlayerControllerList[index].dispose();
+        videoPlayerControllerList[index] = newController;
+        await newController.initialize();
+        await newController.play();
+        _retryAttempts.remove(index); // Reset số lần thử khi thành công
+        videoPlayerControllerList.refresh();
+        return true;
+      } else {
+        if (_retryAttempts[index]! >= 2) {
+          // Nếu thử lại 2 lần vẫn lỗi
+          await removeInvalidVideo(index);
+        }
+        return false;
+      }
+    } catch (e) {
+      log('Error retrying video at index $index: $e');
+      if (_retryAttempts[index]! >= 2) {
+        await removeInvalidVideo(index);
+      }
+      return false;
+    }
+  }
+
+  Future<void> removeInvalidVideo(int index) async {
+    if (index < 0 || index >= videoList.length) return;
+    log('Removing invalid video at index $index: ${videoList[index]}');
+    videoPlayerControllerList[index].dispose();
+    videoPlayerControllerList.removeAt(index);
+    videoList.removeAt(index);
+    pageCount.value = videoList.length;
+    videoPlayerControllerList.refresh();
   }
 
   void safeAnimationStop() {

@@ -371,6 +371,7 @@ class ReelReplyCommentListSheet extends StatelessWidget {
                     child: TextField(
                       focusNode: focusNode,
                       controller: textController,
+                      textInputAction: TextInputAction.done,
                       onChanged: (value) => commentContent.value = value,
                       decoration: InputDecoration(
                         fillColor: Colors.grey.shade400,

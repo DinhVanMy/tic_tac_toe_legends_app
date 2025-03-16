@@ -177,6 +177,7 @@ class CreateReelPage extends StatelessWidget {
                       children: [
                         SizedBox(
                           height: 300,
+                          width: MediaQuery.sizeOf(context).width * 0.5,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(15),
                             child: WhiteCodelReelsPage(

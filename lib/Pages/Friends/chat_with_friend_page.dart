@@ -338,6 +338,7 @@ class ChatWithFriendPage extends StatelessWidget {
                     child: TextField(
                       focusNode: chatController.focusNode,
                       controller: textController,
+                      textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 10.0, horizontal: 10.0),

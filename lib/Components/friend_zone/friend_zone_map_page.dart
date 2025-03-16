@@ -252,6 +252,7 @@ class FriendZoneMapPage extends StatelessWidget {
                     () => TextField(
                       controller: textEditingController,
                       focusNode: searchFocusNode, // Gắn FocusNode
+                      textInputAction: TextInputAction.done,
                       onChanged: (value) {
                         searchText.value = value;
                       },

@@ -77,7 +77,7 @@ class HyperlinkTextFunction {
                   child: Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      'Oops!',
+                      'Oops???',
                       style: TextStyle(
                         color: Colors.white,
                         fontStyle: FontStyle.italic,

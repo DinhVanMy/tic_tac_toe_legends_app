@@ -254,7 +254,7 @@ class HomePage extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                const SizedBox(height: 250, child: MiddleCustomWidget()),
+                 SizedBox(height: 250, child: MiddleCustomWidget()),
                 Column(
                   children: [
                     PrimaryIconWithButton(

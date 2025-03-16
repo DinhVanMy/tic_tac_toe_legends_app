@@ -294,6 +294,7 @@ class AgoraLivestreamingPage extends StatelessWidget {
                               }
                             },
                             controller: textController,
+                            textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               fillColor: Colors.transparent,
                               contentPadding: const EdgeInsets.symmetric(

@@ -432,6 +432,7 @@ class ChatBotPage extends StatelessWidget {
                   Expanded(
                     child: TextField(
                       controller: textController,
+                      textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
                         contentPadding: const EdgeInsets.all(5),
                         border: OutlineInputBorder(

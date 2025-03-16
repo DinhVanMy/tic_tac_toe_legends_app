@@ -117,18 +117,6 @@ Widget _buildLoginBottomSheet(
                     TextButton(
                       onPressed: () async {
                         Get.defaultDialog(
-                          // cancel: MaterialButton(
-                          //   color: Colors.redAccent,
-                          //   onPressed: () {
-                          //     Get.back();
-                          //   },
-                          //   child: const Text("Cancel"),
-                          // ),
-                          // confirm: MaterialButton(
-                          //   color: Colors.greenAccent,
-                          //   onPressed: () {},
-                          //   child: const Text("Confirm"),
-                          // ),
                           content: Form(
                             key: formKeyReset,
                             child: Column(

@@ -102,9 +102,7 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
           onPageChanged: (index) async {
             try {
               if (index < 0 ||
-                  index >= controller.videoPlayerControllerList.length) {
-                return;
-              }
+                  index >= controller.videoPlayerControllerList.length) return;
               for (var i = 0;
                   i < controller.videoPlayerControllerList.length;
                   i++) {
@@ -114,9 +112,14 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
                   await controller.videoPlayerControllerList[i].pause();
                 }
               }
-              if (controller
-                  .videoPlayerControllerList[index].value.isInitialized) {
-                await controller.videoPlayerControllerList[index].play();
+              final currentController =
+                  controller.videoPlayerControllerList[index];
+              if (currentController.dataSource.isNotEmpty &&
+                  !currentController.value.isInitialized) {
+                await currentController.initialize();
+              }
+              if (currentController.value.isInitialized) {
+                await currentController.play();
               }
               if (widget.reelController != null) {
                 controller.checkAndFetchMoreReels(
@@ -124,7 +127,7 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
                     currentIndex: index);
               }
             } catch (e) {
-              errorMessage("Please calm down the controller");
+              print("Error switching page: $e");
             }
           },
           itemBuilder: (context, index) {
@@ -145,7 +148,9 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
         ? widget.reels![index]
         : null;
     final vpController = controller.videoPlayerControllerList[index];
-    if (vpController.dataSource.isEmpty) {
+
+    if (vpController.dataSource.isEmpty ||
+        (!vpController.value.isInitialized && !controller.loading.value)) {
       return Center(
         child: Container(
           width: double.infinity,
@@ -159,14 +164,34 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
                         Colors.black.withOpacity(0.5), BlendMode.dstATop),
                   ),
                 )
-              : null,
-          child: const Column(
+              : const BoxDecoration(color: Colors.black),
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, color: Colors.white, size: 50),
-              SizedBox(height: 10),
-              Text("Video unavailable",
-                  style: TextStyle(color: Colors.white, fontSize: 16)),
+              const Icon(Icons.error_outline, color: Colors.white, size: 50),
+              const SizedBox(height: 10),
+              const Text(
+                "Failed to load video",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  controller.loading.value = true;
+                  final success = await controller.retryInitializeVideo(index);
+                  controller.loading.value = false;
+                  if (success) {
+                    successMessage("Video loaded successfully");
+                  } else {
+                    errorMessage("Failed to reload video. It may be invalid.");
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.pinkAccent,
+                ),
+                child: const Text("Retry"),
+              ),
             ],
           ),
         ),
@@ -176,11 +201,13 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
     return VisibilityDetector(
       key: Key('reel_tile_$index'),
       onVisibilityChanged: (visibilityInfo) async {
-        if (!_isMounted) return;
-        if (index < 0 || index >= controller.videoPlayerControllerList.length) {
-          return;
-        }
+        if (!_isMounted ||
+            index < 0 ||
+            index >= controller.videoPlayerControllerList.length) return;
         await Future.delayed(const Duration(milliseconds: 100));
+        if (!_isMounted) return;
+
+        final vpController = controller.videoPlayerControllerList[index];
         if (visibilityInfo.visibleFraction < 0.5) {
           if (vpController.value.isInitialized) {
             await vpController.seekTo(Duration.zero);
@@ -201,9 +228,8 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
       },
       child: GestureDetector(
         onTap: () async {
-          if (index < 0 || index >= controller.videoPlayerControllerList.length) {
+          if (index < 0 || index >= controller.videoPlayerControllerList.length)
             return;
-          }
           if (vpController.value.isInitialized) {
             if (vpController.value.isPlaying) {
               await vpController.pause();
@@ -221,7 +247,7 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
               index >= controller.videoPlayerControllerList.length) {
             return const Center(child: Text("Error: Invalid index"));
           }
-          if (controller.loading.value || !vpController.value.isInitialized) {
+          if (controller.loading.value) {
             return reel?.thumbnailUrl != null
                 ? Image.memory(
                     base64Decode(reel!.thumbnailUrl!),
@@ -258,8 +284,10 @@ class _WhiteCodelReelsPageState extends State<WhiteCodelReelsPage> {
               if (vpController.value.isInitialized && _isMounted) {
                 double videoProgress =
                     vpController.value.position.inMilliseconds /
-                        vpController.value.duration.inMilliseconds;
-                _progressControllers[index]!.add(videoProgress);
+                        (vpController.value.duration.inMilliseconds > 0
+                            ? vpController.value.duration.inMilliseconds
+                            : 1);
+                _progressControllers[index]!.add(videoProgress.clamp(0.0, 1.0));
               }
             }
 
