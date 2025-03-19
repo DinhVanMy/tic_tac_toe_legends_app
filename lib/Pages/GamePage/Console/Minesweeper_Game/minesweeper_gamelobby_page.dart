@@ -4,15 +4,15 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 // ignore: implementation_imports
 import 'package:cyber_punk_tool_kit_ui/src/containers/cyber_container_two.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_controller.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Minesweeper_Game/minesweeper_game_controller.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Minesweeper_Game/minesweeper_game_page.dart';
 
-class BreakoutGamelobbyPage extends StatelessWidget {
-  const BreakoutGamelobbyPage({super.key});
+class MinesweeperGamelobbyPage extends StatelessWidget {
+  const MinesweeperGamelobbyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Rxn<Level> selectedLevel = Rxn<Level>();
+    Rxn<GameLevel> selectedLevel = Rxn<GameLevel>();
     RxnInt selectedMode = RxnInt();
     RxnString selectedImageIndex = RxnString();
     final List<String> imagePaths = [
@@ -28,6 +28,13 @@ class BreakoutGamelobbyPage extends StatelessWidget {
       fontWeight: FontWeight.w600,
       fontSize: 20,
     );
+    final List<Map<String, dynamic>> boardConfigs = [
+      {'mode': 'Small', 'size': '8x4', 'rows': 8, 'columns': 4},
+      {'mode': 'Medium', 'size': '10x5', 'rows': 10, 'columns': 5},
+      {'mode': 'Large', 'size': '12x6', 'rows': 12, 'columns': 6},
+      {'mode': 'Extra Large', 'size': '14x7', 'rows': 14, 'columns': 7},
+      {'mode': 'Epic', 'size': '10x7', '16x8': 16, 'columns': 8},
+    ];
 
     return Scaffold(
       // appBar: AppBar(title: const Text('Sudoku Lobby', style: textStyle)),
@@ -61,7 +68,7 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: Level.values.map((level) {
+                      children: GameLevel.values.map((level) {
                         return InkWell(
                           splashColor: Colors.blueAccent,
                           borderRadius: BorderRadius.circular(10),
@@ -103,16 +110,18 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [4, 9, 16, 25].map((size) {
+                      children: boardConfigs.map((config) {
                         return InkWell(
                           splashColor: Colors.blueAccent,
                           borderRadius: BorderRadius.circular(10),
-                          onTap: () => selectedMode.value = size,
+                          onTap: () =>
+                              selectedMode.value = boardConfigs.indexOf(config),
                           child: Obx(() => Container(
                                 padding: const EdgeInsets.all(10),
                                 margin: const EdgeInsets.all(10),
                                 decoration: selectedMode.value != null &&
-                                        selectedMode.value == size
+                                        selectedMode.value ==
+                                            boardConfigs.indexOf(config)
                                     ? BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(10),
@@ -126,7 +135,7 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                                             color: Colors.white, width: 3),
                                       ),
                                 child: Text(
-                                  '${size}x$size',
+                                  config["size"],
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontFamily: "Orbitron",
@@ -182,10 +191,15 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                           selectedLevel.value != null &&
                           selectedImageIndex.value != null
                       ? InkWell(
-                          onTap: () => Get.to(() => BreakoutGame(
-                                level: selectedLevel.value!,
-                                backgroundUrl: selectedImageIndex.value!,
-                              ),transition: Transition.zoom),
+                          onTap: () => Get.to(
+                            () => MinesweeperGame(
+                              rows: boardConfigs[selectedMode.value!]["rows"],
+                              columns: boardConfigs[selectedMode.value!]
+                                  ["columns"],
+                              cellSize: 30,
+                              level: selectedLevel.value!,
+                            ),
+                          ),
                           child: Ink(
                             height: 50,
                             width: 100,

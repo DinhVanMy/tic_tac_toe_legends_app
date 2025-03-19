@@ -74,7 +74,8 @@ class SudokuGamePlayPage extends StatelessWidget {
                       boundaryMargin: const EdgeInsets.all(double.infinity),
                       child: GridView.builder(
                         shrinkWrap: true,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: size,
                           childAspectRatio: 1,
                         ),
@@ -83,12 +84,12 @@ class SudokuGamePlayPage extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final value = controller.puzzle[index];
                           final isEditable = controller.puzzle[index] == -1;
-
+    
                           // Hero được ánh xạ từ số
                           final hero = value == -1
                               ? null
                               : controller.selectedHeroes[value - 1];
-
+    
                           return GestureDetector(
                             onTap: isEditable
                                 ? () {
@@ -112,8 +113,8 @@ class SudokuGamePlayPage extends StatelessWidget {
                                               fontSize: 17),
                                         ),
                                         confirm: CyberButton(
-                                          onTap: () =>
-                                              controller.hintForSpecify(index),
+                                          onTap: () => controller
+                                              .hintForSpecify(index),
                                           primaryColorBigContainer:
                                               Colors.green,
                                           secondaryColorBigContainer:
@@ -127,7 +128,8 @@ class SudokuGamePlayPage extends StatelessWidget {
                                           onTap: () {
                                             Get.back();
                                           },
-                                          primaryColorBigContainer: Colors.red,
+                                          primaryColorBigContainer:
+                                              Colors.red,
                                           secondaryColorBigContainer:
                                               Colors.redAccent,
                                           child: const Text(

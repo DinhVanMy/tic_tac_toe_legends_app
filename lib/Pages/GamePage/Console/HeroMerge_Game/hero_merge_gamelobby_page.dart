@@ -4,15 +4,14 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 // ignore: implementation_imports
 import 'package:cyber_punk_tool_kit_ui/src/containers/cyber_container_two.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_controller.dart';
-import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/HeroMerge_Game/hero_merge_gameplay_page.dart';
 
-class BreakoutGamelobbyPage extends StatelessWidget {
-  const BreakoutGamelobbyPage({super.key});
+class HeroMergeGamelobbyPage extends StatelessWidget {
+  const HeroMergeGamelobbyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Rxn<Level> selectedLevel = Rxn<Level>();
+    Rxn<int> selectedLevel = Rxn<int>();
     RxnInt selectedMode = RxnInt();
     RxnString selectedImageIndex = RxnString();
     final List<String> imagePaths = [
@@ -28,7 +27,21 @@ class BreakoutGamelobbyPage extends StatelessWidget {
       fontWeight: FontWeight.w600,
       fontSize: 20,
     );
-
+    final Map<String, int> levelMapping = {
+      'Easy': 1,
+      'Medium': 2,
+      'Hard': 3,
+      'Expert': 4,
+      'Legendary': 5,
+    };
+    final List<String> levels = levelMapping.keys.toList();
+    final List<Map<String, dynamic>> boardConfigs = [
+      {'mode': 'Small', 'size': '5x5', 'rows': 5, 'columns': 5},
+      {'mode': 'Medium', 'size': '6x5', 'rows': 6, 'columns': 5},
+      {'mode': 'Large', 'size': '7x5', 'rows': 7, 'columns': 5},
+      {'mode': 'Extra Large', 'size': '8x6', 'rows': 8, 'columns': 6},
+      {'mode': 'Epic', 'size': '10x7', 'rows': 10, 'columns': 7},
+    ];
     return Scaffold(
       // appBar: AppBar(title: const Text('Sudoku Lobby', style: textStyle)),
       body: Stack(
@@ -56,21 +69,23 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                   const SizedBox(
                     height: 20,
                   ),
-                  const Text('Select Difficulty', style: textStyle),
+                  const Text('Select Level', style: textStyle),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: Level.values.map((level) {
+                      children: levels.map((levelName) {
                         return InkWell(
                           splashColor: Colors.blueAccent,
                           borderRadius: BorderRadius.circular(10),
-                          onTap: () => selectedLevel.value = level,
+                          onTap: () =>
+                              selectedLevel.value = levelMapping[levelName],
                           child: Obx(() => Container(
                                 padding: const EdgeInsets.all(10),
                                 margin: const EdgeInsets.all(10),
                                 decoration: selectedLevel.value != null &&
-                                        selectedLevel.value == level
+                                        selectedLevel.value ==
+                                            levelMapping[levelName]
                                     ? BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(10),
@@ -84,7 +99,7 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                                             color: Colors.white, width: 3),
                                       ),
                                 child: Text(
-                                  level.name.capitalizeFirst!,
+                                  levelName,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontFamily: "Orbitron",
@@ -103,16 +118,18 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [4, 9, 16, 25].map((size) {
+                      children: boardConfigs.map((config) {
                         return InkWell(
                           splashColor: Colors.blueAccent,
                           borderRadius: BorderRadius.circular(10),
-                          onTap: () => selectedMode.value = size,
+                          onTap: () =>
+                              selectedMode.value = boardConfigs.indexOf(config),
                           child: Obx(() => Container(
                                 padding: const EdgeInsets.all(10),
                                 margin: const EdgeInsets.all(10),
                                 decoration: selectedMode.value != null &&
-                                        selectedMode.value == size
+                                        selectedMode.value ==
+                                            boardConfigs.indexOf(config)
                                     ? BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(10),
@@ -126,7 +143,7 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                                             color: Colors.white, width: 3),
                                       ),
                                 child: Text(
-                                  '${size}x$size',
+                                  config["size"],
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontFamily: "Orbitron",
@@ -182,10 +199,16 @@ class BreakoutGamelobbyPage extends StatelessWidget {
                           selectedLevel.value != null &&
                           selectedImageIndex.value != null
                       ? InkWell(
-                          onTap: () => Get.to(() => BreakoutGame(
-                                level: selectedLevel.value!,
-                                backgroundUrl: selectedImageIndex.value!,
-                              ),transition: Transition.zoom),
+                          onTap: () => Get.to(
+                              () => HeroMergeGameplayPage(
+                                    rows: boardConfigs[selectedMode.value!]
+                                        ["rows"],
+                                    columns: boardConfigs[selectedMode.value!]
+                                        ["columns"],
+                                    level: selectedLevel.value!,
+                                    backgroundUrl: selectedImageIndex.value!,
+                                  ),
+                              transition: Transition.zoom),
                           child: Ink(
                             height: 50,
                             width: 100,

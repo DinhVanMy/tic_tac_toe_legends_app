@@ -348,8 +348,7 @@ class Match3Controller extends GetxController with GetTickerProviderStateMixin {
       },
       textCancel: "Exit",
       onCancel: () {
-        Get.back();
-        // Logic thoát game nếu cần
+        Get.offNamed("mainHome");
       },
     );
   }

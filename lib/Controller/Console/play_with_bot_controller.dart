@@ -262,7 +262,7 @@ class PlayWithBotController extends GetxController {
     if (winner == "X") {
       currentWin += 1;
       currentCoin += 10;
-      firestoreController.incrementCoinsAndWins();
+      firestoreController.incrementCoinsAndWins(100);
       xScore.value = xScore.value + 1;
     } else if (winner == "O") {
       oScore.value = oScore.value + 1;

@@ -26,6 +26,7 @@ dependencies:
   firebase_auth: ^4.18.0
   firebase_core: ^2.27.2
   firebase_storage: ^11.6.11
+  fl_chart: ^0.70.2
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2

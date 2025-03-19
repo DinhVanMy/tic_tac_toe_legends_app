@@ -2,6 +2,7 @@ import 'package:cyber_punk_tool_kit_ui/cyber_punk_tool_kit_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
+// ignore: implementation_imports
 import 'package:cyber_punk_tool_kit_ui/src/containers/cyber_container_two.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_gameplay_page.dart';
 
@@ -185,11 +186,13 @@ class Match3LobbyPage extends StatelessWidget {
                           selectedLevel.value != null &&
                           selectedImageIndex.value != null
                       ? InkWell(
-                          onTap: () => Get.to(() => Match3GamePlayPage(
-                                selectedLevel: selectedLevel.value!,
-                                size: selectedMode.value!,
-                                map: selectedImageIndex.value!,
-                              )),
+                          onTap: () => Get.to(
+                              () => Match3GamePlayPage(
+                                    selectedLevel: selectedLevel.value!,
+                                    size: selectedMode.value!,
+                                    map: selectedImageIndex.value!,
+                                  ),
+                              transition: Transition.zoom),
                           child: Ink(
                             height: 50,
                             width: 100,
@@ -244,7 +247,7 @@ class Match3LobbyPage extends StatelessWidget {
             left: 10,
             child: CyberButton(
               onTap: () {
-                Get.toNamed("mainHome");
+                Get.back();
               },
               width: 100,
               height: 50,

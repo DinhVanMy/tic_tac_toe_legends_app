@@ -6,8 +6,8 @@ import 'package:tictactoe_gameapp/Models/champion_model.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/sodoku_gamelobby_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_lobby_page.dart';
 import 'package:tictactoe_gameapp/Test/Bubble_Shooter/bubble_shooter_gameplay_page.dart';
-import 'package:tictactoe_gameapp/Test/Minesweeper_Game/minesweeper_game_page.dart';
-import 'package:tictactoe_gameapp/Test/NumberMerge_Game/number_merge_gameplay_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Minesweeper_Game/minesweeper_gamelobby_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/HeroMerge_Game/hero_merge_gamelobby_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gamelobby_page.dart';
 
 const String url1 = "https://github.com/DinhVanMy?tab=repositories";
@@ -78,20 +78,16 @@ final List<Cards> images = [
   Cards(
     image: Jajas.card1,
     title: "MINESWEEPER",
-    page: MinesweeperGame(
-      rows: 20,
-      columns: 8,
-      cellSize: 30,
-    ),
+    page: const MinesweeperGamelobbyPage(),
   ),
   Cards(
     image: Jajas.card2,
-    title: "NUMBER MERGE",
-    page: const NumberMergeGame(),
+    title: "HERO MERGE",
+    page: const HeroMergeGamelobbyPage(),
   ),
   Cards(
     image: Jajas.card3,
-    title: "MATCH 3",
+    title: "MATCH HERO",
     page: const Match3LobbyPage(),
   ),
   Cards(

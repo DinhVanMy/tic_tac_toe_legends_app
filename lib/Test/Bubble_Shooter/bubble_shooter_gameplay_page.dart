@@ -204,7 +204,6 @@ class ShootingPath extends StatelessWidget {
         // Lấy dữ liệu từ controller và chuyển cho CustomPainter
         final shooterPos = controller.shooterPosition.value;
         final targetPos = controller.targetPosition.value;
-
         return CustomPaint(
           size: Size.infinite,
           painter: ShootingPathPainter(

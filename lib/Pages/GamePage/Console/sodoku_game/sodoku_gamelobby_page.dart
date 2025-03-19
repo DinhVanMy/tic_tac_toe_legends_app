@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/dynamic_sodoku_controller.dart';
+// ignore: implementation_imports
 import 'package:cyber_punk_tool_kit_ui/src/containers/cyber_container_two.dart';
 import 'sodoku_gameplay_page.dart';
 
@@ -244,7 +245,7 @@ class SodokuGamelobbyPage extends StatelessWidget {
             left: 10,
             child: CyberButton(
               onTap: () {
-                Get.toNamed("mainHome");
+                Get.back();
               },
               width: 100,
               height: 50,

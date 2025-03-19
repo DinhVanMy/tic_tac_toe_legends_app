@@ -145,12 +145,12 @@ class FirestoreController extends GetxController {
   }
 
   // Hàm cập nhật totalCoins và totalWins
-  Future<void> incrementCoinsAndWins() async {
+  Future<void> incrementCoinsAndWins(int coinEarned) async {
     try {
       int userIndex = usersList.indexWhere((user) => user.id == userId);
 
       // Tăng totalCoins lên 10 và totalWins lên 1
-      int newCoins = int.parse(usersList[userIndex].totalCoins ?? "0") + 10;
+      int newCoins = int.parse(usersList[userIndex].totalCoins ?? "0") + coinEarned;
       int newWins = int.parse(usersList[userIndex].totalWins ?? "0") + 1;
 
       // Cập nhật dữ liệu trong Firestore
@@ -188,4 +188,5 @@ class FirestoreController extends GetxController {
     friendsSubscription.cancel();
     super.onClose();
   }
+
 }

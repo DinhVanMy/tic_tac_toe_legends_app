@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Configs/assets_path.dart';
-import 'package:tictactoe_gameapp/Test/Minesweeper_Game/minesweeper_game_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Minesweeper_Game/minesweeper_game_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gameplay_controller.dart';
 
 class BreakoutGame extends StatelessWidget {
@@ -25,12 +24,6 @@ class BreakoutGame extends StatelessWidget {
       fontFamily: "Orbitron",
       fontWeight: FontWeight.w600,
       fontSize: 20,
-    );
-    const TextStyle textStyleMedium = TextStyle(
-      color: Colors.white,
-      fontFamily: "Orbitron",
-      fontWeight: FontWeight.w400,
-      fontSize: 16,
     );
 
     return Scaffold(
