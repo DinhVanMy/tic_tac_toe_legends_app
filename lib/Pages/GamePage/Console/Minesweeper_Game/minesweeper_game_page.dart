@@ -38,7 +38,6 @@ class MinesweeperGame extends StatelessWidget {
       canPop: false,
       onPopInvoked: (didPop) async {
         if (didPop) return;
-
         if (!controller.gameOver.value) {
           final shouldExit = await showExitConfirmationDialog();
           if (shouldExit) {

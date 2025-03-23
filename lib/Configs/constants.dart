@@ -5,10 +5,10 @@ import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Models/champion_model.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/sodoku_game/sodoku_gamelobby_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Match3_Game/match3_lobby_page.dart';
-import 'package:tictactoe_gameapp/Test/Bubble_Shooter/bubble_shooter_gameplay_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Minesweeper_Game/minesweeper_gamelobby_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/HeroMerge_Game/hero_merge_gamelobby_page.dart';
 import 'package:tictactoe_gameapp/Pages/GamePage/Console/Breakout_Game/breakout_gamelobby_page.dart';
+import 'package:tictactoe_gameapp/Pages/GamePage/Console/Bubble_Shooter/bubble_shooter_lobby_page.dart.dart';
 
 const String url1 = "https://github.com/DinhVanMy?tab=repositories";
 const String url2 = "https://poki.com/";
@@ -98,7 +98,7 @@ final List<Cards> images = [
   Cards(
     image: Jajas.card5,
     title: "BUBBLE SHOOTER",
-    page: const BubbleShooterGame(),
+    page: const BubbleShooterLobbyPage(),
   ),
 ];
 
