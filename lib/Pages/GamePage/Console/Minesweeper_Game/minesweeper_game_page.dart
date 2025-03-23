@@ -134,6 +134,7 @@ class MinesweeperGame extends StatelessWidget {
                                 child: HexCellWidget(
                                   cell: controller.board[row][col],
                                   cellSize: cellSize,
+                                  minesweeperController: controller,
                                 ),
                               ),
                         ],
@@ -149,16 +150,21 @@ class MinesweeperGame extends StatelessWidget {
 }
 
 class HexCellWidget extends StatelessWidget {
+  final MinesweeperController minesweeperController;
   final HexCell cell;
   final double cellSize;
 
-  const HexCellWidget({super.key, required this.cell, required this.cellSize});
+  const HexCellWidget(
+      {super.key,
+      required this.cell,
+      required this.cellSize,
+      required this.minesweeperController});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.find<MinesweeperController>().revealCell(cell.row, cell.col);
+        minesweeperController.revealCell(cell.row, cell.col);
       },
       child: Obx(() => ClipPath(
             clipper: HexagonClipper(),

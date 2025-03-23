@@ -17,7 +17,7 @@ class MinesweeperController extends GetxController {
   Timer? _timer;
 
   final List<String> heroImages = listChampions;
-  final String placeholderImage = ImagePath.background1;
+  final String placeholderImage = GifsPath.loadingGif;
 
   void initializeBoard(int rows, int columns, GameLevel level) {
     this.rows = rows;
