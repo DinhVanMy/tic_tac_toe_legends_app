@@ -6,7 +6,7 @@ TicTacToe Game App is a Flutter-based application that integrates both **gaming 
 
 🎥 **Demo Video:** [Watch demo here](https://github.com/DinhVanMy/tic_tac_toe_legends_app/issues/1#issue-2845405867)
 
-📥 **Download & Installation:** [Download app here](https://www.mediafire.com/file/mhf5ada8y18k9gh/Gaming_social_app_1-0-5.apk/file)
+📥 **Download & Installation:** [Download app here](https://www.mediafire.com/file/35oytsyheeoawlu/Gaming_social_app_1-0-5.apk/file)
 
 🕸️ **Website HomePage:** [Home page](https://sites.google.com/view/gaming-social-app/trang-ch%E1%BB%A7)
 
