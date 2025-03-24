@@ -26,7 +26,7 @@ dependencies:
   firebase_auth: ^4.18.0
   firebase_core: ^2.27.2
   firebase_storage: ^11.6.11
-  fl_chart: ^0.70.2
+  fl_chart: ^0.69.2
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
@@ -52,6 +52,7 @@ dependencies:
   http: ^1.3.0
   image_picker: ^1.0.7
   internet_connection_checker: ^3.0.1
+  intl: null
   just_audio: ^0.9.39
   latlong2: ^0.9.1
   lite_rolling_switch: ^1.0.1

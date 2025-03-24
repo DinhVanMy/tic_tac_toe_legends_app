@@ -15,7 +15,8 @@ import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
 import 'package:tictactoe_gameapp/Pages/Splace/splace_page.dart';
-import 'package:tictactoe_gameapp/Test/admin/admin_home_page.dart';
+import 'package:tictactoe_gameapp/Test/admin/Pages/admin_home_page.dart';
+import 'package:tictactoe_gameapp/Test/admin/app_routes.dart';
 import 'package:tictactoe_gameapp/Test/customed_error_widget.dart';
 import 'firebase_options.dart';
 
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
+     AdminRoutes.setupAdminRoutes();
     final LanguageController languageController = Get.put(LanguageController());
     return GetMaterialApp(
       initialBinding: BindingsBuilder(() {
@@ -92,7 +94,7 @@ class MyApp extends StatelessWidget {
         };
         return child!;
       },
-      home: const AdminHomePage(),
+      home: const AdminDashboardPage(),
       //  const MultiPlayer(
       //   roomId: "339C80AB",
       // ),
