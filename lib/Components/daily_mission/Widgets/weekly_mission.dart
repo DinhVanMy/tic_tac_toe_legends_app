@@ -84,39 +84,42 @@ class WeeklyMissionPage extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      Row(
-                        children: [
-                          Container(
-                            width: 100,
-                            height: 25,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.blueGrey.shade400,
-                              borderRadius: BorderRadius.circular(20),
-                              border:
-                                  Border.all(color: Colors.yellow, width: 3),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 100,
+                              height: 25,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: Colors.blueGrey.shade400,
+                                borderRadius: BorderRadius.circular(20),
+                                border:
+                                    Border.all(color: Colors.yellow, width: 3),
+                              ),
+                              child: Text(
+                                "${weeklyTask.progress} / ${weeklyTask.goal}",
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
-                            child: Text(
-                              "${weeklyTask.progress} / ${weeklyTask.goal}",
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              taskController.displayDate(weeklyTask.deadline),
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: Colors.black,
+                                color: Colors.grey,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            taskController.displayDate(weeklyTask.deadline),
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       )
                     ],
                   ),

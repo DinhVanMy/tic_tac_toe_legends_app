@@ -14,9 +14,9 @@ import 'package:tictactoe_gameapp/Controller/auth_controller.dart';
 import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/admin_home_page.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/app_routes.dart';
 import 'package:tictactoe_gameapp/Pages/Splace/splace_page.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/admin_home_page.dart';
-import 'package:tictactoe_gameapp/Test/admin/app_routes.dart';
 import 'package:tictactoe_gameapp/Test/customed_error_widget.dart';
 import 'firebase_options.dart';
 
@@ -94,7 +94,7 @@ class MyApp extends StatelessWidget {
         };
         return child!;
       },
-      home: const AdminDashboardPage(),
+      home: const SplacePage(),
       //  const MultiPlayer(
       //   roomId: "339C80AB",
       // ),

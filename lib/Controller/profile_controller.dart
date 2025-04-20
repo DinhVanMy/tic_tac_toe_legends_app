@@ -16,7 +16,7 @@ class ProfileController extends GetxController {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
   final String userId = Get.find<AuthController>().getCurrentUserId();
-  late final UserModel? user;
+  late  UserModel? user;
 
   // @override
   // void onInit() {

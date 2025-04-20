@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/dashboard_overview.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/tabs/user_support_system_tab.dart';
 import 'package:tictactoe_gameapp/Pages/Splace/splace_page.dart';
-import 'package:tictactoe_gameapp/Test/admin/controllers/admin_controller.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/tabs/user_management_tab.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/tabs/content_moderation_tab.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/tabs/analytics_tab.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/tabs/announcements_tab.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/tabs/game_management_tab.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/controllers/admin_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/tabs/user_management_tab.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/tabs/content_moderation_tab.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/tabs/analytics_tab.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/tabs/announcements_tab.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/tabs/game_management_tab.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -39,10 +41,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Dashboard'),
-        backgroundColor: Colors.deepPurpleAccent,
+        backgroundColor: Colors.deepPurple.withOpacity(0.5),
         bottom: TabBar(
           controller: controller.tabController,
           isScrollable: true,
+          labelColor: Colors.blueAccent,
+          unselectedLabelColor: Colors.blueGrey,
+          indicatorSize: TabBarIndicatorSize.tab,
+          splashBorderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          indicatorWeight: 5,
           indicatorColor: Colors.white,
           tabs: const [
             Tab(
@@ -179,16 +189,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage>
             leading: const Icon(Icons.dashboard),
             title: const Text('Dashboard'),
             onTap: () {
-              Get.back(); // Close drawer
-              controller.tabController.animateTo(0); // Go to first tab
+              Get.to(() => const DashboardOverviewPage());
             },
           ),
           ListTile(
             leading: const Icon(Icons.people),
-            title: const Text('User Management'),
+            title: const Text('Support System'),
             onTap: () {
-              Get.back();
-              controller.tabController.animateTo(0);
+              Get.to(() => const SupportSystemPage());
             },
           ),
           ListTile(

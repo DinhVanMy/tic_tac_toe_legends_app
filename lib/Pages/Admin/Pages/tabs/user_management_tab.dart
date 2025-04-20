@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
-import 'package:tictactoe_gameapp/Test/admin/controllers/admin_controller.dart';
-import 'package:tictactoe_gameapp/Test/admin/models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/controllers/admin_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/models/user_model.dart';
 import 'package:tictactoe_gameapp/Configs/assets_path.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
 
@@ -161,7 +161,18 @@ class _UserManagementTabState extends State<UserManagementTab> {
   Widget _buildUserList(AdminController controller) {
     return Obx(() {
       if (controller.isLoadingUsers.value) {
-        return const Center(child: CircularProgressIndicator());
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(
+                GifsPath.transitionGif,
+              ),
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
       }
 
       if (controller.users.isEmpty) {
@@ -332,94 +343,93 @@ class _UserManagementTabState extends State<UserManagementTab> {
                   ],
                 ),
                 title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _showUserDetailsDialog(user);
-                          },
-                          onLongPress: () {
-                            if (user.id != null) {
-                              controller.toggleUserSelection(user.id!);
-                            }
-                          },
-                          child: Stack(
-                            children: [
-                              user.image != null && user.image!.isNotEmpty
-                                  ? CircleAvatar(
-                                      backgroundImage:
-                                          CachedNetworkImageProvider(
-                                              user.image!),
-                                      radius: 25,
-                                    )
-                                  : const CircleAvatar(
-                                      radius: 25,
-                                      child: Icon(Icons.person_2_outlined),
-                                    ),
-                              if (isSelected)
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(2),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.deepPurpleAccent,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.check,
-                                      size: 12,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                    GestureDetector(
+                      onTap: () {
+                        _showUserDetailsDialog(user);
+                      },
+                      onLongPress: () {
+                        if (user.id != null) {
+                          controller.toggleUserSelection(user.id!);
+                        }
+                      },
+                      child: Stack(
+                        children: [
+                          user.image != null && user.image!.isNotEmpty
+                              ? CircleAvatar(
+                                  backgroundImage:
+                                      CachedNetworkImageProvider(user.image!),
+                                  radius: 25,
+                                )
+                              : const CircleAvatar(
+                                  radius: 25,
+                                  child: Icon(Icons.person_2_outlined),
                                 ),
+                          if (isSelected)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration: const BoxDecoration(
+                                  color: Colors.deepPurpleAccent,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.check,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Sử dụng Expanded cho phần thông tin user
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name ?? 'Unknown',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: user.suspended == true
+                                  ? Colors.grey
+                                  : Colors.deepPurple,
+                              fontSize: 15,
+                              decoration: user.suspended == true
+                                  ? TextDecoration.lineThrough
+                                  : null,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                user.totalCoins ?? "0",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.yellowAccent,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              SvgPicture.asset(
+                                IconsPath.coinIcon,
+                                width: 20,
+                                color: Colors.yellowAccent,
+                              ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              user.name ?? 'Unknown',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: user.suspended == true
-                                    ? Colors.grey
-                                    : Colors.deepPurple,
-                                fontSize: 15,
-                                decoration: user.suspended == true
-                                    ? TextDecoration.lineThrough
-                                    : null,
-                              ),
-                              overflow: TextOverflow.clip,
-                              maxLines: 1,
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  user.totalCoins ?? "0",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.yellowAccent,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                SvgPicture.asset(
-                                  IconsPath.coinIcon,
-                                  width: 20,
-                                  color: Colors.yellowAccent,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    // Phần này sẽ luôn hiển thị
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Chip(
                           label: Text(user.role ?? 'user'),
@@ -429,6 +439,7 @@ class _UserManagementTabState extends State<UserManagementTab> {
                           padding: EdgeInsets.zero,
                           materialTapTargetSize:
                               MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
                         ),
                         const SizedBox(width: 4),
                         if (user.verified == true)
@@ -467,58 +478,62 @@ class _UserManagementTabState extends State<UserManagementTab> {
                             ),
                           ),
                         const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            OutlinedButton.icon(
-                              icon: const Icon(Icons.edit),
-                              label: const Text('Edit Role'),
-                              onPressed: () {
-                                _showEditRoleDialog(user, controller);
-                              },
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(color: Colors.white),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              OutlinedButton.icon(
+                                icon: const Icon(Icons.edit),
+                                label: const Text('Edit Role'),
+                                onPressed: () {
+                                  _showEditRoleDialog(user, controller);
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  side: const BorderSide(color: Colors.white),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            OutlinedButton.icon(
-                              icon: Icon(user.suspended == true
-                                  ? Icons.check_circle
-                                  : Icons.block),
-                              label: Text(user.suspended == true
-                                  ? 'Activate'
-                                  : 'Suspend'),
-                              onPressed: () {
-                                if (user.suspended == true) {
-                                  _confirmActivateUser(user, controller);
-                                } else {
-                                  _confirmSuspendUser(user, controller);
-                                }
-                              },
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: user.suspended == true
-                                    ? Colors.green
-                                    : Colors.red,
-                                side: BorderSide(
-                                    color: user.suspended == true
-                                        ? Colors.green
-                                        : Colors.red),
+                              const SizedBox(width: 8),
+                              OutlinedButton.icon(
+                                icon: Icon(user.suspended == true
+                                    ? Icons.check_circle
+                                    : Icons.block),
+                                label: Text(user.suspended == true
+                                    ? 'Activate'
+                                    : 'Suspend'),
+                                onPressed: () {
+                                  if (user.suspended == true) {
+                                    _confirmActivateUser(user, controller);
+                                  } else {
+                                    _confirmSuspendUser(user, controller);
+                                  }
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: user.suspended == true
+                                      ? Colors.green
+                                      : Colors.red,
+                                  side: BorderSide(
+                                      color: user.suspended == true
+                                          ? Colors.green
+                                          : Colors.red),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            OutlinedButton.icon(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              label: const Text('Delete'),
-                              onPressed: () {
-                                _confirmDeleteUser(user, controller);
-                              },
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.red,
-                                side: const BorderSide(color: Colors.red),
+                              const SizedBox(width: 8),
+                              OutlinedButton.icon(
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
+                                label: const Text('Delete'),
+                                onPressed: () {
+                                  _confirmDeleteUser(user, controller);
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                  side: const BorderSide(color: Colors.red),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),

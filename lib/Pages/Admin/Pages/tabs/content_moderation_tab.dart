@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
-import 'package:tictactoe_gameapp/Test/admin/controllers/admin_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/controllers/admin_controller.dart';
 
 class ContentModerationTab extends StatelessWidget {
   const ContentModerationTab({super.key});

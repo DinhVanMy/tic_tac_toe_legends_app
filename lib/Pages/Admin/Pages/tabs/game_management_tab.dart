@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Test/admin/controllers/admin_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/controllers/admin_controller.dart';
 import 'package:tictactoe_gameapp/Components/belong_to_users/avatar_user_widget.dart';
 
 class GameManagementTab extends StatefulWidget {
@@ -177,27 +177,25 @@ class _GameManagementTabState extends State<GameManagementTab>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          Text(
-                            '${gameId.capitalize} Configuration',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${gameId.capitalize} Configuration',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                          ElevatedButton.icon(
-                            onPressed: () => _saveGameConfig(controller),
-                            icon: const Icon(Icons.save),
-                            label: const Text('Save Changes'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.deepPurpleAccent,
-                            ),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () => _saveGameConfig(controller),
+                          icon: const Icon(Icons.save),
+                          label: const Text('Save Changes'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurpleAccent,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     const Divider(),

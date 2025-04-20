@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
-import 'package:tictactoe_gameapp/Test/admin/models/user_model.dart';
-import 'package:tictactoe_gameapp/Test/admin/services/admin_service.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/services/admin_service.dart';
 
 class AdminController extends GetxController with GetSingleTickerProviderStateMixin {
   final AdminService _adminService = AdminService();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Configs/messages.dart';
-import 'package:tictactoe_gameapp/Test/admin/services/admin_service.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/services/admin_service.dart';
 
 class AdminSettingsPage extends StatefulWidget {
   const AdminSettingsPage({super.key});

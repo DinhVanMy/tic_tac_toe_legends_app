@@ -8,6 +8,7 @@ import 'package:tictactoe_gameapp/Models/user_model.dart';
 
 class ListenLatestMessagesController extends GetxController {
   final ProfileController profileController = Get.find();
+  
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   RxList<MessageFriendModel> latestMessages = <MessageFriendModel>[].obs;

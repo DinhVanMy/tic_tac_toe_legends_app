@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tictactoe_gameapp/Test/admin/models/user_model.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/models/user_model.dart';
 
 class AdminService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

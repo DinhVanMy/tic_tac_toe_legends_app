@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:tictactoe_gameapp/Models/Functions/time_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:tictactoe_gameapp/Test/admin/controllers/admin_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/controllers/admin_controller.dart';
 
 class AnnouncementsTab extends StatelessWidget {
   const AnnouncementsTab({super.key});

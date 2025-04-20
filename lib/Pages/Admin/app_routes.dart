@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
-import 'package:tictactoe_gameapp/Test/admin/middlewares/admin_middleware.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/admin_setting_page.dart';
-import 'package:tictactoe_gameapp/Test/admin/Pages/admin_home_page.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/middlewares/admin_middleware.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/admin_setting_page.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/admin_home_page.dart';
 
 class AdminRoutes {
   static List<GetPage> routes = [
