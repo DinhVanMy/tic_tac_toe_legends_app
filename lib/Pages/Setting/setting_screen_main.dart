@@ -9,6 +9,7 @@ import 'package:tictactoe_gameapp/Controller/language_controller.dart';
 import 'package:tictactoe_gameapp/Controller/Music/background_music_controller.dart';
 import 'package:tictactoe_gameapp/Controller/online_status_controller.dart';
 import 'package:tictactoe_gameapp/Controller/theme_controller.dart';
+import 'package:tictactoe_gameapp/Pages/Admin/Pages/admin_home_page.dart';
 import 'package:tictactoe_gameapp/Pages/Login/change_password_dialog.dart';
 import 'package:tictactoe_gameapp/Pages/Setting/Widgets/locale_button.dart';
 
@@ -59,14 +60,19 @@ class SettingScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.greenAccent, width: 4),
+            GestureDetector(
+              onTap: () {
+                Get.to(const AdminDashboardPage());
+              },
+              child: Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color.fromARGB(255, 39, 49, 44), width: 4),
+                ),
+                child: const Icon(Icons.admin_panel_settings_rounded, size: 30),
               ),
-              child: const Icon(Icons.search_off_outlined, size: 30),
             ),
           ],
         ),
